@@ -1,0 +1,318 @@
+
+
+
+\section{Bermudan swaption pricing in the Libor Market Model}
+
+While in section \ref{DerPrdcts}  we introduced the most common \emph{vanilla} 
+interest rate products, namely Caps, Floors and European Swaptions, the aim of the present 
+one is to describe some \emph{exotic} products which undergo the name of Bermudan Swaptions.\\ 
+
+Let us consider as before a tenor structure $T_0,\ldots,T_M$ and define an \emph{ending date} $T_e$ and a \emph{starting date} $T_s$ such that $T_0\leq T_s\leq T_e\leq T_M$.
+There are (at least) two possibility of setting up a Bermudan Swaption agreement: one with  \emph{fixed-maturity} and one with \emph{fixed-lenght}. A fixed-maturity  Bermudan Swaption is an agreement which gives the owner the right of chosing, at each $T_i$ with $s\leq i\leq e$,  whether to enter or not into an European Swaption over $[T_i,T_e]$, while a Bermudan Swaption with a fixed lenght of $m\in\mathbb{N}$ tenor periods, will give the owner the right to enter into an European Swaption over $[T_i,T_{i+m}]$. From now on, we will restrict to the case of fixed-maturity Bermudan Swaptions, extension to  fixed-lenght ones being straightforward\footnote{See for instance \cite{Pedersen99} for details.}.\\
+
+Entering a payer  $[T_i,T_e]$-European Swaption with strike $K$ and nominal value $\mathcal{N}$,   means to be payed at time  $T_i$ the quantity\footnote{For simplicity of notation, we omit functional dependence on $K$ and $\mathcal{N}$, considered as fixed throughout the following.} 
+\ba
+Swpt(T_i;T_i,T_e) \doteq \left(\sum_{j=i+1}^{e-1}\mathcal{N}\tau B(T_j,T_e)\right) (S(T_i,T_i,T_e)-K)_+
+\ea   
+where $S(T_i,T_i,T_e)$ is the swap rate corresponding to the chosen swap agreement.\\
+Thus, price at time $t<T_s$ of a  Bermudan swaption with starting date $T_s$ and fixed-maturity $T_e$, is given, under the measure $\mathbb{Q}^Y$ corresponding to a given price process $Y$ as numeraire, by 
+\ba\label{optimalstopping}
+U(t)=\sup_{\bar \tau\in\mathcal{T}^{s,e-1}}E^Y_{t}\left[\frac{Y(t)}{Y(\bar \tau)}Swpt(\bar \tau;\bar \tau,T_e)\right],
+\ea  
+where $\mathcal{T}^{s,e-1}$ is the set of stopping times $\bar \tau$ taking values in $\{T_s,\ldots,T_{e-1}\}$.
+Standard theory of optimal stopping time \cite{LambLap} ensures us that $U(0)$ is the solution of the following  dynamic programming problem:
+\begin{equation}\label{dynamicprogramming}\left\{\begin{aligned}
+U_{e-1}&= Swpt(T_{e-1};T_{e-1},T_e)\\
+U_i\:&=\max\left\{Swpt(T_{i};T_{i},T_e),E^Y_{T_i} \left[\frac{Y(T_i)}{Y(T_{i+1})}U_{i+1}\right]\right\}, {\forall\,i=s,\ldots,e-2}\\
+U_0\:&=E^Y_{T_0} \left[\frac{U_s}{Y(T_s)}\right]
+\end{aligned}\right.\end{equation}
+where for simplicity of notation we set $U(T_i)=U_i$. The dynamic programming formulation is clearly less synthetic than the optimal stopping time one but is of easier implementation. \\
+\subsection{Monte Carlo Pricing of Bermudan Swaptions with the Longstaff-Schwartz Algorithm}
+Due to the necessity of comparing at each time $T_i$ the exercise value $Swpt(T_{i};T_{i},T_e)$ to the continuation value  $V_i\doteq E^Y_{T_i} \left[\frac{Y(T_i)}{Y(T_{i+1})}U_{i+1}\right]$, pricing of early excercise derivatives on high dimensional underlying (here the forward rates) is usually performed \emph{via} Monte Carlo simulations or by means of trees methods. In Premia we implement the MC algorithm which was firstly  introduced by Longstaff and Schwartz in 2001 and which is based on a least squares approach. As this algorithm is widely described in the PremiaDoc section devoted to Monte Carlo methods for asset derivatives, here we will only report main ideas for self-consistency.\\
+Let us take a look to equation (\ref{dynamicprogramming}): in order to price a Bermudan Swaption, it is clear that we must be able to evaluate continuation values, a task which a priori is nor easy nor straightforward. However, by definition of conditional expectation, each continuation value $V_i$ can be seen  as the best $L^2$-approximation of the discounted $T_{i+1}$ price $Y(T_i)U_{i+1}/Y(T_{i+1})$ among the $\mathcal{F}_{T_i}$-measurable random variables. Thus,  following the authors, we choose an  $\mathcal{F}$-adapted  and square integrable stochastic process $X(t)$ together with a set of basis functions $\underline{e}=(e_1,\ldots,e_m)$ such that $E[e_i^2(X(t))]<\infty$ for all $t\leq T_e$ and we  set
+\begin{equation}\label{leastsquares}\begin{aligned}
+V_i&\approx \underline{a}_i\cdot \underline{e}(X(T_i))\\
+\underline{a}_i&=\mathrm{arg}\min_{\underline{a}\in\mathbb{R}^M}E\left[\frac{Y(T_i)}{Y(T_{i+1})}U_{i+1}-\underline{a}\cdot \underline{e}(X(T_i))\right]^2.
+\end{aligned}\end{equation} 
+In other words, for all $i=s,\ldots,e-1$  we find the best approximation of $$Y(T_i)U_{i+1}/Y(T_{i+1})$$ in the $m$-dimensional subset of $L^2$ spanned by $\{e_1(X(T_i),\ldots,e_m(X(T_i))\}$. 
+The goodness of such an approximation will rely on the \emph{``explanatory power''} of $X$ and on the choice of the basis functions. The Longstaff and Schwartz algorithm is then based on finding an approximated solution to the least squares problem (\ref{leastsquares}) by   considering $N$ independent samples of the forward rates stochastic process $L(t)=\{L(t,T_0,\tau),\ldots,L(t,T_{e-1},\tau)\}$ and of the \emph{explanatory variable} $X(t)$. It is then natural to approximate regression coefficients $\underline{a}_i$ by  
+\ba\label{MCleastsquares}
+\underline{a}_i\approx\underline{a}^N_i=\mathrm{arg}\min_{\underline{a}\in\mathbb{R}^M}\frac{1}{N}\sum_{n=1}^{N}\left[\frac{B^{(n)}(T_i)}{B^{(n)}(T_{i+1})}U^{(n)}_{i+1}-\underline{a}\cdot \underline{e}(X^{(n)}(T_i))\right]^2
+\ea
+where the superscript $^{(n)}$ stand for the $n$-th Monte Carlo call.
+Finally, the dynamic programming problem (\ref{dynamicprogramming}) rewrites,
+\begin{equation}\label{approxdynamicprogramming}\left\{\begin{aligned}
+U^{N,(n)}_{e-1}&= Swpt^{(n)}(T_{e-1};T_{e-1},T_e)\\
+U^{N,(n)}_i\:&=\max\left\{Swpt^{(n)}(T_{i};T_{i},T_e),\underline{a}^N_i\cdot \underline{e}(X^{(n)}(T_i))\right\}, {\forall\,i=s,\ldots,e-2}\\
+U^N_0\:&=\frac{1}{N}\sum_{n=1}^{N}\left[\frac{U^{(n)}_s}{B^{(n)}(T_s)}\right]
+\end{aligned}\right.\end{equation} 
+Cl\'ement, Lamberton and Protter \cite{CLProtter} have proved convergence of such an algorithm to the original problem when $N$ and $m$ go to $+\infty$. In particular, when $N\rightarrow\infty$, a central limit theorem holds.\\
+\subsection{Premia Implementation}
+Implementing the Longstaff ans Schwartz algorithm, require the choice of a set of basis functions and of an explanatory variable. \\
+
+Concerning the basis functions, Premia algorithm  allow for two options: a canonical  polynomial basis and an Hermite polynomial basis. At each timestep $T_i$, optimal coefficients $\underline{a}^N_i$, are found by regressing the $B^{(n)}(T_i)U^{(n)}_{i+1}/B^{(n)}(T_{i+1})$ over the $X^{(n)}(T_i)$. Moreover, for early steps of backward dynamic programming (regression for $T_{e-2}, T_{e-3},\ldots$) the price will not be very different from excercice value. With our algorithm it is thus possible to include the early excercise value in the regression basis, that is to set for the first basis function $e_1(X^{(n)}(T_i))=Swpt^{(n)}(T_{i};T_{i},T_e)$ for all $i$ greater than a given $\bar{i}$.\\ 
+
+On the other side, the choice of an explicatory variable is more tricky and constrained by the necessity of keeping $m$ quite small  in order to make regression fast. Let us recall that the swap rate $S(T_i,T_i,T_e)$ is indeed a function of $L(T_i,T_i,\tau),\ldots,L(T_i,T_{e-1},\tau)$ and then the more natural explanatory variable would be the Libor state vector $L(t)$. However, imagine to consider a Bermudan swaptions with $\tau=0.5$ years, $T_s=3.0$ yars, $T_e=8.0$ years. Following above reasoning, we would need two Libors for regressing at time $T_{e-2}$ but we would need nine libors to regress at time $T_s$. Thus, for maturities close to $T_s$ we must have $m\approx 10$ to take into account all relevant Libors. Whenever considering long maturity swaptions, things get even worse. That is why Pieterz et al. \cite{Pelsser03} suggest to regress directly on the Notional Paying Value (NPV) $Swpt(\cdot,\cdot,T_e)$ while Pedersen \cite{Pedersen99} do test regression on the Numeraire, the fixed leg value $K\left(\sum_{j=i+1}^{e-1}\mathcal{N}\tau B(T_j,T_e)\right)$ and the prices of some European options embedded in the Bermudan contract. Pedersen concludes that the European prices are not relevant and that a quadratic function in the Numeraire and in the fixed leg value is accurate enough.\\
+
+Premia users can set the explanatory variable to be 
+\begin{itemize}
+\item the notional paying value
+\item the underlying Brownian motion
+\item the Numeraire.
+\end{itemize}
+In table \ref{PremiavsPelsser} we report Premia pricing results and compare them to the ones obtained by Pietersz. et al. \cite{Pelsser03} with a Longstaff and Schwartz algorithm and their drift approximation method. In particular, we take a 1-Factor model with flat volatility (15\%) and initial forward rate values (5\%); the tenor $\tau$ is 0.5 years and the SDE is discretized with 10 timesteps for each tenor period. We price At-The-Money  Bermudan swaptions for various choices of starting and ending times $T_s$ and $T_e$ and  changing the explanatory variable (Brownian, NPV, Numeraire). Regression basis is four dimensional ($m=4$) and we used 10000 Monte Carlo calls.\\
+
+\underline{R\small{EMARK}}  We strongly reccomend to include NPV  in regression basis when regressing onto the Brownian motion or the Numeraire, expecially for short lenght swaption, in which the difference between the european and the bermudan contract is small. On the other side, when regressing on the NVP, take care NOT to include the payoff into regression\footnote{It is sufficient to set $T_{\bar i}=T_{e-1}$.}  because it is likely to waste the performance of regression (Cholesky routine used for regression could return errors). For instance, regressing on the Numeraire, a choice $T_{\bar i}=5$ years is good enough either for a swaption with $(T_s,T_e)=(5,8)$ and for a $(1,8)$ swaption. When the lenght of the longest swaption $(T_s,T_e)$ is short, regression on Brownian motion seems to be more stable with respect to changes in   $T_{\bar i}$ than regression on the Numeraire.
+\begin{table}[h!]\label{PremiavsPelsser}
+\begin{tabular}{cc}
+\hline
+Pietersz et al. & Premia\\ 
+\hline
+\begin{tabular}{cccc}
+$[T_s,T_e]$& Drift & L-S & Std\\
+           &Approx &     & Err\\
+\hline
+1,2 &29.40  &28.85 &0.42\\  
+1,3 &64.33  &62.78 &0.83\\  
+1,4 &101.66 &101.51 &1.29\\  
+3,4 &44.09  &43.59 &0.70\\  
+%1,5 &141.22 &137.95 &1.68\\  
+%3,5 &89.25  &86.75 &1.34\\  
+1,6 &182.16 &179.48 &2.22\\  
+3,6 &134.88 &136.43 &2.01\\  
+5,6 &50.93  &50.79  &0.86\\  
+%1,7 &224.40 &221.38 &2.61\\  
+%3,7 &181.20 &177.11 &2.53\\  
+%5,7 &101.84 &100.59 &1.64\\  
+1,8 &266.63 &266.35 &3.15\\  
+3,8 &226.55 &226.94 &3.14\\  
+5,8 &151.23 &151.13 &2.38\\  
+7,8 &54.20  &53.70 &0.96\\ 
+\end{tabular}&
+\begin{tabular}{ccc}
+Brown.&Numer.&NPV\\&&\\
+\hline
+29,36&28,91&29,35\\
+64,66&63,61&64,75\\
+102,98&102,36&103,14\\
+43,74&43,70&43,74\\
+185.65&184,59&185,67\\
+134,84& 132,40&134.96\\
+49,66& 49,65& 49,66\\
+264,00& 262,11&263,83\\
+223.85& 219,54&223,94\\
+148.07& 148.10&148,13\\
+52.50&52.48 &52,49\\
+\end{tabular}\\
+\hline
+\end{tabular}
+\caption{Fixed-maturity Bermudan Swaptions prices for different starting and ending time. Pietersz, Pelsser and von Mortengel \cite{Pelsser03} Drift Approximation and Longstaff-Schwartz 1 Factor results compared to Premia 1-factor Longstaff-Schwartz with different choices for the explanatory variable.}
+\end{table}
+
+
+\subsection{List Of Inputs}
+Inputs required by the algorithm are
+\begin{itemize}
+\item \emph{double} the tenor $\tau$ (in yrs) 
+\item \emph{double} the starting date $T_s$, called ``swaption maturity'' (yrs)
+\item \emph{double} the ending date $T_e$, called ``swap maturity'' (yrs)
+\item \emph{int} the number of maturities (that is $T_e/\tau$)
+\item \emph{double} the payoff as regressor $T_{\bar i}$: the time  after which regression will
+include the NPV in the basis  
+\item \emph{char*} the pricing measure. Numeraire can be either the Jamshidian 1997's roll-over money account
+$J(T_i)=1/(\prod_{l=0}^{i-1}B(T_i,T_{i+1}))$ (spot measure) or the bond $B(\cdot,T_e)$ (terminal forward measure).
+\item \emph{char*} the explanatory variable: Numeraire, NPV or Brownian Motion
+\item  \emph{long} the number of Monte Carlo calls for pricing and regression
+\item \emph{char*} the regression basis: canonical or Hermite polynomials
+\item  \emph{int} the dimension $m$ of the regression basis $\underline e(\cdot)$
+\item  \emph{int} the number of step to be used for SDE discretization over $[T_i,T_{i+1}]$
+\item \emph{double} the number of factors
+\item \emph{double} the strike $K$   
+\end{itemize}
+
+See ``lmm\_bermudatest.c'' for an example.
+
+
+\subsection{Programming interface}
+
+
+\subsubsection{C API of the pricer}
+
+We define a simpler interface to the bermudan swaption pricer as follow:
+
+\small{
+\begin{verbatim}
+double lmm_swaption_payer_bermudan_LS_pricer(tenor ,numberTimeStep, 
+                 numFac, swaptionMat, swapMat, payoff_as_Regressor, numberMCPaths, 
+                 Regr_Basis_Dimension, basis_name , measure_name , Explanatory , K)
+\end{verbatim}
+}
+
+Arguments description:
+\begin{itemize}
+\item $tenor$ is the period in years of the rate (usually 3 or 6 months); type:double 
+\item $numberTimeStep$ number of time steps in the euler scheme; type:int 
+\item $numFac$ is the number of factors max 2; type: int
+\item $swaptionMat$ is the swaption maturity in years; type: double
+\item $swapMat$ is the swap maturity in years ; type: double 
+\item $numberMCPaths$ number of monte carlo paths; type:long
+\item $payoff\_as\_Regressor$ in (years) maturity after which payoff is included in regression
+\item $Regr\_Basis\_Dimension$ finite-dimensional approximation of $L^2$ ; type: int
+\item $basis\_name$ basis name; type: char*
+\item $measure\_name$ measure name: type: char*
+\item $Explanatory$ Explanatory variable for regression B=Brownian, S=Nominal Swap Paying Value, N=Numeraire;
+\item $K$ strike; type:double
+\end{itemize}
+
+{\bf Remarks:}
+\begin{enumerate}
+\item To price a caplet just call the function with $swapMat=swaptionMat+tenor$
+\item $swapMat$ must be equal to $k*tenor$ with $k$ an integer
+\item $swaptionMat$ must be equal to $k*tenor$ with $k$ an integer
+\item $payoff\_as\_Regressor$ must be equal to $k*tenor$ with $k$ an integer
+\end{enumerate}
+
+\subsubsection{calling the bermudan swaption pricer from a C program}
+
+\small{
+
+\begin{verbatim}
+************************************************
+ *   Bermudean Swaptions Pricer             
+ *
+ *   -Spot Probability Measure (Numeraire=Roll-Over Bond)
+ *   -Possibility to include Martingale Discretization
+ *   -Bermudean with fixed ending date.
+ *   Nicola Moreni, August 2004 
+ *
+ ****************************************************/ 
+ 
+
+#include<stdio.h>
+
+#include"lmm_header.h"
+#include"lmm_volatility.h"
+#include"lmm_libor.h"
+#include"lmm_random_generator.h"
+#include"lmm_products.h"
+#include"lmm_numerical.h"
+#include"lmm_zero_bond.h"
+#include"lmm_bermudaprice.h"
+
+/*REMINDER:
+-lmm_header.h contains structures definition: volatility, libor, swaption
+-lmm_vol.c lmm_products.c lmm_libor.c  contain allocation/initialization routines
+-lmm_numerical.c contains evolution routines, european swaption pricers
+-lmm_mathtools.c contains random number generator, cholesky sqrt....
+In the present file file all parametres are given an initial value and pricing routine 
+is called
+*/
+  
+int main()
+{
+
+  float  tenor=0.5;               // tenor is the lenght of the rate usually 3 months or 6 months 
+  int numberTimeStep=10;
+  int numFac=2;
+  double  swaptionMat=1.0;        //(years)
+  double  swapMat=8.0;            //(years)
+  double payoff_as_Regressor=5.0; //(years) Maturity after which payoff is included in regression
+  double  priceVal=0.20;
+  double K=0.05;                  //strike
+  long numberMCPaths=10000;
+  int Regr_Basis_Dimension=4 ;    //finite-dimensional approx. of L² 
+  char Explanatory='N';           //Explanatory variable for regression B=Brownian, 
+                                  //                 S=Nominal Swap Paying Value, N=Numeraire;
+  char* basis_name="HerD";        //Hermite basis
+  char* measure_name="Spot" ;     // spot "    "    "    "
+  double p;
+
+  
+  
+  p=lmm_swaption_payer_bermudan_LS_pricer(tenor ,numberTimeStep, numFac, swaptionMat , swapMat ,  
+                   payoff_as_Regressor , numberMCPaths , Regr_Basis_Dimension , basis_name ,
+                   measure_name , Explanatory , K); 
+
+  printf("Bermudean swaption with terminal time %f and exercise\n",swapMat);
+  printf("each %f year starting from %f ,is, under %s measure\n %f bps.\n",tenor,swaptionMat 
+	                                                                    , measure_name , p*10000);
+  
+  
+  
+  return(EXIT_SUCCESS);
+}
+\end{verbatim}
+
+}
+
+
+we obtain the following result for a $2$ factors model, the first one flat equal to $20\%$ (volatility structure different from the one used for other numerical examples).
+
+\small{
+
+\begin{verbatim}
+$lmm_bermuda_example 
+
+ WARNING: following errors found
+
+Bermudean swaption with terminal time 8.000000 and exercise
+each 0.500000 year starting from 1.000000 ,is, under Spot measure
+ 426.344032 bps.
+$ 
+\end{verbatim} 
+}
+
+
+
+
+
+\subsubsection{A Scilab function for the bermudan swaption pricer}
+
+We defined a scilab function (in file lmm\_scilab.sci) for the swaption bermuda pricer which interface is as follow:
+
+
+\small{
+\begin{verbatim}
+lmm_bermuda_LS_sci(period , nb_fac , swpt_maturity , swp_maturity , strike , payoff_Reg ,Regr_basis_dim )
+\end{verbatim} 
+}
+
+It returns the price in {\it bps} of the swaption and the input parameters are 
+
+\begin{itemize}
+\item {\it period} is the period length of the rate; type:double
+\item {\it nb\_fac} is the number of factors; type: int
+\item {\it swpt\_maturity} is the swpation maturity in years; type: double
+\item {\it swp\_maturity} is th swap maturity in years; type: double
+\item {\it strike} is the strike; type:double
+\item {\it payoff\_Reg} is the time  after which regression will include the NPV in the basis; type: double
+\item {\it   Regr\_basis\_dim} is the dimension of the regression basis
+\end{itemize}
+
+
+{\bf Loading the scilab functions}: first you should compile the library, report to the README file. Then at the scilab ``File'' menu click on ``File Operations'' then select the file ``lmm\_scilab.sci'' and click on ``Getf'' buttom, it will produce something like this in ``scilex''
+\small{
+\begin{verbatim} 
+-->;getf("/home/der_mif/jose/recherche/taux/prog/cprog/bgmPremia/code/lmm_scilab.sci");
+\end{verbatim} 
+}
+
+all functions within this file are now available at the prompt or can be called from a scilab program. 
+ 
+We illustrate the use of the function presented above. 
+
+We obtained the following result from scilab-2.7:
+
+\small{
+\begin{verbatim}
+-->b=lmm_bermuda_LS_sci(0.5, 2, 1.,8., 0.05, 5. , 4)                             
+shared archive loaded
+Link done
+ b  =
+ 
+    426.40389  
+ 
+-->
+\end{verbatim} 
+}
+ 

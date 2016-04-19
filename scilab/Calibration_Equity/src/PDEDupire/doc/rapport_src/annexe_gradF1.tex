@@ -1,0 +1,449 @@
+\section{Calcul du gradient de $F_1$ \label{gradF1}}
+\label{ANN:GRADF1}
+
+On d\'ecrit dans cette annexe le calcul du gradient de la fonction 
+$$
+F_1(\sigma) = \| \, \nabla \sigma \, \|^2.
+$$
+Pour \'eviter toute confusion, nous notons $\Sigma$ l'ensemble 
+des degr\'es de libert\'e de la volatilit\'e et $\sigma$ la 
+fonction de deux variables associ\'ee.
+
+\subsection{Premi\`ere approche}
+
+Regardons dans un premier temps le calcul du gradient de $F_1$.
+\begin{equation*}
+\begin{split}
+F_1(\Sigma) &= \| \, \nabla \sigma \, \|^2 \\
+&= \iint\limits_{R} \biggl [\biggl 
+(\frac{\partial\sigma}{\partial y}(y,t)\biggr)^2 + 
+\biggl(\frac{\partial\sigma}{\partial t}(y,t)\biggr)^2 
+\biggr]\,dy\,dt\\
+&= \sum_{i=1}^{n} \sum_{j=1}^{m} \iint\limits_{R_{ij}} 
+\biggl [ \biggl ( \sum_{p=1}^3 \sum_{q=0}^3 
+p\gamma_{pq}^{ij}(y-y_{i-1})^{p-1}(t-t_{j-1})^q \biggr )^2\\
+& \phantom{= \sum_{i=1}^{n} \sum_{j=1}^{m} \iint\limits_{R_{ij}} 
+\biggl [} + \biggl (\sum_{p=0}^3 \sum_{q=1}^3 
+q\gamma_{pq}^{ij}(y-y_{i-1})^p(t-t_{j-1})^{q-1} 
+\biggr)^2 \biggr] \,dy \,dt\\
+&=  \sum_{i=1}^{n} \sum_{j=1}^{m} \biggl ( \int_{y_{i-1}}^{y_i} 
+\int_{t_{j-1}}^{t_j} A(y,t) \,dy\,dt + 
+\int_{y_{i-1}}^{y_i} \int_{t_{j-1}}^{t_j} B(y,t) \,dy\,dt \biggr)
+\end{split}
+\end{equation*}
+o\`u 
+\begin{eqnarray*}
+A(y,t) &=&  \biggl (\sum_{p=1}^3 \sum_{q=0}^3 
+p\gamma_{pq}^{ij}(y-y_{i-1})^{p-1}(t-t_{j-1})^q \biggr)^2,\\
+B(y,t) &=&  \biggl (\sum_{p=0}^3 \sum_{q=1}^3 
+q\gamma_{pq}^{ij}(y-y_{i-1})^p(t-t_{j-1})^{q-1} \biggr)^2.
+\end{eqnarray*}
+Apr\`es calculs, on obtient une expression de $F_1$ comme fonction 
+quadratique des $\gamma^{ij}$~:
+\begin{eqnarray*}
+F_1(\Sigma) &=& \sum\limits_{i,j} (\gamma^{ij})^T Q^{ij} \gamma^{ij}
+\end{eqnarray*}
+o\`u  $\gamma_{ij}$ est le vecteur form\'e par les coefficients 
+$\gamma^{ij}_{pq}$. Puis, gr\^ace aux syt\`emes d'\'equations 
+(\ref{syst_spline1}) \`a (\ref{syst_spline4}) et \`a l'\'equation 
+(\ref{coeffs}), on peut exprimer les $\gamma^{ij}$ lin\'eairement 
+par rapport au vecteur de param\`etres $\Sigma$~:
+\begin{eqnarray*}
+\gamma^{ij} &=& M^{ij}\cdot \Sigma.
+\end{eqnarray*}  
+On obtient finalement~:
+\begin{eqnarray*}
+F_1(\Sigma) &=& \sum\limits_{i,j} \Sigma^T[(M^{ij})^T 
+Q^{ij} M^{ij}]\Sigma.
+\end{eqnarray*}
+Mais tous ces calculs demandent un travail vraiment important~: nous 
+pr\'esentons ci-dessous une solution alternative beaucoup simple 
+\`a mettre en oeuvre.
+
+\subsection{Une expression simplifi\'ee du probl\`eme}
+
+Au lieu de p\'enaliser le gradient dans la fonction objectif, on 
+choisit de p\'enaliser la somme des carr\'es des d\'eriv\'ees 
+premi\`eres calcul\'ees aux points de la grille~: 
+\begin{eqnarray*}
+F(\sigma) &=& G(\sigma) + \lambda\sum\limits_{i,j}(\sigma_{y,ij}^2 
++ \sigma_{t,ij}^2)
+\end{eqnarray*}
+avec, pour tout point $(y_i,T_j)$ de la grille~:
+\begin{xalignat*}{2}
+\sigma_{y,ij} &= \frac{\partial \sigma}{\partial y}(y_i,T_j) 
+& \qquad \sigma_{t,ij} &= 
+\frac{\partial \sigma}{\partial T}(y_i,T_j).\\
+\end{xalignat*}
+On note 
+$$
+F_1(\Sigma) =  \sum\limits_{i,j}(\sigma_{y,ij}^2 
++ \sigma_{t,ij}^2).
+$$
+On peut \'ecrire 
+\begin{eqnarray*}
+F_1(\Sigma) &=& \sum\limits_{i,j}\sigma_{\cdot,ij}^T\sigma_{\cdot,ij}.
+\end{eqnarray*}
+D'autre part, gr\^ace aux syst\`emes d'\'equations 
+(\ref{syst_spline1}) \`a (\ref{syst_spline4}), on peut exprimer ces 
+d\'eriv\'ees lin\'eairement en fonction du vecteur de param\`etres 
+$\Sigma$~:
+\begin{eqnarray*}
+\sigma_{\cdot,ij} = N^{ij}\cdot \Sigma.
+\end{eqnarray*}
+
+\begin{Rem}
+$N^{ij}$ est une matrice de taille 
+$2\times ((n+1)(m+1)+2(n+1)+2(m+1)+4) = 2(n+3)(m+3)$.
+\end{Rem}
+
+On a donc~: 
+\begin{align*}
+F_1(\Sigma) &= \sum\limits_{i,j}(N^{ij}\cdot \Sigma)^T \cdot 
+(N^{ij}\cdot \Sigma)\\
+&=  \sum\limits_{i,j}\Sigma^T(N^{ij})^T N^{ij}\cdot \Sigma,
+\end{align*}
+et en d\'erivant~: 
+\begin{eqnarray}
+\nabla F_1(\Sigma) &=& \sum\limits_{i,j}(N^{ij})^T N^{ij}\cdot 
+\Sigma. 
+\label{grad_F1}
+\end{eqnarray} 
+Le calcul du gradient de $F_1$ se r\'esume donc au calcul des 
+matrices $N^{ij}$.
+
+\subsubsection*{Calcul de la matrice $N^{ij}$}
+
+Ecrivons les syst\`emes (\ref{syst_spline1}) et (\ref{syst_spline2}) 
+pour la fonction $\sigma(y,t)$ et ses d\'eriv\'ees premi\`eres. Pour 
+$j=0,...,m$, 
+\begin{eqnarray}
+\lefteqn{\Delta y_{i-1}\sigma_{y,i+1,j}+
+2(\Delta y_{i-1}+\Delta y_i)\sigma_{y,ij} + 
+\Delta y_i \sigma_{y,i-1,j} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta y_{i-1}}{\Delta y_i}
+(\sigma_{i+1,j}-\sigma_{i,j}) + \frac{\Delta y_i}{\Delta y_{i-1}}
+(\sigma_{i,j}-\sigma_{i-1,j})\biggr ],~ i=1,...,n-1;
+\label{syst_spline1_bis}
+\end{eqnarray}
+pour $i=0,...,n$, 
+\begin{eqnarray}
+\lefteqn{\Delta t_{j-1}\sigma_{t,i,j+1}+
+2(\Delta t_{j-1}+\Delta t_j)\sigma_{t,ij} + 
+\Delta t_j \sigma_{t,i,j-1} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta t_{j-1}}{\Delta t_j}
+(\sigma_{i,j+1}-\sigma_{i,j}) + \frac{\Delta t_j}{\Delta t_{j-1}}
+(\sigma_{i,j}-\sigma_{i,j-1})\biggr ],~ j=1,...,m-1.
+\label{syst_spline2_bis}
+\end{eqnarray}
+En y ajoutant les conditions aux bords, (\ref{syst_spline1_bis}) peut 
+s'\'ecrire sous la forme matricielle~: 
+\begin{eqnarray}
+\lefteqn{A\sigma_{y,\cdot j} + \Delta y_1 \sigma_{y,0j}e_1 + 
+\Delta y_{n-1}\sigma_{y,nj}e^{n-1}=}\nonumber \\
+&& 3B\sigma_{\cdot j}-3\frac{\Delta y_1}{\Delta y_0}\sigma_{0j}e_1 + 
+3\frac{\Delta y_{n-2}}{\Delta y_{n-1}}\sigma_{nj}e_{n-1}
+\end{eqnarray}
+\begin{eqnarray*}
+A &=& \begin{pmatrix}
+(\Delta y_0 + \Delta y_1) & \Delta y_0 & 0 & \ldots & \ldots & 0 \\
+\Delta y_2 & (\Delta y_1+\Delta y_2) &\Delta y_1 & 0 & \ldots & 0 \\
+0 & \ddots & \ddots & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & \ddots & 0 \\
+\vdots &  & \ddots & \ddots & \ddots & \Delta y_{n-3}\\
+0 & \ldots & \ldots & 0 & \Delta y_{n-1} & 
+(\Delta y_{n-2}+\Delta y_{n-1})
+\end{pmatrix},
+\end{eqnarray*}
+\begin{eqnarray*}
+B &=& \begin{pmatrix}
+\biggl ( \frac{\Delta y_1}{\Delta y_0}-\frac{\Delta y_0}
+{\Delta y_1}\biggr ) & \frac{\Delta y_0}{\Delta y_1} & 0 
+& \ldots & \ldots & 0 \\
+-\frac{\Delta y_2}{\Delta y_1} & \biggl ( \frac{\Delta y_2}
+{\Delta y_1}-\frac{\Delta y_1}{\Delta y_2}\biggr ) & 
+\frac{\Delta y_1}{\Delta y_2} & 0 & \ldots & 0 \\
+0 & \ddots & \ddots & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & \ddots & 0 \\
+\vdots &  & \ddots & \ddots & \ddots & \frac{\Delta y_{n-3}}
+{\Delta y_{n-2}}\\
+0 & \ldots & \ldots & 0 & -\frac{\Delta y_{n-1}}{\Delta y_{n-2}} 
+& \biggl ( \frac{\Delta y_{n-1}}{\Delta y_{n-2}}
+-\frac{\Delta y_{n-2}}{\Delta y_{n-1}}\biggr )
+\end{pmatrix}
+\end{eqnarray*}
+et
+\begin{alignat*}{2}
+e_1 &= \begin{pmatrix} 1\\0\\ \vdots \\0 \end{pmatrix}, 
+&\qquad e_{n-1} &= \begin{pmatrix} 0\\ \vdots \\0\\1 \end{pmatrix}.
+\end{alignat*}
+
+\begin{Rem}
+$A$ et $B$ sont des matrices carr\'ees de taille $n-1$~; $e_1$ et 
+$e_{n-1}$ sont des vecteurs de taille $n-1$.
+\end{Rem}
+
+On cherche \`a pr\'esent \`a exprimer $\Sigma_{y,\cdot j}$ 
+lin\'eairement en fonction du vecteur de param\`etres $P$. Rappelons 
+que le vecteur $P$ de taille $(n+3)(m+3)$ 
+contient les donn\'ees permettant de d\'efinir la fonction 
+d'interpolation $\sigma$~:
+\begin{eqnarray*}
+P &= \begin{pmatrix}
+\Sigma_{\cdot 0}\\ \vdots \\ \Sigma_{\cdot m} \\ 
+\Sigma_{y,0\cdot} \\ 
+\Sigma_{y,n\cdot} \\ \Sigma_{t,\cdot 0} \\ 
+\Sigma_{t,\cdot m} \\ \sigma_{yt,00} \\ \sigma_{yt,n0} \\ 
+\sigma_{yt,0m} \\ \sigma_{yt,nm}\end{pmatrix}.
+\end{eqnarray*}
+On construit les matrices $\mathcal{A}$ et $\mathcal{B}_j$ \`a partir 
+de $A$ et $B$~:
+\setlength{\fboxsep}{24pt}
+\begin{eqnarray*}
+\mathcal{A} &=& \begin{pmatrix} 
+1 & \begin{matrix} 0 &\ldots & 0 \end{matrix} & 0\\
+\begin{matrix} \Delta y_1\\0\\ \vdots\\0 \end{matrix} & 
+\raisebox{-1ex}{\fbox{\Huge A}} & \begin{matrix} 0\\ \vdots\\0 \\ 
+\Delta y_{n-1} \end{matrix}\\
+0 &  \begin{matrix}0 &\ldots &0 \end{matrix} & 1
+\end{pmatrix}
+\end{eqnarray*}
+et on d\'efinit $\mathcal{B}_j$ par la matrice~: 
+\setlength{\fboxsep}{31.8pt}
+\setcounter{MaxMatrixCols}{20}
+{\tiny
+\begin{eqnarray*}
+&&\begin{pmatrix}
+\begin{matrix} 
+0 & \ldots & 0 & \mathbf{0} \\ 
+\vdots & & \vdots & \mathbf{-3\frac{\Delta y_1}{\Delta y_0}} \\ 
+\vdots & & \vdots & \mathbf{0} \\ 
+\vdots & & \vdots & \mathbf{\vdots} \\ 
+\vdots & & \vdots & \mathbf{0} \\  
+0 & \ldots & 0 & \mathbf{0} 
+\end{matrix} &
+\begin{matrix}
+\begin{matrix} \mathbf{0} & \mathbf{\ldots} & \mathbf{\ldots} & 
+\mathbf{\ldots} & \mathbf{0} \end{matrix}\\
+\raisebox{-1ex}{\fbox{\large $\mathbf{3B}$}}\\
+\begin{matrix} \mathbf{0} & \mathbf{\ldots} & \mathbf{\ldots} & 
+\mathbf{\ldots} & \mathbf{0} \end{matrix}
+\end{matrix} &
+\begin{matrix}
+\mathbf{0} & 0 & \ldots & 0 & \mathbf{1} & 0 & \ldots & 0 
+&\mathbf{0} & 0 & \ldots & 0 \\
+\mathbf{\vdots} & \vdots & & \vdots & \mathbf{0} & \vdots & 
+& \vdots &\mathbf{\vdots} & \vdots & & \vdots \\
+\mathbf{\vdots} & \vdots & & \vdots & \mathbf{\vdots} & \vdots & 
+& \vdots & \mathbf{\vdots} & \vdots & & \vdots \\
+\mathbf{0} & \vdots & & \vdots & \mathbf{\vdots} & \vdots & 
+& \vdots & \mathbf{\vdots} & \vdots & & \vdots \\
+\mathbf{3\frac{\Delta y_{n-2}}{\Delta y_{n-1}}} & \vdots & 
+& \vdots & \mathbf{\vdots} & \vdots & & \vdots & \mathbf{0} 
+& \vdots & & \vdots \\
+\mathbf{0} & 0 & \ldots & 0 & \mathbf{0} & 0 & \ldots & 0 
+& \mathbf{1} & 0 & \ldots & 0
+\end{matrix}
+\end{pmatrix}.\\
+&&\phantom{xxxxxxxxxxxxx} 
+\underbrace{\phantom{aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}} 
+\phantom{iiiiiiiiiiiiiiiiiiii} \Uparrow 
+\phantom{iiiiiiiiiiiiiiiiiiii} \Uparrow \\
+&&\phantom{xxxxxxxxxxxxxxxxx} \text{indices correspondant \`a} 
+\quad \sigma_{.j} \quad \text{dans}\quad p  
+\phantom{iiiiiiiiiiiiiiiii} \text{indice de} \quad \sigma_{y,0j} 
+\phantom{iiiiiiii}  \text{indice de} \quad \sigma_{y,Nj}\\
+&&\phantom{xxxxxxxxxxxxxxxxx} \text{de}\quad j(n+1)+1 \quad 
+\text{\`a} \quad (j+1)(n+1) \phantom{iiiiiiiiiiiiiiiii} 
+(n+1)(m+1) \phantom{iiiiiiii} (n+2)(m+1)\\ &&
+\phantom{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+ +j+1  \phantom{iiiiiiiiiiiiiiiiiii} +j+1 
+\end{eqnarray*}}
+\setlength{\fboxsep}{3pt}
+\setcounter{MaxMatrixCols}{10}
+On a alors~:
+\begin{eqnarray}
+\mathcal{A} \Sigma_{y,\cdot j} &=& \mathcal{B}_j p. 
+\label{lineaire1_p}
+\end{eqnarray}
+De la m\^eme mani\`ere, on construit une \'equation matricielle \`a 
+partir de (\ref{syst_spline2_bis}). De (\ref{syst_spline2_bis}), on 
+d\'eduit~: 
+\begin{eqnarray}
+\lefteqn{C\sigma_{t,i \cdot} + \Delta t_1 \sigma_{t,i0}f_1 + 
+\Delta t_{m-1}\sigma_{t,im}f_{m-1}=}\nonumber \\
+&& 3D\sigma_{i \cdot}-3\frac{\Delta t_1}{\Delta t_0}\sigma_{i0}f_1 + 
+3\frac{\Delta t_{m-2}}{\Delta t_{m-1}}\sigma_{im}f_{m-1}
+\end{eqnarray}
+o\`u 
+\begin{eqnarray*}
+C &=& \begin{pmatrix}
+(\Delta t_0 + \Delta t_1) & \Delta t_0 & 0 & \ldots & \ldots & 0 \\
+\Delta t_2 & (\Delta t_1+\Delta t_2) &\Delta t_1 & 0 & \ldots & 0 \\
+0 & \ddots & \ddots & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & \ddots & 0 \\
+\vdots &  & \ddots & \ddots & \ddots & \Delta t_{m-3}\\
+0 & \ldots & \ldots & 0 & \Delta t_{m-1} & (\Delta t_{m-2}+
+\Delta t_{m-1})
+\end{pmatrix},
+\end{eqnarray*}
+\begin{eqnarray*}
+D &=& \begin{pmatrix}
+\biggl ( \frac{\Delta t_1}{\Delta t_0}-\frac{\Delta t_0}
+{\Delta t_1}\biggr ) & \frac{\Delta t_0}{\Delta t_1} & 0 
+& \ldots & \ldots & 0 \\
+-\frac{\Delta t_2}{\Delta t_1} & \biggl 
+( \frac{\Delta t_2}{\Delta t_1}-\frac{\Delta t_1}{\Delta t_2}\biggr ) 
+& \frac{\Delta t_1}{\Delta t_2} & 0 & \ldots & 0 \\
+0 & \ddots & \ddots & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & \ddots & 0 \\
+\vdots &  & \ddots & \ddots & \ddots & 
+\frac{\Delta t_{m-3}}{\Delta t_{m-2}}\\
+0 & \ldots & \ldots & 0 & -\frac{\Delta t_{m-1}}{\Delta t_{m-2}} & 
+\biggl ( \frac{\Delta t_{m-1}}{\Delta t_{m-2}}
+-\frac{\Delta t_{m-2}}
+{\Delta t_{m-1}}\biggr )
+\end{pmatrix}
+\end{eqnarray*}
+et
+\begin{alignat*}{2}
+f_1 &= \begin{pmatrix} 1\\0\\ \vdots \\0 \end{pmatrix}, 
+&\qquad f_{m-1} &= \begin{pmatrix} 0\\ \vdots \\0\\1 \end{pmatrix}.
+\end{alignat*}
+
+\begin{Rem}
+$C$ et $D$ sont des matrices carr\'ees de taille $m-1$~; $f_1$ et 
+$f_{m-1}$ sont des vecteurs de taille $m-1$.
+\end{Rem}
+
+On cherche \`a pr\'esent \`a exprimer $\Sigma_{t,i \cdot}$ 
+lin\'eairement en fonction du vecteur de param\`etres $P$ gr\^ace \`a 
+l'\'equation 
+\begin{eqnarray}
+\mathcal{C} \Sigma_{t,i \cdot} &=& \mathcal{D}_i P. 
+\label{lineaire2_p}
+\end{eqnarray}
+Pour obtenir cette \'equation il faut d\'efinir $\mathcal{C}$ par 
+\setlength{\fboxsep}{24pt}
+\begin{eqnarray*}
+\mathcal{C} &=& \begin{pmatrix} 
+1 & \begin{matrix} 0 &\ldots & 0 \end{matrix} & 0\\
+\begin{matrix} \Delta t_1\\0\\ \vdots\\0 \end{matrix} & 
+\raisebox{-1ex}{\fbox{\Huge C}} & \begin{matrix} 0\\ \vdots\\0 \\ 
+\Delta t_{m-1} \end{matrix}\\
+0 &  \begin{matrix}0 &\ldots &0 \end{matrix} & 1
+\end{pmatrix}
+\end{eqnarray*}
+et $\mathcal{D}_i$ par la matrice 
+\newcommand{\matZeros}{\vdots ~~~~ \vdots}
+\setlength{\fboxsep}{3pt}
+\setcounter{MaxMatrixCols}{20}
+{\tiny
+\begin{align*}
+&\begin{pmatrix}
+0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0
+& ~~~~~
+& 0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0 
+& \mathbf{1} 
+& 0 \ldots 0 
+& \mathbf{0} 
+& 0 \ldots 0 
+\\
+\matZeros 
+&\begin{matrix}  \mathbf{-3\frac{\Delta t_1}{\Delta t_0}} 
+\\\mathbf{0} \\  \mathbf{\vdots} \\   \mathbf{\vdots} \\  
+\mathbf{\vdots} \\  \mathbf{\vdots} \\  \mathbf{\vdots} 
+\end{matrix} 
+& \matZeros 
+& \raisebox{-20ex}{\vertBox{$\mathbf{1^{\text{{\bf \`ere}}}}$ 
+{\bf colonne de} $\mathbf{3D}$ \phantom{iiiiiiiiiiiiiiiii}}} 
+& \matZeros
+& \ldots
+& \matZeros 
+& \raisebox{-20ex}{\vertBox{$\mathbf{(m-1)^{\text{{\bf \`eme}}}}$ 
+{\bf colonne de} $\mathbf{3D}$ \phantom{iiii}}}
+& \matZeros 
+& \begin{matrix} \mathbf{0} \\  \mathbf{\vdots} \\  
+\mathbf{\vdots} \\ 
+\mathbf{\vdots} \\  \mathbf{\vdots} \\ \mathbf{\vdots} \\  
+\mathbf{3\frac{\Delta t_{m-2}}{\Delta t_{m-1}}} \end{matrix} 
+& \matZeros 
+& \begin{matrix}  \mathbf{0} \\  \mathbf{\vdots} \\  
+\mathbf{\vdots} \\ 
+\mathbf{\vdots} \\  \mathbf{\vdots} \\ \mathbf{\vdots} \\   
+\mathbf{\vdots} \end{matrix} 
+& \matZeros 
+& \begin{matrix}  \mathbf{\vdots} \\   \mathbf{\vdots} \\ 
+\mathbf{\vdots} \\ \mathbf{\vdots} \\  \mathbf{\vdots} \\  
+\mathbf{\vdots} \\  \mathbf{0} \end{matrix} 
+& \matZeros \\
+0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0
+& ~~~~~
+& 0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0
+& \mathbf{0} 
+& 0 \ldots 0 
+& \mathbf{0} 
+& 0 \ldots 0 
+& \mathbf{1}
+& 0 \ldots 0
+\end{pmatrix}. \\
+& \phantom{iiiiiiiiiiiiiiii} \uparrow 
+\phantom{iiiiiiiiiiiiiiiiiii} \uparrow  
+\phantom{iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii} \uparrow  
+\phantom{iiiiiiiiiiiiiiiiiiiiii} \uparrow  
+\phantom{iiiiiiiiiiiiiiiiiiii} \uparrow  
+\phantom{iiiiiiiiiiiii} \uparrow \\
+& \phantom{iiiiiiiiiiiiiiii} \text{\begin{sideways} indice 
+de $\sigma_{i0}$ \end{sideways}}  \phantom{iiiiiiiiiiiiiiiiiii} 
+\text{\begin{sideways} indice de $\sigma_{i1}$ \end{sideways}}  
+\phantom{iiiiiiiiiiiiiiii}\raisebox{10ex}{$\ldots$}
+\phantom{iiiiiiiiiiiiiiiii} \text{\begin{sideways} indice 
+de $\sigma_{i,m-1}$ \end{sideways}}  
+\phantom{iiiiiiiiiiiiiiiiiiiiiii} \text{\begin{sideways} indice de 
+$\sigma_{im}$ \end{sideways}}  \phantom{iiiiiiiiiiiiiiiiiiiii} 
+\text{\begin{sideways} indice de $\sigma_{t,i0}$ \end{sideways}} 
+\phantom{iiiiiiiiiiiiiii} \text{\begin{sideways} indice de 
+$\sigma_{t,im}$ \end{sideways}} 
+\end{align*}}
+
+\setlength{\fboxsep}{3pt}
+\setcounter{MaxMatrixCols}{10}
+
+Gr\^ace \`a (\ref{lineaire1_p}) et (\ref{lineaire2_p}) et apr\`es 
+le r\'eordonnancement suivant~:
+\begin{eqnarray*}
+N^{ij} &=& \begin{pmatrix} i^{\text{\`eme}}\text{ ligne de } 
+\mathcal{A}^{-1}\mathcal{B}_i \\ j^{\text{\`eme}}\text{ ligne de } 
+\mathcal{C}^{-1}\mathcal{D}_i \end{pmatrix},
+\end{eqnarray*}
+on peut construire les matrices $N^{ij}$ telles que~:
+\begin{equation}
+\sigma_{.,ij} = \begin{pmatrix} \sigma_{y,ij}\\ \sigma_{t,ij}
+\end{pmatrix} = N^{ij}\cdot p.
+\end{equation}
+
+\begin{Rem}
+La simple p\'enalisation des d\'eriv\'ees du premier ordre 
+n'emp\^eche pas l'apparition de ``pics'' \`a l'int\'erieur des 
+rectangles $R_{ij}$. Pour \'eviter ce ph\'enom\`ene, on pourra par 
+la suite p\'enaliser aussi toutes les d\'eriv\'ees du second ordre. 
+La nouvelle fonction $F_1$ serait alors 
+\begin{eqnarray*}
+F_1(\sigma) &=& \sum\limits_{i,j}(\sigma_{y,ij}^2 + \sigma_{t,ij}^2 
++ \sigma_{yt,ij}^2 + \sigma_{yy,ij}^2 + \sigma_{tt,ij}^2). 
+\end{eqnarray*}
+\end{Rem}

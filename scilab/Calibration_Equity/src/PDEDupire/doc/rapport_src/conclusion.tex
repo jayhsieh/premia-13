@@ -1,0 +1,36 @@
+\section{Conclusion}
+
+La m\'ethode de calibration propos\'ee se ram\`ene \`a la 
+r\'esolution d'un probl\`eme inverse r\'egularis\'e. Elle se 
+distingue des articles dont elle s'inspire (\cite{lag:jcf:97}, 
+\cite{jac:jcf:98}, \cite{col:jcf:99}) sur plusieurs points. Le 
+probl\`eme direct de pricing repose sur l'EDP de Dupire et non 
+sur celle de Black-Scholes, ce qui permet d'\'evaluer la fonction 
+co\^ut en une seule r\'esolution d'EDP, alors qu'il faut r\'esoudre 
+autant d'EDP de Black-Scholes qu'il y a de donn\'ees pour faire 
+cette m\^eme \'evaluation. Une autre particularit\'e r\'eside dans 
+la repr\'esentation de $\sigma$~: nous utilisons ici des splines 
+bicubiques, qui permettent de d\'efinir des fonctions $C^2$ tr\`es 
+diverses. Enfin, nous avons choisi de calculer le gradient de la 
+fonction co\^ut analytiquement afin d'acc\'el\'erer l'algorithme. 
+
+L'exploitation des r\'esultats num\'eriques nous a amen\'e \`a 
+faire une autre modification~: nous choisissons un coefficient 
+de r\'egularisation $\lambda = 0$ et nous r\'egularisons le 
+probl\`eme en utilisant une approche multi\'echelle. L'id\'ee est 
+d'obtenir une premi\`ere volatilit\'e tr\`es r\'eguli\`ere sur 
+une grille tr\`es grossi\`ere, puis de raffiner progressivement 
+la grille de repr\'esentation de $\sigma$ pour affiner la solution. 
+
+Les tests num\'eriques effectu\'es sur donn\'ees synth\'etiques 
+ont \'egalement montr\'es qu'il \'etait important d'utiliser un 
+algorithme de Quasi-Newton avec bornes pour \'eviter d'obtenir 
+des valeurs n\'egatives de $\sigma$ dans certaines zones du 
+domaine. Nous montrons que notre algorithme de calibration 
+converge vers une solution tr\`es satisfaisante en partant 
+de points initiaux (constants) tr\`es \'eloign\'es~: $0.1$, 
+$0.35$, $0.5$ et $0.9$. Sur les donn\'ees r\'eelles, nous 
+montrons l'int\'er\^et d'utiliser l'approche multi\'echelle 
+et l'algorithme de Quasi-Newton avec bornes. La volatilit\'e 
+estim\'ee est assez r\'eguli\`ere et les valeurs de $\sigma$ 
+ne semblent pas aberrantes.

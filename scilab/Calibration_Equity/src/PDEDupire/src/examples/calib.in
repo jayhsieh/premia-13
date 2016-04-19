@@ -1,0 +1,57 @@
+################################################################################
+###################### VARIABLES S_0, R, Q AND OPTIONTYPE ######################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+590
+# r : risk-free rate     
+0.06
+# q : dividends (continuously compounded) 
+0.0262
+# optionType : type of the option (1 for call, 0 for put)  
+1
+################################################################################
+##################################### DUPIRE ###################################
+################################################################################
+# t_0 : time origin
+0
+# T_max : maximal maturity (in year)
+2
+# y_min : --> S_min=exp(y_min)     
+-7
+# y_max : --> S_max=exp(y_max)
+7
+# N : number of space steps of the fine grid
+400
+# M : number of time steps of the fine grid
+100
+# gridType : type of the y_fineGrid (0 for regular, 1 for tanh)
+0
+# theta : type of scheme used
+.5
+################################################################################
+################################## OPTIMIZATION ################################
+################################################################################
+# choice_optim : choice of the optimization method (1-->QN, 2-->QN with bounds)
+2
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_optim : name of the file containing the optimization parameters
+optim2.in
+# name_in_data : name of the file containing the data prices
+sp500prices.data
+# name_in_sigmainit_ddl : name of the file containing the degrees of freedom of
+#   the initial sigma
+sigmainit_n1m1_0_013.ddl
+# name_out_sigmaest_ddl : name of the file containing the degrees of freedom of
+#   the estimated sigma
+v2_008_1_sigmaest_n1m1_0_013.ddl
+# name_in_sigma_visu : name of the file containing the visualization parameters
+#   Type "_" if no visualization is required
+visusigma
+# name_out_sigmainit_visu : name of the out file containing the initial sigma 
+#   to be visualized (Type "_" is no visualization is required)
+sigmainit_n1m1_0_013.visu
+# name_out_sigmaest_visu : name of the out file containing the estimated sigma
+#   to be visualized (Type "_" is no visualization is required)
+v2_008_1_sigmaest_n1m1_0_013.visu

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# 
+# Start and stop daemon for Karrigell
+# taking care of log messages
+#
+
+KARRIGELL_DIR=
+LOGFILE="/var/log/karrigell.log"
+PIDFILE="/var/run/karrigell.pid"
+PYTHON=
+
+
+case "$1" in
+    start)
+        cd "$KARRIGELL_DIR"; 
+        "$PYTHON" Karrigell_ThreadingHTTPServer.py >>"$LOGFILE" 2>&1 &
+        echo $! > "$PIDFILE"
+        echo "Karrigell has been started with pid $(cat $PIDFILE)"
+        ;;
+
+    stop)   
+        if test -f "$PIDFILE"; then
+            kill -9 `cat "$PIDFILE"`
+            rm -f "$PIDFILE"
+            echo "Karrigell has been stopped"
+        else
+            echo "Karrigell is not running"
+        fi
+        ;;
+
+    status)
+        if test -f "$PIDFILE" && ps -p $(cat "$PIDFILE"); then
+            echo "Karrigel is running with PID $(cat $PIDFILE)"
+        fi
+        ;;
+esac
+

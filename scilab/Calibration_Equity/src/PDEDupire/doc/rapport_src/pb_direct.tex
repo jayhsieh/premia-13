@@ -1,0 +1,611 @@
+\section{Probl\`eme direct~: r\'esolution num\'erique de l'EDP 
+parabolique de Dupire}
+\label{SEC:PB_DIRECT}
+
+\subsection{Hypoth\`eses et donn\'ees}
+
+On consid\`ere une option europ\'eenne de type call (on peut de 
+mani\`ere similaire traiter une option de type put). Soient~: 
+\begin{itemize}
+\item $t_0 \geq 0$ l'origine du temps,
+\item $S_0$ le prix de l'actif sous-jacent \`a l'instant $t_0$,
+\item $K$ le prix d'exercice,
+\item $T$ la maturit\'e,
+\item $\sigma(S,t)$ la volatilit\'e de l'actif sous-jacent de prix 
+$S$ \`a la date $t$,
+\item $V(K,T;S_0,t_0,\sigma)$, que l'on notera $V(K,T)$, le prix de 
+l'option de prix d'exercice $K$, de maturit\'e $T$, \`a l'instant 
+$t_0$ lorsque l'actif sous-jacent vaut $S_0$ et la volatilit\'e vaut 
+$\sigma$ \footnote{Contrairement \`a l'\'equation de Black-Scholes, 
+$S_0$ et $t_0$ sont les param\`etres du probl\`emes tandis que $K$ 
+et $T$ sont les variables.},
+\item $r$ le taux d'int\'er\^et constant sans risque,
+\item $q$ le rendement continu constant de l'actif,
+\item le prix de l'actif sous-jacent est gouvern\'e par l'\'equation 
+diff\'erentielle suivante (voir par exemple \cite{bla:jpe:73})~:
+\begin{eqnarray}
+\frac{dS}{S} &=& (r-q)dt + \sigma(S,t)dW
+\end{eqnarray}
+o\`u $W$ est un mouvement brownien.
+\end{itemize}
+
+\subsection{Formulation de l'EDP de Dupire \`a partir de 
+l'\'equation de Fokker-Planck}
+
+Le prix de l'actif $S$ v\'erifie l'\'equation diff\'erentielle~:
+\begin{eqnarray*}
+dS &=& S(r-q)dt + S\sigma(S,t)dW.
+\end{eqnarray*}
+L'\'equation de Fokker-Planck est donc (cf. \cite{dup:risk:94})~:
+\begin{eqnarray}
+\partial_tp(S,t) = -\partial_S((r-q)Sp(S,t)) + 
+\partial_{SS}(\frac{\sigma(S,t)^2}{2}S^2p(S,t)), \label{FP}
+\end{eqnarray}
+o\`u $p(.,t)$ est la densit\'e du prix du sous-jacent \`a la date 
+$t$. Par d\'efinition, le prix de l'option de prix d'exercice $K$, 
+de maturit\'e $T$, \`a l'instant $t_0$ est~:
+\begin{eqnarray*}
+V(K,T) = e^{-r(T-t_0)}\int_{0}^{\infty}(S-K)_+p(S,T)dS.
+\end{eqnarray*}
+On d\'erive les deux c\^ot\'es par rapport \`a $T$ en tenant compte 
+de (\ref{FP})~:
+\begin{eqnarray*}
+\partial_tV(K,T) &=& -rV(K,T) + 
+e^{-r(T-t_0)}\int_{0}^{\infty}(S-K)_+ 
+\biggl[-\partial_S((r-q)Sp(S,T)) \\
+&& + \partial_{SS}(\half\sigma(S,T)^2S^2p(S,T))\biggr ]dS.\\
+\end{eqnarray*}
+Par une int\'egration par partie, on obtient~:
+\begin{eqnarray*}
+\partial_tV(K,T) &=& -rV(K,T) - e^{-r(T-t_0)} 
+\int_K^\infty \partial_S(\half\sigma^2(S,T)S^2p(S,T))dS\\
+&& +e^{-r(T-t_0)}\int_0^\infty (r-q)(S-K)_+p(S,T)dS \\
+&& + K(r-q)e^{-r(T-t_0)}\int_K^\infty p(S,T)dS\\
+&=& -rV(K,T) + e^{-r(T-t_0)} \half\sigma^2(K,T)K^2p(K,T)\\
+&& + (r-q)e^{-r(T-t_0)}\int_0^\infty (S-K)_+p(S,T)dS\\
+&& + K(r-q)e^{-r(T-t_0)}\int_K^\infty p(S,T)dS.
+\end{eqnarray*}
+Puis, gr\^ace aux \'egalit\'es suivantes, apr\`es calculs~:
+\begin{eqnarray*}
+V(K,T) &=& e^{-r(T-t_0)}\int_{0}^{\infty}(S-K)_+p(S,T)dS, \\
+\partial_K V(K,T) &=& -e^{-r(T-t_0)}\int_K^\infty p(S,T)dS, \\
+\partial_{KK}V(K,T) &=& e^{-r(T-t_0)}p(K,T).
+\end{eqnarray*}
+On en d\'eduit que~:
+\begin{eqnarray*}
+\partial_tV(K,T) &=&  -rV(K,T) +  
+\frac{1}{2}\sigma^2(K,T)K^2\partial_{KK}V(K,T) \\
+&&+ (r-q)V(K,T) -(r-q)K\partial_KV(K,T),
+\end{eqnarray*}
+d'o\`u~:
+\begin{eqnarray*}
+\frac{\partial V}{\partial T}(K,T) &=& -qV(K,T) - 
+(r-q)K\frac{\partial V}{\partial K}(K,T) + 
+\frac{1}{2}\sigma^2(K,T)K^2\frac{\partial^2 V}{\partial K^2}(K,T) 
+\end{eqnarray*}
+sous les conditions aux limites suivantes~: 
+$$
+\left \{
+\begin{array}{ll}
+V(K,t_0) = \max(S_0-K,0)& \text{pour}~ 0\leq K,\\
+\lim_{K\rightarrow 0}V(K,T) = S_0e^{-q(T-t_0)} & 
+\text{pour}~ t_0\leq T,\\
+\lim_{K \rightarrow +\infty} V(K,T) = 0 & 
+\text{pour}~ t_0\leq T.
+\end{array}
+\right .
+$$
+
+\subsection{Changement de variable logarithmique}
+
+On choisit de faire un changement de variable logarithmique pour 
+obtenir une condition de stabilit\'e moins contraignante sur les 
+pas de temps et d'espace. En posant~: 
+\begin{eqnarray*}
+y &=& \ln (K), \\
+U(y,T) &=& V(K,T),\\
+\hat{\sigma}(y,T) &=& \sigma(K,T),
+\end{eqnarray*}
+on obtient l'EDP suivante~:
+\begin{eqnarray*}
+\frac{\partial U}{\partial T}(y,T) &=& -qU(y,T) - 
+(r-q+\frac{1}{2}\hat{\sigma}^2(y,T)) 
+\frac{\partial U}{\partial y}(y,T) + 
+\frac{1}{2}\hat{\sigma}^2(y,T) 
+\frac{\partial^2 U}{\partial y^2}(y,T), 
+\end{eqnarray*}
+avec les conditions aux limites suivantes~: 
+$$
+\left \{
+\begin{array}{ll}
+U(y,t_0) = \max(S_0-e^y,0)& \text{pour tout $y$ r\'eel},\\
+\lim_{y \rightarrow -\infty}U(y,T) = S_0e^{-q(T-t_0)} & 
+\text{pour}~ t_0\leq T,\\
+\lim_{y \rightarrow +\infty} U(y,T) = 0 & 
+\text{pour}~ t_0\leq T.
+\end{array}
+\right .
+$$
+Nous r\'esolvons num\'eriquement cette EDP de Dupire par 
+diff\'erences finies. La m\'ethode de discr\'etisation que 
+nous choisissons s'inspire de celle pr\'esent\'ee 
+dans~\cite{lamb:ell:91}. 
+
+\subsection{Discr\'etisation uniforme \label{unif}}
+
+On d\'efinit les op\'erateurs $A$ et $\tilde{A}$ de la 
+mani\`ere suivante~:
+\begin{eqnarray*}
+(AU)(y,T) &=& -\frac{1}{2}\hat{\sigma}^2(y,T) 
+\frac{\partial^2 U}{\partial y^2}(y,T) + 
+(r-q+\frac{1}{2}\hat{\sigma}^2(y,T)) 
+\frac{\partial U}{\partial y}(y,T),\\
+(\tilde{A}U)(y,T) &=& (AU)(y,T) + qU(y,T).
+\end{eqnarray*}
+
+\begin{Rem}
+Le signe du coefficient $(r-q+\frac{1}{2}\hat{\sigma}^2(y,T))$ de 
+la d\'eriv\'ee au premier ordre peut varier. En effet, on a 
+logiquement $r-q<0$ car le rendement $q$ de l'actif risqu\'e doit 
+\^etre sup\'erieur au rendement de l'actif sans risque. On peut 
+penser que $r-q$ sera de l'ordre de $10^{-2}$. $\hat{\sigma}^2(y,T)$ 
+sera lui aussi de l'ordre de $10^{-2}$ puisque la volatilit\'e est 
+de l'ordre de $10^{-1}$. Cette incertitude concernant le signe nous 
+pousse \`a utiliser une approximation centr\'ee des d\'eriv\'ees 
+lors de la discr\'etisation de l'EDP.
+\end{Rem}
+
+\subsubsection{Discr\'etisation en espace}
+
+En se restreignant \`a $y \in [y_{min};y_{max}]$ et 
+$T \in [t_0;T_{max}]$, on obtient l'\'equation semi-discr\'etis\'ee 
+suivante~: 
+$$
+(E)
+\left \{
+\begin{array}{ll}
+\frac{\partial U}{\partial T}(y,T) + \tilde{A}U(y,T) = 0 & 
+\text{dans}~ ]y_{min};y_{max}[ \times [t_0;T_{max}],\\
+U(y_{min},T) = S_0e^{-q(T-t_0)} & 
+\text{si}~ T \in [t_0;T_{max}],\\
+U(y_{max},T) = 0 &  \text{si}~ T \in [t_0;T_{max}],\\ 
+U(y,t_0) = f(y) = \max(S_0-e^y,0) & 
+\text{pour}~ y \in ]y_{min};y_{max}[. 
+\end{array}
+\right .
+$$
+Soit $h=(y_{max}-y_{min})/N$ le pas d'espace. On pose, pour $i$ 
+allant de $0$ \`a $N$~: 
+\begin{eqnarray*}
+y_i &=& y_{min} + ih,\\
+f_i &=& f(y_i).
+\end{eqnarray*}
+Soit $u(T) = (U(y_i,T))_{1\leq i\leq N-1} \in \cR^{N-1}$. A chaque 
+instant, on discr\'etise $\tilde{A}$ par un op\'erateur discret 
+$\tilde{A}_T:u(T) \in R^{N-1} \rightarrow \tilde{A}_Tu(T) 
+\in \cR^{N-1}$. Pour cela, on remplace
+\begin{eqnarray*}
+\frac{\partial U}{\partial y}(y_i,T) & \text{par} & 
+\frac{u_{i+1}(T)-u_{i-1}(T)}{2h},\\
+\frac{\partial^2 U}{\partial y^2}(y_i,T) & \text{par} & 
+\frac{u_{i+1}(T)-2u_i(T)+u_{i-1}(T)}{h^2}.
+\end{eqnarray*}
+Posons 
+\begin{align*}
+\alpha_{i,T} &= -\frac{\hat{\sigma}^2(y_i,T)}{2h^2} - 
+\frac{1}{2h}(r-q+\frac{\hat{\sigma}^2(y_i,T)}{2}),\\
+\beta_{i,T} &= \frac{\hat{\sigma}^2(y_i,T)}{h^2} + q,\\
+\gamma_{i,T} &= -\frac{\hat{\sigma}^2(y_i,T)}{2h^2} + 
+\frac{1}{2h}(r-q+\frac{\hat{\sigma}^2(y_i,T)}{2}).
+\end{align*}
+On a alors, pour $i \in \{1,...,N-1\}$ et pour tout $T$~:
+\begin{eqnarray*}
+(\tilde{A}_T u(T))_i &=& \alpha_{i,T}u_{i-1}(T) + 
+\beta_{i,T}u_i(T) + \gamma_{i,T}u_{i+1}(T).
+\end{eqnarray*}
+
+\paragraph{Conditions aux limites}
+
+Pour $i=0$, on a pour tout $T$ une condition de type Dirichlet 
+$u_0(T) = S_0e^{-q(T-t_0)}$. Par cons\'equent, 
+\begin{eqnarray*}
+(\tilde{A}_T u(T))_1 &=& \alpha_{1,T}S_0e^{-q(T-t_0)}+
+\beta_{1,T}u_1(T)+\gamma_{1,T}u_2(T).
+\end{eqnarray*}
+Pour $i=N$ ($y=y_{max}$), on a pour tout $T$ la condition de 
+Dirichlet $u_N(T) = 0$, donc
+\begin{eqnarray*}
+(\tilde{A}_T u(T))_{N-1} &=& \alpha_{N-1,T}u_{N-2}(T) + 
+\beta_{N-1,T}u_{N-1}(T).
+\end{eqnarray*}
+En particulier, pour $T=t_0$~:
+$$
+\left \{
+\begin{array}{lll}
+f_0 &=& S_0e^{-q(T-t_0)},\\
+f_N &=& 0.
+\end{array}
+\right .
+$$
+
+\paragraph{Construction de l'op\'erateur}
+
+On d\'efinit l'op\'erateur interm\'ediaire $\hat{A}_T$ de 
+$\cR^{N-1}$ repr\'esent\'e par la matrice suivante~: 
+\begin{eqnarray*}
+\biggl( (\hat{A}_T)_{ij} \biggr)_{1 \leq i,j \leq N} & = &  
+\begin{pmatrix}
+\beta_{1,T}  & \gamma_{1,T} & 0              & \cdots          
+& 0              \\
+\alpha_{2,T} & \beta_{2,T}  & \gamma_{2,T}   & \ddots          
+& \vdots         \\
+0            & \ddots       & \ddots         & \ddots          
+& 0              \\
+\vdots       & \cdots       & \alpha_{N-2,T} & \beta_{N-2,T}   
+& \gamma_{N-2,T} \\ 
+0            & 0            & \cdots         & \alpha_{N-1,T}  
+& \beta_{N-1,T}  \\
+\end{pmatrix}
+\end{eqnarray*}
+A cause de la condition de Dirichlet en $i=0$, on a alors~: 
+\begin{eqnarray*}
+(\tilde{A}_T u(T))_1 &=& \alpha_{1,T}S_0e^{-q(T-t_0)} + 
+(\hat{A}_T u(T))_1,\\
+(\tilde{A}_T u(T))_i &=& 
+(\hat{A}_T u(T))_i \quad \forall i \in {2,...,N-1}.
+\end{eqnarray*}
+
+\paragraph{EDP discr\'etis\'ee en espace}
+
+Cette discr\'etisation en espace permet de ramener l'EDP $(E)$ 
+\`a l'EDO $(E_h)$~:
+$$
+(E^h)
+\left \{
+\begin{array}{ll}
+{\displaystyle \frac{\partial u}{\partial T}(T) + 
+\tilde{A}_Tu(T) = 0} & \text{si}~ T \in [t_0;T_{max}]\\
+u(t_0) = f &
+\end{array}
+\right .
+$$
+soit
+$$
+(E^h)
+\left \{
+\begin{array}{ll}
+{\displaystyle \frac{\partial u}{\partial T}(T) + 
+\biggl(\hat{A}_Tu(T) + \alpha_{1,T}S_0e^{-q(T-t_0)}e_1\biggr) = 0} & 
+\text{si}~ T \in [t_0;T_{max}]\\
+u(t_0) = f &
+\end{array}
+\right .
+$$
+o\`u $f = (f(y_i))_{1\leq i\leq N-1}$ et 
+$e_1 = \begin{pmatrix} 1\\0\\\vdots\\0\end{pmatrix}$. 
+
+\subsubsection{Discr\'etisation en temps par les $\theta$-sch\'emas}
+
+On utilise ici une g\'en\'eralisation de la discr\'etisation par les 
+$\theta$-sch\'emas propos\'ee par \cite{lamb:ell:91}. Soient 
+$\theta \in [0;1]$ fix\'e et $k$ un pas de temps tel que 
+$T_{max}-t_0=Mk$. On approxime la solution $u$ de $(E^h)$ aux 
+instants $t_0+nk$ par les $u^n$ solutions de~:
+$$
+(E^{h,k})
+\left \{
+\begin{array}{l}
+u^0 = f \\
+{\displaystyle \frac{u^{n+1}-u^n}{k} + 
+\theta\tilde{A}^n u^n +(1-\theta)\tilde{A}^{n+1}u^{n+1}= 0
+\quad\text{pour}\quad  0\leq n\leq M-1}\\
+\end{array}
+\right .
+$$
+soit
+$$
+(E^{h,k})
+\left \{
+\begin{array}{l}
+u^0 = f  \\
+{\displaystyle\frac{u^{n+1}-u^n}{k} + \theta(\hat{A}^n u^n + 
+\alpha_{1,T_n}S_0e^{-q(T_n-t_0)}e_1)} \\
+{\displaystyle +(1-\theta)(\hat{A}^{n+1}u^{n+1} + 
+\alpha_{1,T_{n+1}}S_0e^{-q(T_{n+1}-t_0)}e_1)= 0
+\quad\text{pour}\quad  0\leq n\leq M-1}\\
+\end{array}
+\right .
+$$
+o\`u l'op\'erateur $\hat{A}^n$ est en fait l'op\'erateur 
+$\hat{A}_{(t_0+nk)}$. 
+
+On obtient diff\'erents types de sch\'emas selon la valeur de 
+$\theta$~: 
+\begin{itemize}
+\item si $\theta=1$, le sch\'ema est explicite,
+\item si $0\leq \theta<1$, le sch\'ema est implicite.
+\end{itemize}
+
+\subsubsection{R\'esolution}
+
+On doit r\'esoudre \`a chaque \'etape un syst\`eme lin\'eaire 
+\begin{eqnarray*}
+H^n u^{n+1} &=& b^n
+\end{eqnarray*}
+o\`u 
+\begin{eqnarray*}
+b^n &=& (I-\theta k \hat{A}^n)u^n - S_0k
+\biggl(\theta \alpha_{1,T_n}e^{-q(T_n-t_0)}+(1-\theta)
+\alpha_{1,T_{n+1}}e^{-q(T_{n+1}-t_0)}\biggr)e_1,\\
+H^n &=& I+(1-\theta)k\hat{A}^{n+1}.
+\end{eqnarray*}
+avec $H^n$ de taille $(N-1,N-1)$ et tridiagonale pour tout $n$. Il 
+suffit alors de triangulariser ce syst\`eme \`a chaque pas de temps 
+par la m\'ethode du pivot et de le r\'esoudre.
+
+\subsubsection{Tests num\'eriques}
+
+Pour le cas o\`u la volatilit\'e est constante, on dispose de la 
+formule explicite de Black-Scholes~:
+\begin{eqnarray*}
+V(K,T;S_0,t_0) &=& S_0e^{-q(T-t_0)}N(d_1) - Ke^{-r(T-t_0)}N(d_2)
+\end{eqnarray*}
+avec 
+\begin{eqnarray*}
+d_1 &=& \frac{\ln(S_0/K)+(r-q+\sigma^2/2)(T-t_0)}
+{\sigma \sqrt{T-t_0}},\\
+d_2 &=& d_1 - \sigma \sqrt{T-t_0}.
+\end{eqnarray*}
+et $N(x)$ est la fonction de r\'epartition d'une variable normale de 
+moyenne nulle et de variance $1$~:
+$$
+N(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^x e^{-\frac{t^2}{2}} dt.
+$$
+Si la volatilit\'e d\'epend du temps seulement, on a plus 
+g\'en\'eralement la formule suivante (voir par 
+exemple~\cite{lamb:ell:91})~: 
+\begin{eqnarray*}
+V(K,T;S_0,t_0) &=& S_0e^{-q(T-t_0)}N(d_1) - 
+Ke^{-r(T-t_0)}N(d_2), \label{tests}
+\end{eqnarray*}
+avec
+\begin{eqnarray*}
+d_1 &=& \frac{\ln(S_0/K)+(r-q+\Sigma_{t_0,T}^2/2)(T-t_0)}
+{\Sigma_{t_0,T} \sqrt{T-t_0}},\\
+d_2 &=& d_1 - \Sigma_{t_0,T} \sqrt{T-t_0} 
+\end{eqnarray*}
+et 
+\begin{eqnarray*}
+\Sigma_{t_0,T}^2 &=& \frac{1}{T-t_0}\int_{t_0}^T \sigma^2(t)dt.
+\end{eqnarray*}
+
+Testons en premier lieu le cas $\sigma = $ constante, par exemple 
+$\sigma = 0.2$. Avec $N=400$, $M=100$, $\theta=0.5$, $r=0.05$, 
+$q=0.02$ et $S_0=100$, on compare les r\'esultats obtenus par la 
+m\'ethode d\'evelopp\'ee pr\'ec\'edemment 
+(figure~\ref{FIG:DUPIRE02} \`a gauche) \`a ceux obtenus avec la 
+formule explicite de Black-Scholes en mesurant la diff\'erence 
+s\'eparant les deux (figure~\ref{FIG:DUPIRE02} \`a droite). On voit 
+sur cet exemple que l'erreur maximale est concentr\'ee autour de 
+$S_0$. Pour pallier \`a ce probl\`eme, nous proposons une 
+discr\'etisation en espace non uniforme 
+(section~\ref{SSEC:DISCR_NON_UNIFORME}) de sorte qu'il y ait plus 
+de valeurs discr\`etes autour de $S_0$.  
+
+% FIG:DUPIRE02
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/dupire02}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/erreur02}
+}
+\end{minipage}
+\end{center}
+
+\caption{$\sigma = 0.2$. Discr\'etisation uniforme en espace. 
+A gauche~: Nappe de prix obtenue par l'EDP de Dupire. 
+A droite~: Diff\'erences de prix entre Dupire et Black-Scholes.}
+\label{FIG:DUPIRE02}
+\end{figure}
+
+\subsection{Discr\'etisation non uniforme}
+\label{SSEC:DISCR_NON_UNIFORME}
+
+On a vu que la r\'esolution de l'EDP donnait des r\'esultats moins 
+bons autour de $S_0$, c'est \`a dire dans la r\'egion qui nous 
+int\'eresse le plus \`a priori. Pour rem\'edier \`a cela, on peut 
+modifier la discr\'etisation de mani\`ere \`a ce que le pas d'espace 
+soit plus petit autour de $S_0$, quitte \`a \^etre plus grand aux 
+extr\'emit\'es. Dans le cas o\`u $y_{min} = -y_{max}$, une solution 
+pour construire une telle grille de prix est la suivante~: 
+\begin{itemize}
+\item construire une grille uniforme sur $[-y_{max};+y_{max}]$,
+\item prendre l'image de cette grille par l'inverse de la fonction 
+$$
+x \rightarrow y_{max}*\tanh(x-y_0),
+$$
+o\`u $y_0 = \ln (S_0)$.
+\end{itemize}
+En effet, on voit sur le graphe de cette fonction 
+(figure~\ref{FIG:TANH}) que les images inverses de cette fonction 
+sont plus denses autour de $y_0$ et se rar\'efient aux 
+extr\'emit\'es. La fonction inverse de 
+$x \rightarrow y_{max}*\tanh(x-y_0)$ est la fonction d\'efinie par 
+$$
+g(y) = \frac{1}{2}\log((y_{max}+y)/(y_{max}-y)) + y_0.
+$$
+
+% FIG:TANH
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=270,draft=\draft] 
+{./fig/tanh}
+}
+\end{minipage}
+\end{center}
+
+\caption{Graphe de la fonction $x \rightarrow y_{max}*\tanh(x-y_0)$ 
+pour $y_{max}=7$ et $y_0=\log(100) = 4.60 $.}
+\label{FIG:TANH}
+\end{figure}
+
+\subsubsection{Discr\'etisation et construction de l'op\'erateur}
+
+Comme le pas d'espace $h$ n'est plus constant, les formules de 
+discr\'etisation sont diff\'erentes. En se restreignant \`a 
+$y \in [-y_{max};y_{max}]$ et $ T \in [t_0;T_{max}]$, on obtient 
+l'\'equation suivante~:
+$$
+(E)
+\left \{
+\begin{array}{ll}
+\frac{\partial U}{\partial T}(y,T) + \tilde{A}U(y,T) = 0 & 
+\text{dans}~ ]-y_{max};y_{max}[ \times [t_0;T_{max}],\\
+U(-y_{max},T) = S_0e^{-q(T-t_0)} & \text{si}~ T \in [t_0;T_{max}],\\
+U(y_{max},T) = 0 &  \text{si}~ T \in [t_0;T_{max}],\\ 
+U(y,t_0) = f(y) = max(S_0-e^y,0) & 
+\text{pour}~ y \in ]y_{max};y_{max}[. 
+\end{array}
+\right .
+$$
+Posons $h=2y_{max}/N$. On d\'efinit une discr\'etisation de l'espace 
+des prix $[-y_{max};+y_{max}]$ de la mani\`ere suivante~:
+\begin{itemize}
+\item Soit $i_0 \in {0,...,N}$ le plus petit indice tel que 
+$g(-y_{max} + i_0\cdot h) > -y_{max}$. Entre $-y_{max}$ et 
+$g(-y_{max} + i_0\cdot h)$, l'espace est discr\'etis\'e de mani\`ere 
+uniforme \`a l'aide de $i_0$ points $y_0,...,y_{i_0-1}$.
+\item Soit $i_1 \in {0,...,N}$ le plus grand indice tel que 
+$g(-y_{max} + i_1\cdot h) < y_{max}$. Entre $g(y_{max} + i_1\cdot h)$ 
+et $y_{max}$, l'espace est discr\'etis\'e de mani\`ere uniforme \`a 
+l'aide de $N-i_1+1$ points $y_{i_1+1},...,y_N$).
+\item Pour tout $i \in {i_0,...,i_1}$, on d\'efinit 
+$y_i = g(-y_{max} + ih)$.
+\end{itemize}
+On d\'efinit ensuite, pour $i \in {0,...,N}$~:
+\begin{eqnarray*}
+f_i &=& f(y_i),\\
+h_i &=& y_{i+1}-y_i.
+\end{eqnarray*}
+Soit $u(T) = (U(y_i,T))_{0\leq i\leq N} \in \cR^N$. Pour 
+discr\'etiser $\tilde{A}$ par un sch\'ema centr\'e, on remplace
+\begin{eqnarray*}
+\frac{\partial U}{\partial y}(y_i,T) & \text{par} & 
+\frac{1}{2}\biggl ( \frac{u_{i+1}(T)-u_{i}(T)}{h_i} + 
+\frac{u_{i}(T)-u_{i-1}(T)}{h_{i-1}}\biggr ),\\
+\frac{\partial^2 U}{\partial y^2}(y_i,T) & \text{par} & 
+\frac{2}{h_i+h_{i-1}}\biggl(\frac{u_{i+1}(T)-u_i(T)}{h_i} - 
+\frac{u_i(T)-u_{i-1}(T)}{h_{i-1}}\biggr).
+\end{eqnarray*}
+Posons, pour $i \in \{1,...,N-1\}$~: 
+\begin{align*}
+\alpha_{i,T} &= -\frac{\hat{\sigma}^2(y_i,T)}
+{(h_i+h_{i-1})h_{i-1}} - \frac{1}{2h_{i-1}}
+\biggl(r-q+\frac{\hat{\sigma}^2(y_i,T)}{2}\biggr),\\
+\beta_{i,T} &= \frac{\hat{\sigma}^2(y_i,T)}
+{h_i+h_{i-1}}\biggl(\frac{1}{h_i} + \frac{1}{h_{i-1}}\biggr) + 
+\frac{1}{2} \biggl (r-q+\frac{\hat{\sigma}^2(y_i,T)}{2}\biggr)
+\biggl(\frac{1}{h_{i-1}} - \frac{1}{h_i}\biggr) + q,\\
+\gamma_{i,T} &= -\frac{\hat{\sigma}^2(y_i,T)}{(h_i+h_{i-1})h_i} + 
+\frac{1}{2h_i}\biggl(r-q+\frac{\hat{\sigma}^2(y_i,T)}{2}\biggr).
+\end{align*}
+On a alors, pour $i \in \{1,...,N-1\}$ et pour tout $T$~:
+\begin{eqnarray*}
+(\tilde{A}_T u(T))_i &=& \alpha_{i,T}u_{i-1}(T) + \beta_{i,T}u_i(T) + 
+\gamma_{i,T}u_{i+1}(T).
+\end{eqnarray*}
+Une fois ces changements effectu\'es, la m\'ethode de r\'esolution de 
+l'EDP est la m\^eme que dans le cas d'une discr\'etisation uniforme 
+(cf. \ref{unif}).
+
+\subsubsection{Tests num\'eriques}
+
+On refait le m\^eme test que pr\'ec\'edemment pour \'evaluer 
+l'int\'er\^et de cette nouvelle discr\'etisation (voir la 
+figure~\ref{FIG:DUPIRE02TANH}). On note une nette diminution de 
+l'erreur autour de $S_0$. Par contre, les r\'esultats sont bien 
+s\^ur moins bons aux extr\'emit\'es, ce qui ne pr\'esente pas de 
+probl\`eme dans la mesure o\`u l'on s'int\'eresse aux prix des 
+options dont le strike n'est pas trop \'eloign\'e du prix actuel 
+de l'actif sous-jacent.
+
+Dans l'exemple suivant, on choisit une volatilit\'e qui d\'epend 
+du temps~: 
+$$
+\sigma(t) = \frac{t}{2}
+$$
+et on augmente le nombre de pas d'espace (N=1000) et de temps 
+(M=200). On obtient les r\'esultats suivants montr\'es \`a la 
+figure~\ref{FIG:DUPIRETSUR2TANH}.
+
+Cette m\'ethode de pricing avec volatilit\'e locale a \'egalement 
+\'et\'e valid\'ee par comparaison avec d'autres m\'ethodes de pricing 
+couramment utilis\'ees en finance~:
+\begin{itemize}
+\item m\'ethode de Monte-Carlo,
+\item r\'esolution de l'EDP de Black-Scholes g\'en\'eralis\'ee avec 
+pas adaptatif.
+\end{itemize}
+
+% FIG:DUPIRE02TANH
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/dupire02tanh}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/erreur02tanh}
+}
+\end{minipage}
+\end{center}
+
+\caption{$\sigma = 0.2$. Discr\'etisation non uniforme en espace. 
+A gauche~: Nappe de prix obtenue par l'EDP de Dupire. 
+A droite~: Diff\'erences de prix entre Dupire et Black-Scholes.}
+\label{FIG:DUPIRE02TANH}
+\end{figure}
+
+% FIG:DUPIRETSUR2TANH
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/dupiretsur2tanh}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/erreurtsur2tanh}
+}
+\end{minipage}
+\end{center}
+
+\caption{$\sigma(t) = \frac{t}{2}$. Discr\'etisation non uniforme en 
+espace. 
+A gauche~: Nappe de prix obtenue par l'EDP de Dupire. 
+A droite~: Diff\'erences de prix entre Dupire et Black-Scholes.}
+\label{FIG:DUPIRETSUR2TANH}
+\end{figure}

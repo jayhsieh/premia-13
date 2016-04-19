@@ -1,0 +1,5 @@
+print "<TABLE><TR><TD valign='top'>"
+Include("/premia/mod/all.py")
+print "</TD><TD>"
+Include("/premia/opt/all.py")
+print "</TD></TR></TABLE>"

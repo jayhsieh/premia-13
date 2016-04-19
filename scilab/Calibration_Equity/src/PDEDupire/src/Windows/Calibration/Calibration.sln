@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Calibration", "Calibration.vcproj", "{3D521E05-EE25-43C5-925A-DEDDB1730673}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Simul", "..\Simul\Simul.vcproj", "{BF636BA5-B748-40A3-8F1A-DC4692D1DF4B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{3D521E05-EE25-43C5-925A-DEDDB1730673}.Debug.ActiveCfg = Debug|Win32
+		{3D521E05-EE25-43C5-925A-DEDDB1730673}.Debug.Build.0 = Debug|Win32
+		{3D521E05-EE25-43C5-925A-DEDDB1730673}.Release.ActiveCfg = Release|Win32
+		{3D521E05-EE25-43C5-925A-DEDDB1730673}.Release.Build.0 = Release|Win32
+		{BF636BA5-B748-40A3-8F1A-DC4692D1DF4B}.Debug.ActiveCfg = Debug|Win32
+		{BF636BA5-B748-40A3-8F1A-DC4692D1DF4B}.Debug.Build.0 = Debug|Win32
+		{BF636BA5-B748-40A3-8F1A-DC4692D1DF4B}.Release.ActiveCfg = Release|Win32
+		{BF636BA5-B748-40A3-8F1A-DC4692D1DF4B}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

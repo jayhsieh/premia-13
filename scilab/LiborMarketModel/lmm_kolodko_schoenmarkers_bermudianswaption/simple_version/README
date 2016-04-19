@@ -1,0 +1,17 @@
+Compilation
+===========
+
+In this directory to build the library just type 
+
+g++ swaption_example.cpp -lm -o simple_version
+
+It is independent of the other files of Premia;
+
+To execute the algorithm just type
+
+	simple_version
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

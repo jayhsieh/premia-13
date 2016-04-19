@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl5
+
+# Auteur: Jean-Marc Cognet
+# Date de creation:              17/07/02
+# Date de derniere modification: 05/11/02
+# Commentaires:
+#  ...
+
+$nom_court = $0; $nom_court =~ s|.*/||;
+
+# on recupere ensuite la liste des fichiers entres en argument
+@liste_fichiers = @ARGV;
+
+foreach $fic (@liste_fichiers) {
+
+  $fic_out = "$fic".".j";
+  open(FICHIER,$fic);
+  open(FICHIER_OUT,">$fic_out");
+  $bool = 0;
+
+  while (<FICHIER>) {
+
+    if (/iterate/) {
+      @champs = split;
+      $number_iter = $champs[2];
+      $val_j = $champs[4];
+      printf FICHIER_OUT "%-4s %s\n",$number_iter,$val_j;
+    }
+    
+  } # FIN DE : while (<FICHIER>) {
+
+  close(FICHIER);
+  close(FICHIER_OUT);
+
+} # FIN DE : foreach $fic (@liste_fichiers)
+
+exit 0;

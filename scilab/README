@@ -1,0 +1,22 @@
+********************************************************************
+				PREMIA
+********************************************************************
+
+   In directory scilab/, you will find :
+      - the calibration toolbox for equity (in the Dupire and Bates model) and in the Libor Market model tools 
+      - the calibration toolbox for equity Levy models.
+      - the calibration toolbox for equity using Variance Swap Datas in the Heston model
+      - the calibration programs for Libor Market model.
+      - the calibration programs for Stochastic Volatility Libor Market model.
+      - the calibration programs for Stochastic Volatility Libor Market model of Pitebarg.
+      - the calibration programs for HW2d/G2++ interest rate model.
+      - the American Monte Carlo pricing tools in high dimensional.
+        Black-Scholes model 
+      - the LIBOR MARKET model tools.
+      - a CDO Pricer.
+      - Simulation of the path of the CDO spread and index CDS 
+        using itraxx data.
+      - a CDO Calibration Method of Cont Minca.
+      -  the calibration toolbox for equity using VIX in the Revisited Bergomi model.
+	  - The calibration toolbox for equity Heston 2d model.
+       

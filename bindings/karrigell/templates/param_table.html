@@ -1,0 +1,139 @@
+<script type="text/html" id="iterations">
+  <!-- ko if: hasIteration -->
+    <tr data-bind="css: { even: $parents[$parents.length - 2].index%2==0 }">
+      <td></td>
+      <td>
+        <table class="iteration">
+          <tr>
+            <td class="keys">Iterate to:</td>
+            <td class="values" data-bind="css: { error: iterateToInvalid }">
+              <input data-bind='value: iterateTo, valueUpdate: "afterkeydown"'></input>
+            </td>
+          </tr>
+          <tr>
+            <td class="keys">#Iterations:</td>
+            <td class="values" data-bind="css: { error: iterationCountInvalid }">
+              <input data-bind='value: iterationsCount, valueUpdate: "afterkeydown"'></input>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="scalar-row-template">
+  <tr data-bind="css: { even: index%2==0 }">
+    <td class="keys" data-bind="attr: { rowspan: value.hasIteration() ? 2 : 1 }">
+      <span data-bind="text: label"></span>      
+    </td>
+    <td data-bind="if: value.iterable">
+      <input type="checkbox" data-bind="checked: value.hasIteration">
+    </td>
+    <td data-bind="css: { error: value.valueInvalid }">
+      <!-- ko if: hasTrivialSetter==true -->
+        <input data-bind='value: value.value, valueUpdate: "afterkeydown"'></input>
+      <!-- /ko -->
+      <!-- ko if: hasTrivialSetter==false -->
+        <input data-bind='value: value.value'></input>
+      <!-- /ko -->
+    </td>
+    <td class="constraints" data-bind="attr: { rowspan: value.hasIteration() ? 2 : 1 }, html: constraint">
+    </td>
+  </tr>
+  <!-- ko with: value -->
+    <!-- ko template: { name : 'iterations' } -->
+    <!-- /ko -->
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="filename-row-template">
+  <tr data-bind="css: { even: index%2==0 }">
+    <td class="keys">
+      <span data-bind="text: label"></span>      
+    </td>
+    <td>
+    </td>
+    <td>
+      <a target="_blank" data-bind="text: torender, attr: { href: url }"></a>
+    </td>
+    <td>
+    </td>
+  </tr>
+</script>
+
+<script type="text/html" id="enum-row-template">
+  <tr data-bind="css: { even: $index()%2==0 }">
+    <td class="keys" data-bind="text: label"></td>
+    <td></td>
+    <td>
+        <select data-bind="options: options, value: value"></select>
+    </td>
+    <td></td>
+  </tr>
+</script>
+
+<script type="text/html" id="vector-row-template">
+  <!-- ko foreach: values -->
+    <tr data-bind="css: { even: $parent.index%2==0 }">
+      <!-- ko ifnot: $index -->
+        <td class="keys" data-bind="text: $parent.label, attr: { rowspan: $parent.spansize() }"></td>
+      <!-- /ko -->
+      <!-- ko with: $parent.values[$index()] -->
+        <td>
+          <input type="checkbox" data-bind="checked: hasIteration"></input>
+        </td>
+        <td  data-bind="css: { error: valueInvalid }">
+          <input data-bind='value: value, valueUpdate: "afterkeydown"'></input>
+        </td>
+      <!-- /ko -->    
+      <!-- ko ifnot: $index -->
+        <td class="constraints" data-bind="attr: { rowspan: $parent.spansize() }">&#8477;</td>
+      <!-- /ko -->
+    </tr>
+    <!-- ko with: $parent.values[$index()] -->
+      <!-- ko template: { name : 'iterations' } -->
+      <!-- /ko -->
+    <!-- /ko -->    
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="vectorcompact-row-template">
+    <tr data-bind="css: { even: index%2==0 }">
+      <td class="keys" data-bind="text: label, attr: { rowspan: spansize() }"></td>
+      <td></td>
+      <td>
+        <select data-bind="options: options, value: isvector"></select>
+      </td>
+      <td class="constraints" data-bind="attr: { rowspan: spansize() }">&#8477;</td>
+    </tr>
+    <!-- ko foreach: elements -->
+      <tr data-bind="css: { even: $parent.index%2==0 }">
+        <td>
+          <input type="checkbox" data-bind="checked: $parent.at($index()).hasIteration"></input>
+        </td>
+        <td  data-bind="css: { error: $parent.at($index()).valueInvalid }">
+          <input data-bind='value: $parent.at($index()).value, valueUpdate: "afterkeydown"'></input>
+        </td>
+        <td></td>
+      </tr>
+      <!-- ko with: $parent.at($index()) -->
+        <!-- ko template: { name : 'iterations' } -->
+        <!-- /ko -->
+      <!-- /ko -->    
+         
+    <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="row-template">
+  <!-- ko template: { name : renderer } -->
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="row-history-template">
+  <tr data-bind="css: { even: $index()%2==0 }">
+    <td class="keys" data-bind="text: $data[0]"></td>
+    <td class="values" colspan="2" data-bind="text: $data[1]"></td>
+  </tr>
+</script>

@@ -1,0 +1,47 @@
+-*- mode:change-log -*-
+
+25-12-08 Jérôme Lelong  <jerome.lelong@ensta.fr>
+
+	* unique compute button in the interface, no matter if we use
+	iteration or not
+
+	* premia_wrap.c : is_with_iter method added
+
+30-11-08 Jérôme Lelong  <jerome.lelong@ensta.fr>
+
+	* set_option corrected to prevent scripts to pick up an option
+	which is uncomptatible with the model.
+	
+
+25-11-08 Jérôme Lelong  <jerome.lelong@ensta.fr>
+
+	* set_asset uses named argument "str" instead of "asset"
+
+	* set_{model,option,method} accept a named argument "str" in
+	addition to the already existing integer arguments.
+
+
+29-10-08 Jérôme Lelong  <jerome.lelong@ensta.fr>
+
+	* Method get_method_results[] returns an empty list if the compute
+	method has not been called.
+
+
+27-10-08 Jérôme Lelong  <jerome.lelong@ensta.fr>
+
+	* Field Meth.Res are now saved to file together with the object
+	and reloaded when needed.
+
+20-10-08 Jérôme Lelong <jerome.lelong@ensta.fr>
+
+	* A textview widget has been added to the main window to diplay
+	the results of a single computation.
+
+
+17-10-08 Jérôme Lelong  <jerome.lelong@ensta.fr>
+
+	* New field added to a PremiaModel object to store the return of
+	the compute methods and display the right error message when
+	needed.
+  
+

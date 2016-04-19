@@ -1,0 +1,57 @@
+namespace FsPremia 
+
+    exception PremiaExc of string
+
+    module Interop = 
+    
+        let wrap = function
+            | 0 -> ()
+            | -1 -> raise (PremiaExc(FsPremiaInterop.get_error_msg()))
+            | _ -> raise(PremiaExc("unknown error code"))
+            
+    
+        let init_premia = FsPremiaInterop.init_premia >> wrap
+        let setCurrentAsset = FsPremiaInterop.setCurrentAsset >> wrap
+        let reset = FsPremiaInterop.reset >> wrap
+        let stopWriteParameters = FsPremiaInterop.stopWriteParameters >> wrap;
+        let setCurrentModel = FsPremiaInterop.setCurrentModel >> wrap
+        let setCurrentOption = FsPremiaInterop.setCurrentOption >> wrap
+        let setCurrentMethod = FsPremiaInterop.setCurrentMethod >> wrap
+        let write_double = FsPremiaInterop.write_double >> wrap
+        let write_long = FsPremiaInterop.write_long >> wrap
+        let write_int = FsPremiaInterop.write_int >> wrap
+        let write_filename = FsPremiaInterop.write_filename >> wrap
+        let write_enum = FsPremiaInterop.write_enum >> wrap
+        let write_array = FsPremiaInterop.write_array >> wrap
+        let get_result_double = FsPremiaInterop.get_result_double
+        let get_result_bool = FsPremiaInterop.get_result_bool
+        let get_result_array_size = FsPremiaInterop.get_result_array_size
+        let get_result_array_item = FsPremiaInterop.get_result_array_item   
+        let compute_3 = FsPremiaInterop.compute_3 >> wrap
+        
+        let error_msg = FsPremiaInterop.get_error_msg
+        
+        do init_premia(@%DATA_PATH%)    
+
+
+    open Interop
+
+    type IPremiaObj = 
+        abstract member makeCurrent: unit -> unit
+    
+    module Util = 
+  
+        let premiaCompute(model : #IPremiaObj, option : #IPremiaObj, methode : #IPremiaObj) = 
+          model.makeCurrent()
+          option.makeCurrent()
+          methode.makeCurrent()
+          compute_3()
+          
+        let writearray arr = 
+            write_array(Seq.length arr)
+            Seq.iter write_double arr
+            
+        let getResultArray idx = 
+            let sz = get_result_array_size(idx)
+            List.init sz (fun i -> get_result_array_item(idx, i))
+            

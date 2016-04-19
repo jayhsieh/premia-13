@@ -1,0 +1,93 @@
+\section{Introduction}
+
+Le mod\`ele de Black-Scholes suppose que l'\'evolution du prix de 
+l'actif est r\'egi par l'\'equation diff\'erentielle stochastique 
+suivante (cf. \cite{bla:jpe:73})~:
+\begin{eqnarray*}
+dS_t = S_t (\mu dt + \sigma dB_t),
+\end{eqnarray*}
+o\`u la volatilit\'e $\sigma$ du sous-jacent est suppos\'ee 
+constante et o\`u $B_t$ est un mouvement brownien. A partir de ce 
+mod\`ele de diffusion de l'actif, on peut d\'eterminer le prix des 
+options sur cet actif. Inversement, la volatilit\'e $\sigma$ \'etant 
+le seul param\`etre non observable de ce mod\`ele, on s'int\'eresse 
+au calcul de $\sigma$ \`a partir du prix d'une option $(K,T)$ 
+observ\'e sur le march\'e. La volatilit\'e ainsi obtenue est 
+appel\'ee volatilit\'e implicite (not\'ee $\sigma_{BS}(K,T)$). 
+
+Lorsque l'on confronte ce mod\`ele aux donn\'ees r\'eelles, on 
+r\'ealise ses limites~: la volatilit\'e implicite $\sigma_{BS}(K,T)$ 
+est tr\`es sensible aux variations du strike $K$ et de la maturit\'e 
+$T$. Or, la volatilit\'e d'un actif ne peut pas d\'ependre de 
+l'option que l'on consid\`ere. Ce ph\'enom\`ene est connu sous le 
+nom de ``smile'' (cf.~\cite{dup:risk:94}). Il est important d'estimer 
+la volatilit\'e le plus justement possible pour ensuite pouvoir 
+\'evaluer des options plus complexes. Il faut donc trouver une autre 
+repr\'esentation de $\sigma$. 
+
+De nombreux articles se sont int\'eress\'es \`a ce probl\`eme 
+(\cite{lag:jcf:97}, \cite{col:jcf:99}, \cite{jac:jcf:98}, 
+\cite{ave:amf:97}), en proposant un nouveau processus de diffusion 
+pour le sous-jacent (cf. par exemple \cite{dup:risk:94}, 
+\cite{lag:jcf:97})~: 
+\begin{eqnarray*}
+dS_t = S_t (\mu dt + \sigma(S_t,t) dB_t),
+\end{eqnarray*}
+o\`u la volatilit\'e $\sigma(S_t,t)$ d\'epend maintenant du cours 
+du sous-jacent et du temps. Dans le mod\`ele de base de Black-Scholes 
+(avec $\sigma$ constant), on peut facilement d\'eduire $\sigma_{BS}$ 
+du prix de l'option. Dans le cas de la volatilit\'e locale, 
+d\'eterminer la nappe $\sigma(S_t,t)$ est beaucoup plus d\'elicat. 
+Cela revient en fait \`a r\'esoudre un probl\`eme inverse 
+sous-d\'etermin\'e et mal pos\'e. 
+
+Dans la m\'ethode pr\'esent\'ee ici, la fonction de volatilit\'e 
+appara\^{\i}t comme coefficient d'une EDP (EDP de Dupire) 
+v\'erifi\'ee par le prix de l'option. On cherche \`a d\'eterminer 
+ce coefficient \`a partir de l'information dont on dispose concernant 
+le prix gouvern\'e par l'EDP. En principe, ce probl\`eme inverse 
+peut \^etre r\'esolu si l'on a assez d'information sur les prix 
+d'options, mais dans la pratique~: 
+\begin{itemize}
+\item le probl\`eme inverse est sous-d\'etermin\'e car le march\'e 
+ne fournit qu'une quantit\'e limit\'ee d'information,
+\item le probl\`eme est mal pos\'e car la volatilit\'e ne 
+d\'ependra pas contin\^ument des donn\'ees du march\'e.
+\end{itemize}
+Pour rem\'edier \`a ces obstacles, nous utilisons une technique de 
+r\'egularisation qui permet de faire un compromis entre la 
+pr\'ecision (les donn\'ees simul\'ees avec notre mod\`ele sont 
+proches des donn\'ees du march\'e) et la stabilit\'e en recherchant 
+une volatilit\'e suffisamment r\'eguli\`ere. Dans un premier temps, 
+nous ajoutons un terme de r\'egularisation 
+$\lambda \| \sigma \|^2$ \`a la fonction co\^ut mesurant l'\'ecart 
+entre les donn\'ees simul\'ees et les donn\'ees du march\'e. La 
+difficult\'e revient \`a d\'eterminer le coefficient $\lambda$ le 
+mieux adapt\'e. Apr\`es avoir montr\'e des premiers tests de 
+calibration sur donn\'ees synth\'etiques, nous proposons une 
+autre m\'ethode pour r\'egulariser le probl\`eme~: l'approche 
+multi\'echelle qui est d\'ecrite \`a la 
+section~\ref{SSEC:MULTIECHELLE}.
+
+Plusieurs articles ont d\'ej\`a attaqu\'e ce probl\`eme avec le 
+m\^eme type d'approche ``probl\`eme inverse'' (\cite{lag:jcf:97}, 
+\cite{jac:jcf:98}, \cite{col:jcf:99}). La m\'ethode propos\'ee ici 
+diff\`ere cependant en plusieurs points, dont nous discuterons 
+l'opportunit\'e~: 
+\begin{itemize}
+\item la formulation du probl\`eme direct (EDP de Dupire et non de 
+Black-Scholes),
+\item le param\'etrage de $\sigma$ (spline bicubique non contraint),
+\item la m\'ethode d'optimisation (Quasi-Newton avec calcul exact 
+du gradient, aux erreurs d'arrondis pr\`es).
+\end{itemize}
+
+Dans un premier temps, nous pr\'esentons une m\'ethode de 
+r\'esolution du probl\`eme direct de ``pricing'' (EDP de Dupire). 
+S'ensuit une discussion concernant la r\'egularisation du probl\`eme 
+et le choix de la m\'ethode d'optimisation \`a utiliser. Notre 
+choix se porte sur une approche multi\'echelle et une m\'ethode de 
+Quasi-Newton avec bornes, coupl\'ees avec un param\'etrage de la 
+volatilit\'e par des splines bicubiques. Nous validons notre 
+m\'ethode de calibration sur deux jeux de donn\'ees synth\'etiques 
+et sur un jeu de donn\'ees r\'eelles observ\'ees sur le march\'e.

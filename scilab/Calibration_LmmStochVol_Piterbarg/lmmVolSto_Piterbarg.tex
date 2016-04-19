@@ -1,0 +1,420 @@
+\documentclass[12pt,a4paper]{article}
+\input premiamble
+\input premiadata
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mdwlist} % Define enumerate*, & itemize* to create COMPACT listings
+
+\def \d{\partial}
+\def \p{\varphi}
+\def\E{{\mathbb E}}
+\def\D{{\mathbb D}}
+\def\P{{\mathbb P}}
+\def\Q{{\mathbb Q}}
+\def\R{{\mathbb R}}
+\def\S{{\mathbb S}}
+\def\C{{\mathbb C}}
+\def\V{{\mathbb{V}ar}}
+\def \L{\mathbb{L}}
+\def \cK{\mathcal{K}}
+\def \cG{\mathcal{G}}
+\def \cF{\mathcal{F}}
+\def \cS{\mathcal{S}}
+\def \cD{\mathcal{D}}
+\def \cP{\mathcal{P}}
+\def \cL{\mathcal{L}}
+\def \cN{\mathcal{N}}
+\def \B{{\widetilde{B}}}
+
+\addtolength{\hoffset}{-1cm}
+\addtolength{\textwidth}{2cm}
+
+\begin{document}
+\author{Ismail Laachir}
+\title{TERM-STRUCTURE-OF-SKEW FORWARD LIBOR MODEL, by V.PITERBARG}
+\date{\today}
+\maketitle
+
+\thispagestyle{myheadings}
+
+\tableofcontents
+
+\vspace{10mm}
+  
+This document describes the \textit{Term-Structure-of-Skew forward Libor model} proposed by V.Piterbarg and a C implementation in PREMIA of the calibration of this model using market swaptions volatilities and skews.\\
+
+\textit{NB : To know how to run the program, read the file README.}
+
+\section{Libor market model with stochastic volatility}
+
+Let us consider a set of dates {$T_0,T_1,...,T_N$} with $0=T_0<T_1< ... <T_N$ and $T_{k+1}-T_{k} = \tau$.
+
+We note $L_k(t)$, for a certain date $t \leq T_k$, the value at date $t$ of the Libor rate settled at $T_k$ and payed at $T_{k+1}$. We extend this definition to $t > T_k$ simply by $L_k(t) = L_k(T_k)$.
+
+By absence of arbitrage, the Libor rates are related to Zero Coupon bond by :
+$$L_k(t) = \dfrac{1}{\tau} \left(\dfrac{P(t,T_k)}{P(t,T_{k+1})} - 1\right)$$
+
+and a swap rate with starting date $T_n$ and last payment date $T_m$:
+
+$$S_{n,m}(t) = \dfrac{P(t,T_n)-P(t,T_m)}{\displaystyle\sum_{i=n+1}^{m} \tau P(t,T_i)}$$
+
+Under the swap measure $Q^{n,m}$, a European swaption can be viewed as a European option on the swap rate $S_{n,m}(t)$. In fact, if we note this price $Swpt_{n,m}(t)$, then: 
+$$ Swpt_{n,m}(t) = N_t \E\left[ \dfrac{\left( S_{n,m}(T_n) - K\right) ^+}{N_{T_n}}\right] $$ where $N_t$ is the numeraire related to the swap measure $Q^{n,m}$. i.e. $N_t = \displaystyle\sum_{i=n+1}^{m} \tau P(t,T_i)$.
+
+\subsection{Simple model}
+One possible way to price this contract is to model the swap rate $S_{n,m}(t)$ only. This kind of model is called ``simple model'' because it does not describe the evolution the whole interest rate curve. A classic example is the Black model for European swaptions, and a way to extends this model is to introduce stochastic volatility
+
+\begin{eqnarray}
+\label{simple}
+\begin{array}{rll}
+  d S_{n,m}(t) &=&  \lambda\left( bS_{n,m}(t) + (1-b)S_{n,m}(0)\right)  \sqrt{z(t)} dW_t\\
+  d z(t) &=& \kappa (z_0 - z(t)) dt + \eta \sqrt{z(t)} d V(t) \\
+  z(0) &=& z_0 \\
+  <d V, d W> &=& 0 
+   \end{array}
+\end{eqnarray}
+
+The parameter $\lambda$ is responsible of the overall level of volatility smile, $b$ for the slope of the volatility smile at-the-money. With this dynamic, the pricing of a European swaption is straightforward using Fourier transform based methods. (cf appendix)
+
+Each swap rate dynamic is calibrated to the swaption smile across different strikes, witch gives in final a set of parameters $\left\lbrace (\lambda_{n,m}, b_{n,m}, \eta_{n,m})\right\rbrace_{n,m=1}^N$ \footnote{The author suggest to consider $\kappa$ as a global parameter. With a ``good`` choice of $\kappa$,  the parameters $\eta_{n,m}$ can also be chosen constant $\eta_{n,m}=\eta$.}.
+
+Notice also that $z_0$ can be chosen equal to $1$. In fact, if we define $\tilde{\eta} = \dfrac{\eta}{\sqrt{z_0}}$, $\tilde{z}(t) = \dfrac{z(t)}{\sqrt{z_0}}$ and $\tilde{\lambda}=\sqrt{z_0}\lambda$, then:
+
+\begin{eqnarray*}
+\begin{array}{rll}
+  d S_{n,m}(t) &=&  \tilde{\lambda}\left( bS_{n,m}(t) + (1-b)S_{n,m}(0)\right)  \sqrt{\tilde{z}(t)} dW_t\\
+  d \tilde{z}(t) &=& \kappa (1 - \tilde{z}(t)) dt + \tilde{\eta} \sqrt{\tilde{z}(t)} d V(t) \\
+  \tilde{z}(0) &=& 1 \\
+   \end{array}
+\end{eqnarray*}
+
+This set of parameters $\left\lbrace (\lambda_{n,m}, b_{n,m})\right\rbrace$, inferred from market prices of swaptions, will play the role of implied volatility, and a model that we want to calibrate will be fitted to these market values $\left\lbrace (\lambda^{mkt}_{n,m}, b^{mkt}_{n,m})\right\rbrace$. So, the first step is to estimate the corresponding values $\left\lbrace (\lambda^{mod}_{n,m}, b^{mod}_{n,m})\right\rbrace$ for the chosen model. This can be done using approximate dynamics for the swap rate, and averaging techniques as developed in the article of Piterbarg, and as we will recall in the following sections.
+
+\subsection{Extension : A stochastic volatility forward Libor model}
+
+The model proposed above describes separately the swap rates and is not suitable to price exotic interest rate derivatives that depend on the term structure information. A possible way to include this information is to model forward Libor rates with stochastic volatility in the following way, under some measure $\P$:
+
+\begin{eqnarray}
+\label{FLSV}
+d L_n(t)&=&\left(\beta L_n(t) + (1-\beta) L_n(0)\right) \sqrt{z(t)} \sum_{k=1}^{K}\sigma_k(t; n)\left(\sqrt{z(t)}\mu_k(t; n) + dW_k(t)\right)
+\end{eqnarray}
+
+The stochastic variance process $z(t)$ is defined by the same SDE an in \ref{simple} :
+
+\begin{eqnarray*}
+\begin{array}{rll}
+  d z(t) &=& \kappa (z_0 - z(t)) dt + \eta \sqrt{z(t)} d V(t) \\
+  z(0) &=& z_0 \\
+\end{array}
+\end{eqnarray*}
+
+$W(t)= (W_k(t))_{1\leq k \leq K}$ is a $K$-dimensional $\P$-Brownian motion independent of $V$.\\
+
+$\left( \sigma_k(t; n), t\leq T_n\right) ^{k=1:K}_{n=1:N-1}$ is instantaneous volatility functions.\\
+
+$\left( \mu_k(t; n), t\leq T_n\right) ^{k=1:K}_{n=1:N-1}$ is a $\P$-dependant drift that ensures  absence of arbitrage within the model. In particular, under the forward measure with numeraire $P(.,T_{n+1})$, $\mu_k(t; n)=0$.\\
+
+In this model, noted (FL-SV), $S_{n,m}(t)$ can be shown to follow the approximate dynamics 
+\begin{eqnarray}
+\label{appS_FLSV}
+ d S_{n,m}(t) =  \sigma(t) \left( \beta S_{n,m}(t) + (1-\beta)S_{n,m}(0)\right)  \sqrt{z(t)} dU(t)
+\end{eqnarray}
+for some Brownian motion $U(t)$ and some time-dependent volatility function $\sigma(t)$. We remark that $\beta$ does not depend on the swap rate we are considering; This imply that the (FL-SV) model cannot reproduce all swaption volatility smile parameters $\left\lbrace (\lambda^{mkt}_{n,m}, b^{mkt}_{n,m})\right\rbrace$.\\
+
+We then have to expand this model to take into account the variability in swaption skews across expiries/maturities. The model described in the next session proposes a solution to this problem.
+
+\section{Term-Structure-of-Skew Libor model, by Piterbarg}
+
+The intuition behind this model is to add some flexibility to account for the variability in swaption skews, by assuming a time-dependant skew $\left\lbrace \beta(t; n), t \geq 0 \right\rbrace_{n=1}^{N-1} $ in the Libor dynamic.
+
+\subsection{The model}
+
+The Libor rates are supposed to follow the dynamic (noted FL-TSS):
+\begin{eqnarray}
+\label{FL_TSS}
+d L_n(t) = \left(\beta(t; n) L_n(t) + (1-\beta(t; n)) L_n(0)\right) \sqrt{z(t)} \sum_{k=1}^{K}\sigma_k(t; n)\left(\sqrt{z(t)}\mu_k(t; n) + dW_k(t)\right)
+\end{eqnarray}
+
+As we noted before, model will be calibrated to the market-inferred parameters $(\lambda^{mkt}_{n,m}, \; b^{mkt}_{n,m})$. To do that, we have to estimate the model-inferred parameters $(\lambda^{mod}_{n,m}, \; b^{mod}_{n,m})$. The first step then to derive approximate dynamics of swap rates.
+
+In fact, \cite{Pit04} derives the following approximate dynamic for the swap rate under the swap measure $Q^{n,m}$ that makes $S_{n,m}(t)$ a martingale:
+\begin{eqnarray}
+\label{appS_FL_TSS}
+d S_{n,m}(t) = \left( \beta(t;n,m) S_{n,m}(t) + (1-\beta(t;n,m))S_{n,m}(0)\right)  \sqrt{z(t)} \sum_{k=1}^{K}
+\sigma_k(t;n,m) dW^{n,m}_k(t) 
+\end{eqnarray}
+where 
+\begin{eqnarray*}
+\begin{array}{rll}
+   \sigma_k(t;n,m) &=& \displaystyle\sum_{i=n+1}^{m} q_i(n,m) \sigma_k(t,i)\\
+   \beta(t;n,m) &=& \displaystyle\sum_{i=n+1}^{m} p_i(n,m) \beta(t,i)\\\\
+   q_i(n,m) &=& \dfrac{L_i(0)}{S_{n,m}(0)} \dfrac{\partial S_{n,m}(0)}{\partial L_i(0)} \\\\
+   p_i(n,m) &=& \dfrac{\sum_{k} \sigma_k(t;i) \sigma_k(t;n,m)}{(m-n)\sum_{k} \sigma_k^2(t;n,m)}
+\end{array}
+\end{eqnarray*}
+
+We note that this dynamic is similar to the approximate dynamic under (FL-SV) as given in \ref{appS_FLSV} with a major difference that the skew in \ref{appS_FL_TSS} is now time-dependant, witch permits a  term structure expiries/maturities calibration of the market skew $b_{n,m}$.
+
+The calibration of this model can be done in two way. The first one is use fast European option pricing formulas (or approximations) and try to fit the market prices of these European options.
+This means that we try to minimise the error function between market and model price of swaptions:
+
+\begin{equation*}
+\left\{
+\begin{tabular}{l}
+    $\displaystyle   \min \; \sum_{n,m} (Swpt^{mod}_{n,m}-Swpt^{mkt}_{n,m})^2$ \\
+    over $\sigma_k(t;i),$ $\beta(t;i)$
+\end{tabular}
+\right.
+\end{equation*}
+
+The second possibility is to use, if available, formulas that relates the model parameters $\sigma_k(t;i)$ and $\beta(t;i)$ to the  ''effective'', constant parameters $\lambda_{n,m}$ and $b_{n,m}$ such that the equations \ref{appS_FL_TSS} can be approximated by the SDE:
+
+\begin{eqnarray}
+\label{appS_eff}
+d S_{n,m}(t) = \lambda_{n,m} \left( b_{n,m} S_{n,m}(t) + (1-b_{n,m})S_{n,m}(0)\right)  \sqrt{z(t)} dU(t) 
+\end{eqnarray}
+
+Then the fitting procedure can be done directly over the market-values $(\lambda^{mkt}_{n,m}, b^{mkt}_{n,m})$, without the need for option valuations during calibration’s non-linear search. 
+
+The problem of finding good ''effective'' $\lambda_{n,m}$ and $b_{n,m}$ such that the equations \ref{appS_FL_TSS} can be approximated with constant parameters is explained in the next session.
+
+\subsection{Averaging techniques}
+
+From equation \ref{appS_FL_TSS}, each swap rate in the FL-TSS model follows, each one under its appropriate measure, an SDE of the form
+
+\begin{eqnarray}
+\label{appS}
+d S(t) = \sigma(t) \left( \beta(t) S(t) + (1-\beta(t))S(0)\right)  \sqrt{z(t)} dU(t) 
+\end{eqnarray}
+
+where $U(t)$ is a Brownian motion.
+
+The ''main'' technical contribution in \cite{Pit04} is to give formulas to approximate the equation above by an equation with constant parameters.
+
+This can be done in two steps:
+\begin{eqnarray}
+\label{eq_1}
+d S(t) &=& \sigma(t) \left( \beta(t) S(t) + (1-\beta(t))S(0)\right)  \sqrt{z(t)} dU(t)  \\
+&\Downarrow& \beta(t) \text{ is replaced with ``skew average'' } b \nonumber\\
+\label{eq_2}
+d S(t) &=& \sigma(t) \left(b S(t) + (1-b)S(0)\right)  \sqrt{z(t)} dU(t) \\
+&\Downarrow& \sigma(t) \text{ is replaced with ``volatility average'' } \nonumber\lambda\\
+\label{eq_3}
+d S(t) &=& \lambda \left( b S(t) + (1-b)S(0)\right)  \sqrt{z(t)} dU(t) 
+\end{eqnarray}
+
+First, equation \ref{eq_1} is approximated by equation \ref{eq_2} with constant skew and volatility still time-dependant. Then the second step is to replace equation \ref{eq_2} with equation \ref{eq_3} with constant skew and constant volatility.
+
+\begin{itemize}
+ \item Effective skew
+\end{itemize}
+
+The average parameter $b$ is the effective skew for the equation \ref{appS} over a time horizon $[0,T]$, and it's given by
+$$b = \int_{0}^T \beta(t) \omega(t)\, \mathrm dt $$
+
+The weights $\omega(t)$ are given by 
+
+\begin{eqnarray*}
+\begin{array}{rcl}
+\omega(t) &=& \dfrac{v^2(t) \sigma^2(t)}{\int_{0}^T v^2(u) \sigma^2(u)\, \mathrm du} \\
+v(t) &=& z_0^2 \int_{0}^t \sigma^2(u)\, \mathrm du + z_0 \eta^2e^{-\kappa t}\int_{0}^t \sigma^2(u) \dfrac{e^{\kappa u}-e^{-\kappa u}}{2 \kappa}\, \mathrm du
+\end{array}
+\end{eqnarray*}
+
+\begin{itemize}
+ \item Effective volatility
+\end{itemize}
+
+The effective volatility parameter $\lambda$ is chosen such that the price of ATM option on $S(t)$, maturing at $T$, given by the dynamic \ref{eq_2} and \ref{eq_3} are the same. This gives to $\sigma(t)$ the role of capturing the ATM implied volatility.
+
+Using some approximations, we can find that $\lambda$ is given as a solution to the equation
+
+\begin{eqnarray*}
+\varphi_0 \left(-\dfrac{g''(\zeta)}{g'(\zeta)} \lambda^2\right) = \varphi\left(-\dfrac{g''(\zeta)}{g'(\zeta)}\right)
+\end{eqnarray*}
+
+where 
+\begin{eqnarray*}
+g(x) &=& \dfrac{S_0}{b} \left( 2 \mathcal{N}(b\sqrt{x}/2) - 1\right) \\
+\zeta &=& z_0 \int_{0}^T  \sigma^2(t)\, \mathrm dt \\
+\varphi_0(\mu) &=& \E\left[  \exp\left( -\mu \int_{0}^T z(t)\, \mathrm dt\right)   \right] \\
+\varphi(\mu) &=& \E\left[  \exp\left( -\mu \int_{0}^T \sigma^2(t) z(t)\, \mathrm dt\right)   \right]
+\end{eqnarray*}
+
+The function $\varphi_0$ is known explicitly, and $\varphi$ is given by a system of two ode, that we can estimate with some Runge-Kutta method. See Appendix E in \cite{Pit04} for more details.
+
+
+\subsection{Model Calibration}
+
+We suppose that we have at hand the market data $\{(\lambda^{mkt}_{n,m}, \; b^{mkt}_{n,m})\}_{n,m}$ inferred from swaption implied volatilities. Then the goal of the model calibration is to obtain model parameters $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$ and $\{ \beta(t;n), \; t\geq0\}_{n}$ such that $\{(\lambda^{mod}_{n,m}, \; b^{mod}_{n,m})\}_{n,m}$, given by the model parameters using averaging techniques developed above, are as close as possible to their market values.
+
+The author in \cite{Pit04} proposes to separate the fitting procedure into two subproblems. One is the fitting of the term
+structure of swaption skews $\{b_{n,m}\}_{n,m}$ . The other is the fitting of the term structure of swaption volatilities $\{\lambda_{n,m}\}_{n,m}$. However, the equation for $b_{n,m}$ involves both $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$ and $\{ \beta(t;n), \; t\geq0\}_{n}$, and the same is true for $\lambda_{n,m}$.
+
+As a solution to this difficulty, the author suggests to solve this problem sequentially in three steps:
+
+\begin{itemize}
+ \item \textbf{Step 1}: We set all model skews $\{ \beta(t;n), \; t\geq0\}_{n}$ to the same value $\bar{\beta}$ (for example, the average of $b_{n,m}$ over the whole swaption grid). Then the model volatilities $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$ are given by fitting problem:
+\begin{equation*}
+\left\{
+\begin{tabular}{l}
+    $\displaystyle   \min \; \sum_{n,m} (\lambda^{mod}_{n,m}-\lambda^{mkt}_{n,m})^2$ \\
+    over $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$
+\end{tabular}
+\right.
+\end{equation*}
+ 
+ \item \textbf{Step 2} With $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$ obtained from the previous step, the model skews $\{ \beta(t;n), \; t\geq0\}_{n}$ are given by a similar fitting criterion:
+
+\begin{equation*}
+\left\{
+\begin{tabular}{l}
+    $\displaystyle   \min \; \sum_{n,m} (b^{mod}_{n,m}-b^{mkt}_{n,m})^2$ \\
+    over $\{ \beta(t;n), \; t\geq0\}_{n}$
+\end{tabular}
+\right.
+\end{equation*}
+ 
+ \item \textbf{Step 3} (Optional) Using the model skews from the previous step, we re-calibrate $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$ as in the first step.
+\end{itemize}
+
+We can, of course, add some penalty function to the objective function to account for some restrictions, like time-homogeneity in the time-dependant functions $\{ \beta(t;n), \; t\geq0\}_{n}$ and $\{ \sigma_k(t;n), \; t\geq0\}_{n,k}$.
+
+We note also that the effective skew $b^{mod}_{n,m}$ can be written as:
+
+\begin{eqnarray*}
+b^{mod}_{n,m} &=& \int_{0}^T \beta(t; n, m) \omega_{n,m}(t)\, \mathrm dt \\
+&=& \int_{0}^T \left( \displaystyle\sum_{i=n+1}^{m} p_i(n,m) \beta(t,i) \right) \omega_{n,m}(t)\, \mathrm dt
+\end{eqnarray*}
+
+where the functions $\omega_{n,m}(t)$ are independents from $\beta(t,i)$, so they can be pre-computed before the optimization routine.\\
+
+ 
+ \textbf{Skew and volatility parametrization:} The calibration procedure is done over the functions $\beta(t,i)$ and $\sigma_k(t,i)$. We then have to suppose some parametric form for these variables. As proposed in \cite{Pit04}, we will adopt a parametrization by time/offset and we denote by 
+$\beta^*(t, \mathcal{T})$  and $\sigma_k^*(t, \mathcal{T})$ the corresponding functions.
+$$
+\beta(t, i) = \beta^*(t, T_i-t) \text{, } \sigma_k(t, i) = \sigma_k^*(t, T_i-t)
+$$
+ 
+We then choose a time/offset grid where these functions are defined, and for the other knot points $(t_i, \mathcal{T}_j)$ we use bilinear interpolation.\\
+
+\textbf{Market data:} We have used the same market data as in \cite{Pit04} page 18:
+
+\begin{itemize}
+ \item  Interest rate curve with continuously-compounded zero rates flat at $5.00\%$
+ \item  All volatility of variance parameters $\eta_{n,m}$ to $130\%$
+ \item  Mean reversion of variance $\kappa$ is set to $15\%$.
+ \item  All market swaption volatilities $\lambda_{n,m}$ are set to $15\%$
+ \item  Market swaption skew $b_{n,m}$ are given in table 1 in \cite{Pit04}
+\end{itemize}
+
+\textbf{Running the program:}
+To run the program, first you have to compile the files by typing ``make``.
+Then, type \textit{./CalibrationLiborStochVol} to run the calibration program.
+
+
+\newpage
+\appendix
+\subsection*{\textsl{Appendix A. Pricing of a swaption under ``Simple Model''}}
+We recall the dynamic of the ``Simple model''. The swap rate is supposed to follow the SDE, under swap measure
+
+\begin{eqnarray*}
+\label{simple}
+\begin{array}{rll}
+  d S_t &=&  \lambda\left( bS_t + (1-b)S_0\right)  \sqrt{z_t} dW_t\\
+  d z_t &=& \kappa (z_0 - z_t) dt + \eta \sqrt{z_t} d V_t \\
+   \end{array}
+\end{eqnarray*}
+where $W$ and $V$ are two independent Brownian motions.\\
+
+We want to compute the following expectation $C_0= \E \left[ \left( S_T - K\right)^+  \right] $. This can be rewritten as 
+
+\begin{equation*}
+\left\{
+\begin{tabular}{l}
+    $C_0 = \dfrac{1}{|b|}\E \left[ (\zeta_T - K')^+\right]$ if $b > 0$\\
+    $C_0 = \dfrac{1}{|b|}\E \left[ (K'-\zeta_T)^+\right]$ if $b < 0$
+\end{tabular}
+\right.
+\end{equation*}
+
+where $\zeta_t = bS_t + (1-b)S_0$ and $K'=bK + (1-b)S_0$. The process $\zeta_t$ follows the SDE
+
+\begin{eqnarray*}
+\label{simple}
+\begin{array}{rll}
+  d \zeta_t &=&  \zeta_t \sqrt{\tilde{z_t}} dW_t\\
+  d \tilde{z_t} &=& \kappa (\tilde{z_0} - \tilde{z_t}) dt + \tilde{\eta} \sqrt{\tilde{z_t}} d V_t \\
+   \end{array}
+\end{eqnarray*}
+
+where $\tilde{z_0}= (b \lambda)^2 z_0 $ and $\tilde{\eta}= |b| \lambda \eta $. 
+
+Then $(\zeta_t,  \tilde{z_t})$ follow the dynamic as in the very known Heston model. So we can use transform-based formulas, with the known characteristic function of the log spot.
+
+In particular, we can use Lewis formula (In the case of $b>0$):
+
+\begin{eqnarray}
+\label{cf_heston}
+C_0 = \dfrac{1}{b} \left[ \zeta_0 - \dfrac{\sqrt{\zeta_0 K'}}{\pi} \int_{0}^\infty Re \left(e^{i u \log(\frac{\zeta_0}{K'})} \phi_T(u-\frac{i}{2}) \right)\dfrac{\mathrm du}{u^2 +\frac{1}{4}}
+\right] 
+\end{eqnarray}
+
+where $\phi_T(u-\frac{i}{2}) = \E\left[  e^{i (u-\frac{i}{2}) \log(\frac{\zeta_T}{\zeta_0})}\right] $. cf \cite{Lewis04}.\\
+
+Because there is no correlation between $W$ and $V$, the quantity $\phi_T(u-\frac{i}{2})$ is in $\R$.
+
+In fact, we have
+
+\begin{eqnarray*}
+\phi_T(u-\frac{i}{2}) = \exp(A + B \tilde{z_0})
+\end{eqnarray*}
+
+where 
+\begin{eqnarray*}
+A &=& \dfrac{\kappa \tilde{z_0}}{\tilde{\epsilon}^2} \left( \kappa-d)T-2\log(\dfrac{ge^{-dT}-1}{g-1})\right) \\ 
+B &=& \dfrac{\kappa-d}{\tilde{\epsilon}^2} \left( \dfrac{e^{-dT}-1}{ge^{-dT}-1} \right) \\
+g &=& \dfrac{\kappa-d}{\kappa+d} \\
+d &=& \sqrt{\kappa^2-4\alpha \gamma}\\
+\alpha &=&  -\dfrac{1}{2} (u^2 + \dfrac{1}{4})\\
+\gamma &=& \dfrac{1}{2} \tilde{\epsilon}^2
+\end{eqnarray*}\\
+
+\textbf{Remark:}\\
+
+ If $\lambda$ is now time-dependant $\lambda=\sigma(t)$, one can always use the formula \ref{cf_heston}, with the characteristic function $\phi_T(u-\frac{i}{2}) = \exp(A(0,T) + B(0,T) \tilde{z_0})$ where $A$ and $B$ are solutions of the ODE
+ 
+\begin{eqnarray*}
+A'(t,T) &=& -\kappa \tilde{z_0} B(t,T)\\ 
+B'(t,T) &=& \kappa B(t,T) + \frac{1}{2}(u^2+\frac{1}{4})\sigma^2(t) - \frac{1}{2} \tilde{\epsilon}^2 B^2(t,T)\\
+A(T,T) &=& B(T,T) = 0
+\end{eqnarray*}
+
+To estimate $A(0,T)$ and $B(0,T)$, we can use Runge-Kutta method for example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{thebibliography}{1}
+
+   
+
+\bibitem[Piterbarg 2004]{Pit04}
+Piterbarg, V. V. (2004)
+\newblock A stochastic volatility forward Libor model with a term structure of volatility smiles.
+\newblock SSRN Working paper.
+
+
+\bibitem[Lewis 2001]{Lewis04}
+Lewis, A. (2001)
+\newblock A Simple Option Formula for General Jump-Diffusion and other Exponential Lévy Processes
+\newblock Envision Financial Systems and OptionCity.net, California. Available at http://optioncity.net/pubs/ExpLevy.pdf
+
+
+%\bibitem[]{}
+%\newblock 
+%\newblock {\em }
+
+\end{thebibliography}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input premiaend
+\end{document}

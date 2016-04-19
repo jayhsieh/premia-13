@@ -1,0 +1,40 @@
+**********************************
+			PREMIA
+	***********************************	
+
+
+
+The program directory contains these files:
+
+ - the documentation file "hestoncalibr.pdf"
+ - the source program file: "calib_heston.c" written in .c
+
+Compilation 
+===========
+
+Compilation command under Linux:
+
+make
+
+generates the executable binary file "CalibHeston". 
+
+
+Data input 
+==========
+
+ The calibration routine use three files:
+
+ - "in.dat" Parameters of calibration
+ - "DataMarket.txt" Observed implied volatilities
+ - "VSMarket.txt" Variance Swaps Prices
+
+
+The PREMIA TEAM
+
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************
+

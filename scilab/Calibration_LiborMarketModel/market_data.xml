@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE  data [
+        <!ELEMENT date (#PCDATA)>
+	<!ELEMENT delta (#PCDATA)>
+	<!ELEMENT maxnumber (#PCDATA)>
+	<!ELEMENT disfact (dismaturity, discountfactor,srmaturity,swaprate)>
+	<!ELEMENT capvol (atmcapmaturity,atmcapvolatility,itmotmcapmaturity,itmotmcapvolatility,itmotmshiftmaturity,itmotmshift,shiftmaturity,shift_to_atm,capsmile)>
+	<!ELEMENT swapvola (atmswapmaturity,atmswapexpiry,atmswapvolatility,itmotmswapmaturity,itmotmswapexpiry,itmotmswapvolatility,itmotmswapshiftmaturity,itmotmswapshift,swapshiftmaturity,swapshift,swapsmile)>
+]>
+
+<data>
+
+<date> 18/10/2001 </date>
+<delta  delta="0.5"> </delta>
+<maxnumber> 42 </maxnumber>
+
+<disfact> 
+	<dismaturity> 
+		1  2  3  4  5  6  7  8  9  10 
+		11 12 13 14 15 16 17 18 19 20 
+		21 22 23 24 25 26 27 28 29 30 
+		31 32 33 34 35 36 37 38 39 40 
+		41
+	</dismaturity>
+	<discountfactor>
+		0.98260 0.96675 0.94967 0.93160 0.91248 0.89262 0.87222 0.85132 0.83017 0.80875 
+		0.78748 0.76618 0.74526 0.72449 0.70415 0.68409 0.66450 0.64527 0.62656 0.60826
+		0.59043 0.57295 0.55574 0.53894 0.52280 0.50712 0.49174 0.47666 0.46189 0.44767
+		0.43434 0.42161 0.40917 0.39704 0.38519 0.37383 0.36255 0.35136 0.34063 0.33033
+		0.32064
+	</discountfactor>
+	<srmaturity> 
+		0
+	</srmaturity>
+	<swaprate>
+		0
+	</swaprate>
+</disfact>
+
+<capvola> 
+	<atmcapmaturity> 
+		0
+	</atmcapmaturity>
+	<atmcapvolatility>
+		23.25  22.97  21.50  20.03  19.06  17.95  17.16  16.38  15.89  15.40 
+		14.90  14.41  14.09  13.77  13.47  13.16  12.95  12.74  12.57  12.40 
+		12.325 12.25  12.175 12.10  12.048 11.99  11.94  11.89  11.84  11.79 
+		11.751 11.712 11.673 11.634 11.595 11.556 11.517 11.478 11.439 11.40
+	</atmcapvolatility>
+	<itmotmcapmaturity>
+		1 2 3 4 5 6 10 15 20 30
+	</itmotmcapmaturity>
+	<itmotmcapvolatility>
+		23.25  22.97  21.50  20.03  19.06 17.95 15.40 13.47 12.40 11.79 
+	</itmotmcapvolatility>
+	<itmotmcapshiftmaturity>
+		1 2 3 5 7 10 15 20
+	</itmotmcapshiftmaturity>
+	<itmotmcapshift>
+		-2 -2 3 1.5 4 -2 0.5 2
+	</itmotmcapshift>
+	<capshiftmaturity>
+		1 5 10 30
+	</capshiftmaturity>
+	<capshift>
+		-5	-2	-1	-0.5	-0.25	0	0.25	0.5	1	2	5	10	20	
+	</capshift>
+	<capsmile>
+		20	6.5	2.75	1	0.5	0	0.05	0.1	0.15	0.5	3.5	7	10.5
+		17.75	4.7	1.75	0.6	0.15	0	0.05	0.05	0.1	0.4	3.2	7	10.5
+		15.5	3.75	0.9	0.3	0.05	0	0.03	0.05	0.05	0.25	2.3	5.5	8
+		9	1.75	0.25	0.15	0	0	0	0	0.05	0.1	1.5	4	6
+	</capsmile>
+</capvola>
+
+<swapvola>
+	<atmswapmaturity> 
+		2 4 6 8 10 12 14 16 18 20 30
+	</atmswapmaturity>
+	<atmswapexpiry> 
+		2 4 6 8 10 12 14 16 18 20 30
+	</atmswapexpiry>
+	<atmswapvolatility> 
+		20.71 18.89 17.32 16.16 15.21 14.53 13.92 13.42 13.01 12.65  11.57  
+		18.12 16.59 15.49 14.71 14.11 13.65 13.22 12.87 12.58 12.28  11.28  
+		16.58 15.17 14.35 13.78 13.38 13.06 12.73 12.45 12.21 12.01  11.01 
+		15.39 14.13 13.48 13.11 12.83 12.58 12.33 12.14 11.94 11.77  10.74 
+		14.28 13.39 12.95 12.60 12.35 12.15 11.95 11.76 11.64 11.48  10.51 
+		12.86 12.16 11.84 11.54 11.34 11.22 11.02 10.90 10.80 10.69  0
+		11.66 10.93 10.65 10.43 10.28 10.17 10.05 9.98  9.89  9.80   0   
+		10.87 10.19 9.95  9.70  9.60  0     0     0     0     0      0  
+	</atmswapvolatility>
+	<itmotmswapmaturity>
+		0
+	</itmotmswapmaturity>
+	<itmotmswapexpiry>
+		2 4 6 8 10 12 14 16 18 20 30
+	</itmotmswapexpiry>
+	<itmotmswapvolatility> 
+		20.71 18.89 17.32 16.16 15.21 14.53 13.92 13.42 13.01 12.65  11.57  
+		18.12 16.59 15.49 14.71 14.11 13.65 13.22 12.87 12.58 12.28  11.28  
+		16.58 15.17 14.35 13.78 13.38 13.06 12.73 12.45 12.21 12.01  11.01 
+		15.39 14.13 13.48 13.11 12.83 12.58 12.33 12.14 11.94 11.77  10.74 
+		14.28 13.39 12.95 12.60 12.35 12.15 11.95 11.76 11.64 11.48  10.51 
+		12.86 12.16 11.84 11.54 11.34 11.22 11.02 10.90 10.80 10.69  0
+		11.66 10.93 10.65 10.43 10.28 10.17 10.05 9.98  9.89  9.80   0   
+		10.87 10.19 9.95  9.70  9.60  0     0     0     0     0      0  
+	</itmotmswapvolatility>
+	<itmotmswapshiftmaturity>
+		1 2 3 5 7 10 15 20
+	</itmotmswapshiftmaturity>
+	<itmotmswapshift>
+		-2 -2 3 1.5 4 -2 0.5 2
+	</itmotmswapshift>
+	<swapshiftmaturity>
+		2 10 20 40 60
+	</swapshiftmaturity>
+	<swapshift>
+		-5	-2	-1	-0.5	-0.25	0	0.25	0.5	1	2	5	8	10	12	20
+	</swapshift>
+	<swapsmile>
+		18	4.5	1.5	0.5	0.25	0	0.05	0.3	0.8	2	6	9.5	11.5	13	17
+		16.5	4.6	1.6	0.7	0.25	0	-0.1	-0.1	0	0.8	3.5	6	7.35	8.3	11.5
+		12.75	3.8	1.45	0.6	0.2	0	-0.1	-0.1	-0.1	0.7	2.75	4.55	5.85	6.85	9.5
+		9.5	2.3	0.8	0.3	0.05	0	-0.1	-0.1	-0.05	0.2	2	3.55	4.55	5.35	7.65
+		8	1.4	0.5	0.2	0.05	0	-0.1	-0.05	-0.05	0.1	1.6	3.05	3.85	4.5	6.6
+	</swapsmile>
+</swapvola>
+
+</data>

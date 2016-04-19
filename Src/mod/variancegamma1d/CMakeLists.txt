@@ -1,0 +1,23 @@
+add_library (libvariancegamma1d OBJECT
+	variancegamma1d.c
+	variancegamma1d_lim/fd_impexpdownout_vg.C
+	variancegamma1d_lim/fd_impexpupout_vg.C
+	variancegamma1d_lim/variancegamma1d_lim.c
+	variancegamma1d_lim/ap_fastwhbar_vg.c
+	variancegamma1d_lim/ap_backwardfourierbar_vg.c
+	variancegamma1d_pad/variancegamma1d_pad.c
+	variancegamma1d_pad/mc_vg_lookbackfixed.c
+	variancegamma1d_pad/mc_vg_lookbackfloating.c
+	variancegamma1d_pad/mc_vg_asianfixed.c
+	variancegamma1d_pad/mc_vg_asianfloating.c
+	variancegamma1d_std/ap_carr_vg.C
+	variancegamma1d_std/fd_impexp_vg.C
+	variancegamma1d_std/variancegamma1d_std.c
+	variancegamma1d_std/ap_fastwhdig_vg.c
+	variancegamma1d_std/ap_fastwh_vg.c
+	variancegamma1d_std/ap_backwardfourier_vg.c
+	variancegamma1d_std/ap_backwardfourierdig_vg.c
+	variancegamma1d_std/tr_mss_vg.c
+	variancegamma1d_stda/ap_gap_variancegamma.C
+	variancegamma1d_stda/variancegamma1d_stda.c
+	)

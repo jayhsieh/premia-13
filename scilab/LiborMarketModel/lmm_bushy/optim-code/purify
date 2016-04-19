@@ -1,0 +1,6 @@
+PURIFY:
+
+rlogin solaris
+setenv LM_LICENSE_FILE /usr/Rational/config/zuni.dat
+rm *.o
+make pure

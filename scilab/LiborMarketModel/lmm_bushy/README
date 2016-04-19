@@ -1,0 +1,43 @@
+/////////////////////////////////////////////////////////////////////////
+//
+//    PREMIA - Pricing of equity and derivatives library
+//    Interest rates modelling	
+//          Libor Market Model (LMM)
+//		
+//	JAN 2005
+//
+// 
+//
+////////////////////////////////////////////////////////////////////////
+
+Compilation
+===========
+
+In this directory to build the library just type 
+
+    make
+
+It is independent of the other files of Premia; 
+
+It will compile the following model
+
+	1) Non exploding bushy tree for the LMM
+
+
+make will produce the following program: lmm_bushy_pricer
+
+Version
+=======
+
+the compilation works under Red Hat 9 with:
+
+	gcc (GCC) 3.2.2 20030222 (Red Hat Linux 3.2.2-5)
+	glibc-2.3.2-11.9
+
+
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

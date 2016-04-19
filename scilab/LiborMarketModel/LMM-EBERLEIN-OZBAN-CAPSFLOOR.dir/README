@@ -1,0 +1,22 @@
+Compilation
+===========
+
+In this directory to build the library just type 
+
+   g++ LMM-EBERLEIN-OZBAN-CAPSFLOOR.cpp -lm -o Cap_Levy_Libor
+
+It is independent of the other files of Premia;
+
+It will compile the following algorithms g
+
+1)  Cap Pricer of Levy Libor Market Model by Eberlein-Ozkan
+
+To execute the algorithm just type
+
+	Cap_Levy_Libor
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************
+

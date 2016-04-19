@@ -1,0 +1,20 @@
+add_library (libbsnd OBJECT
+	bsnd_stdnd/bsnd_stdnd.c
+	bsnd_stdnd/black.c
+	bsnd_stdnd/mc_barraquandmartineau_nd.c
+	bsnd_stdnd/mc_tsitsiklisvanroy_nd.c
+	bsnd_stdnd/mc_longstaffschwatrz_nd.c
+	bsnd_stdnd/mc_broadieglassermann_nd.c
+	bsnd_stdnd/mc_quantization_nd.c
+	bsnd_stdnd/mc_random_quantization_nd.c
+	bsnd_stdnd/mc_quantization_stored_nd.c
+	bsnd_stdnd/ap_carmonadurrleman_nd.c
+	bsnd_stdnd/mc_bsde_labart_nd.c
+	bsnd_stdnd/mc_andersenbroadie_nd.c
+	bsnd_stdnd/mc_jourdainlelong.c
+	bsnd_stdnd/mc_malliavinamer.c
+	bsnd_stdnd/mc_jainoosterlee_nd.c
+	bsnd_stdnd/ap_multispread.c
+	bsnd_stdnd/fd_svd_bs.C
+	bsnd.c
+	)

@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl5
+
+# Auteur: Jean-Marc Cognet
+# Date de creation:              20/06/02
+# Date de derniere modification: 20/06/02
+# Commentaires:
+#  ...
+
+$nom_court = $0; $nom_court =~ s|.*/||;
+
+if ($ARGV[0] eq "-h" || $ARGV[0] eq "-help") {
+  print "\nUtilisation: $nom_court var nbr fic\n\n";
+  print "Remplace la variable var par nbr dans le fichier fic\n";
+  print "(attention, cette commande modifie le fichier fic).\n\n";
+  print "Exemple : $nom_court optionSimul 1 data.in\n\n";
+  exit 1;
+}
+
+$var = $ARGV[0];
+$nbr = $ARGV[1];
+$fic = $ARGV[2];
+
+$fic_tmp = "$fic".".tmp";
+
+open(FICHIER,$fic);
+open(FICHIER_TMP,">$fic_tmp");
+
+$bool = 0;
+while (<FICHIER>) {
+  if (/$var :/) {
+    $bool = 1;
+  }
+  if ($bool == 1){
+    if (/^\#/){
+      print FICHIER_TMP;
+    } else {
+      s/$_/$nbr/;
+      print FICHIER_TMP "$_\n";
+      $bool = 0;
+    }
+  } else {
+    print FICHIER_TMP;
+  }
+}
+
+close(FICHIER);
+close(FICHIER_TMP);
+
+system("mv $fic_tmp $fic");
+
+exit 0;

@@ -1,0 +1,64 @@
+\documentclass[10pt,a4paper,english]{article}
+\input premiamble
+\input premiadata
+
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{babel}
+\usepackage{graphicx}
+\usepackage{color}
+
+\newcommand{\ban}{\begin{eqnarray*}}
+\newcommand{\ean}{\end{eqnarray*}}
+\newcommand{\ba}{\begin{eqnarray}}
+\newcommand{\ea}{\end{eqnarray}}
+
+\begin{document}
+
+
+\author{Marc BARTON-SMITH\footnote{ENPC, CERMICS, France} \quad Jos\'e da FONSECA\footnote{INRIA Rocquencourt, Projet Mathfi, France} \quad Marouen MESSAOUD\footnote{INRIA Rocquencourt, Projet Mathfi, France} \\ \quad Nicola MORENI\footnote{ENPC, CERMICS, France}}
+\title{Libor Market Model}
+\date{\today}
+\maketitle
+\thispagestyle{myheadings}
+\tableofcontents
+
+\vspace{10mm}
+
+
+
+
+%%\section{Derivative products}
+
+\include{LMM_derivative_products}
+
+%\section{Libor Market Model}
+
+\include{LMM_basics}
+
+% \section{Bushy Tree Technique}
+
+\include{LMM_bushy}
+
+
+%\section{Bermudan swaption pricing in the Libor Market Model}
+
+\include{LMM_bermudan_swptns}
+
+%%\section{Libor market model: a stochastic volatility extension}
+
+\include{LMM_stochastic_volatility}
+
+%%\section{Arbitrage free discretization of the Libor Market Model}
+
+\include{LMM_arbitrage_free}
+
+
+ 
+%\begin{thebibliography}{1}
+
+\include{LMM_bibliography}
+
+
+\input premiaend
+
+\end{document}

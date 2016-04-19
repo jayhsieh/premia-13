@@ -1,0 +1,25 @@
+Compilation
+===========
+
+In this directory to build the library just type 
+
+    make
+
+It is independent of the other files of Premia;
+
+It will compile the following algorithms
+
+1)  bermudan swaption pricer by Andersen algorithm
+
+If you want to clean object files execute the following commands
+        (source version only):
+	
+    make clean
+
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************
+

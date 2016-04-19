@@ -1,0 +1,69 @@
+	**********************************
+			PREMIA
+	***********************************	
+
+/////////////////////////////////////////////////////////////////////////
+//
+//      Pricing of CDO
+//	Vincent LEMAIRE (2006)
+//	vincent.lemaire@univ-mlv.fr	
+//
+//
+// 
+//
+////////////////////////////////////////////////////////////////////////
+
+ I - TO INSTALL CDO_PRICER TOOLBOX
+ *********************
+
+ 1 -Configure your system by issuing the following command in the Unix 
+    directory:
+    	./configure
+
+	run ./configure 
+
+
+ 2 - Do in the Unix directory:
+ 	make 
+ 
+        This will compile all  CDO_PRICER TOOLBOX .
+
+3- If you want to clean object files execute the following commands
+	make distclean
+
+
+ II - TO RUN CDO_PRICER TOOLBOX
+ *********************
+
+Run Scilab interface in the Scilab directory
+
+	/scilab/exec interface.sci
+
+
+III-ALGORITHMS
+*********************
+
+CDO_PRICER TOOLBOX contains the following algorithm:
+
+	1) Monte Carlo methods
+	2) Monte Carlo methos with control variate
+	3) Hull-White algorithm
+	4) Laurent-Gregory algorithm
+
+- In the "Src" directory you find .c source files
+- "Scilab" directory containts The CDO_PRICER-scilab interface
+- In "demo" directory  you find the function 'price_cdo'
+used to interface with Scilab
+- in "datas" you find all the data market
+- "doc" contains all the documentation in html and latex
+
+
+--
+Vincent LEMAIRE (2006)
+vincent.lemaire@univ-mlv.fr
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

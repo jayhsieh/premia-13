@@ -1,0 +1,413 @@
+\documentclass[12pt,amsfonts,enumerate,amscd]{amsart}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{amsthm}
+
+\evensidemargin0cm \oddsidemargin0cm
+ \textwidth15.8cm
+
+\numberwithin{table}{section}
+\numberwithin{equation}{section}
+
+
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{rem}{Remark}[section]
+
+
+\newcommand{\eq}[1]{(\ref{#1})}
+\newcommand{\tb}[1]{\ref{#1}}
+
+\newcommand{\lemm}[1]{Lemma \ref{#1}}
+\newcommand{\theor}[1]{Theorem \ref{#1}}
+\newcommand{\cond}[1]{T\ref{#1}}
+\newcommand{\sect}[1]{Section \ref{#1}}
+\newcommand{\subsect}[1]{Subsection \ref{#1}}
+\newcommand{\propos}[1]{Proposition \ref{#1}}
+%%%
+\newcommand{\app}[1]{Appendix \ref{#1}}
+%%%
+\newcommand{\bbe}{\begin{equation}\label}
+\newcommand{\ee}{\end{equation}}
+
+
+
+\newcommand{\hX}{{\hat X}}
+
+
+\newcommand{\om}{\omega}
+
+\newcommand{\bR}{{\mathbb R}}
+\newcommand{\bP}{{\bf P}}
+\newcommand{\bQ}{{\bf Q}}
+\newcommand{\Q}{{\bf Q}}
+\newcommand{\bC}{{\bf C}}
+\newcommand{\C}{{\bf C}}
+\newcommand{\R}{{\bf R}}
+\newcommand{\T}{{\bf T}}
+\newcommand{\Z}{{\bf Z}}
+\newcommand{\N}{{\bf N}}
+
+
+\newcommand{\as}{\hbox{as}}
+\newcommand{\dt}{{\Delta t}}
+\newcommand{\pn}{\bar P^{0}}
+
+
+\newcommand{\eps}{\epsilon}
+
+\newcommand{\INT}{\int_{-\infty}^{+\infty}}
+\newcommand{\tpi}{(2\pi)^{-1}}
+
+\newcommand{\cp}{c_+}
+\newcommand{\cm}{c_-}
+
+
+\newcommand{\xmin}{x_{\rm min}}
+\newcommand{\xmax}{x_{\rm max}}
+
+\newcommand{\bfo}{{\bf 1}}
+
+\newcommand{\I}{{\mathcal I}}
+
+
+\newcommand{\FF}{{\cal F}}
+
+
+
+\renewcommand{\Re}{\operatorname{\rm Re}}
+\renewcommand{\Im}{\operatorname{\rm Im}}
+
+
+\baselineskip 20 pt
+\begin{document}
+
+\title[Heston model calibration]{Heston model calibration using Variance Swaps prices}
+
+\author[Vadim Zherder]{Vadim Zherder}
+
+
+%\keywords{}
+%\subjclass{}
+\maketitle
+
+\vspace*{10pt}  \centerline{\footnotesize\it Premia Team, INRIA}
+
+\centerline{\footnotesize\it
+E-mail: vzherder@mail.ru}
+
+ 
+%\begin{abstract}
+%\end{abstract}
+\vskip0.2cm
+\maketitle
+
+\section{Heston model}
+
+Let the asset price process $S_t$ follows the Heston stochastic volatility model with mean-reversion $\kappa>0$, long-run variance $\theta>0$, volatility of volatility $\sigma>0$, current variance $v_0>0$ and correlation $\rho\in (-1;1)$.
+
+Introduce $\phi$ as the characteristic function of $X_t = \log S_t$. It is known in a closed form and can be used to compute standard call and put prices by the aid of Fourier inversion as in Lord\&Kahl, 2007.
+
+Let $Q_t$ be a process of quadratic variation, 
+\[
+Q_t = \sum_{s\le t} \left(\Delta X_s\right)^2, 
+\]
+then the Variance Swap price with maturity $T$ and strike $K$ is given by
+\[
+\tilde {W}_T = E\left[ Q_T\right] - K. 
+\]
+  Typically, the expectation of quadratic variation process is given in "annual volatility points", i.e. 
+\[
+\tilde{V}_T = \sqrt{ \frac{1}{T} E\left[ Q_T\right]} * 100.
+\]
+In what follows, we use "Variance Swap" to refer to "the expectation of quadratic variation process in annual volatility points".
+
+For the Heston model the expectation of $Q_T$ is expressed by a very simple closed formula:
+\[
+E\left[ Q_T\right] = T V(T;\kappa, \theta, v_0), 
+\]
+where
+\[
+ V(T;\kappa, \theta, v_0)=\theta + (v_0 - \theta) \frac{1-e^{-\kappa T}}{\kappa T}.
+\]
+
+
+Note that for given $T$ the expression for $V(T;...)$ depends on $\kappa$, $\theta$ and $v_0$ only.
+
+ \section{Calibration}
+
+We assume that both vanilla options prices and variance swaps are available at the market.
+Then we can fit model to the data in two steps: first, we estimate $\kappa$, $\theta$ and $v_0$ by variance swaps prices, we fix this values and use them together with some initial values of $\sigma$ and $\rho$ as an initial guess for the algorithm of 5-dimensional minimization of square error of vanilla prices.
+
+\subsection{Variance swaps fitting}
+
+Assume that we observe variance swaps prices $\tilde{W}_i$ for a set of maturities $T_i$, $i=1, 2, .., N$, and we derive from them the observed values of the expectation of quadratic variation:
+\[
+d_i = \left( \tilde{W}_i/100\right)^2. 
+\]
+ 
+Introduce the cost function $f(\kappa, \theta, v_0)$ by
+\[
+f(\kappa, \theta, v_0)=\sum_{i=1}^N \left( V_i - d_i\right)^2, 
+\]
+where $V_i = V(T_i; \kappa, \theta, v_0)$.
+ To minimize $f$, we find its partial derivatives using partial derivatives of $V_i$:
+\begin{eqnarray*}%\label{Vpartial}
+\frac{\partial V_i}{\partial \theta} &=& 1 - \frac{1-e^{-\kappa T_i}}{\kappa T_i},\\
+\frac{\partial V_i}{\partial v_0} &=& \frac{1-e^{-\kappa T_i}}{\kappa T_i}, \\
+\frac{\partial V_i}{\partial \kappa} &=& \frac{v_0-\theta}{\kappa}\left( e^{-\kappa T_i} - \frac{1-e^{-\kappa T_i}}{\kappa T_i}\right), 
+\end{eqnarray*}
+ and obtain the system of equations:
+\begin{eqnarray*}%\label{fsystem1}
+\sum_{i=1}^N \left( V_i - d_i\right) - \sum_{i=1}^N \left( V_i - d_i\right)\frac{1-e^{-\kappa T_i}}{\kappa T_i} &=&0, \\
+\sum_{i=1}^N \left( V_i - d_i \right) \frac{1-e^{-\kappa T_i}}{\kappa T_i}&=&0, \\
+\sum_{i=1}^N \left( V_i - d_i \right)e^{-\kappa T_i} -  \sum_{i=1}^N \left( V_i - d_i \right)\frac{1-e^{-\kappa T_i}}{\kappa T_i} &=&0.
+\end{eqnarray*}
+
+The system may be simplified further to be written as:
+\begin{eqnarray*}%\label{fsystem2}
+\sum_{i=1}^N \left( V_i - d_i\right) &=& 0,\\
+\sum_{i=1}^N \left( V_i - d_i \right)e^{-\kappa T_i}&=&0,\\
+\sum_{i=1}^N \left( V_i - d_i \right)\frac{1-e^{-\kappa T_i}}{\kappa T_i} &=&0.
+\end{eqnarray*}
+
+Substitute the expression of $V_i$ to obtain
+\begin{eqnarray*}%\label{fsystem3}
+\theta\left( N - \sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i}\right) + v_0\sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i} = \sum_{i=1}^N d_i,\\
+\theta\left( \sum_{i=1}^N e^{-\kappa T_i}- \sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i}e^{-\kappa T_i}\right) + v_0\sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i}e^{-\kappa T_i} = \sum_{i=1}^N d_ie^{-\kappa T_i},\\
+\theta\left( \sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i}- \sum_{i=1}^N \left(\frac{1-e^{-\kappa T_i}}{\kappa T_i}\right)^2 \right) + v_0\sum_{i=1}^N \left(\frac{1-e^{-\kappa T_i}}{\kappa T_i}\right)^2 = \sum_{i=1}^N d_i \frac{1-e^{-\kappa T_i}}{\kappa T_i}.
+\end{eqnarray*}
+
+The system is linear in $\theta$ and $v_0$. To write it in a short notation, let us introduce
+\begin{eqnarray*}%\label{coefs}
+A = \sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i},\quad B &=& \sum_{i=1}^N \frac{1-e^{-\kappa T_i}}{\kappa T_i}e^{-\kappa T_i}, \quad C = \sum_{i=1}^N e^{-\kappa T_i}, \\
+D_1 = \sum_{i=1}^N d_i, \quad D_2 &=& \sum_{i=1}^N d_ie^{-\kappa T_i}, \quad D_3 = \sum_{i=1}^N d_i \frac{1-e^{-\kappa T_i}}{\kappa T_i} \\
+G &=& \sum_{i=1}^N \left(\frac{1-e^{-\kappa T_i}}{\kappa T_i}\right)^2.
+\end{eqnarray*}
+
+Now the system may be written in a very simple view:
+\begin{eqnarray*}%\label{fsystem3}
+\theta\left( N - A \right) + v_0 A &=& D_1,\\
+\theta\left( C - B \right) + v_0 B &=& D_2,\\
+\theta\left( A - G \right) + v_0 G &=& D_3.
+\end{eqnarray*}
+From the first two equations we can find $\theta$ and $v_0$: provided $N B - C A \ne 0$ we have 
+\bbe{thetav0}
+\theta = \frac{D_1 B - D_2 A}{N B - C A}, \quad v_0 = \frac{N D_2 - C D_1}{N B - C A} + \theta.
+\ee 
+
+Substitute it to the last equation and obtain an equation with only one variable $\kappa$.
+We solve this equation numerically to find $\kappa$, then  find $\theta$ and $v_0$ from \eq{thetav0}
+
+If $N B - C A =0$ or the derived values are not correct then we minimize the cost function $f(\kappa, \theta, v_0)$ using numerical optimization similar to the scheme described in the next subsection. 
+ 
+
+\subsection{Vanilla options fitting}
+
+Assume that we observe vanilla options prices $\tilde{Y}_i$ for a set of maturities $T_i$, strikes $K_i$, interest rates $r_i$ and dividends $d_i$, $i=1, 2, .., M$, and let $P_i=P_i(\kappa, \theta, v_0, \sigma, \rho)$ be correspondant theoretical options prices.
+
+To estimate the parameters of the Heston model we minimize some cost function $g=g(\kappa, \theta, v_0, \sigma, \rho)$. The error of estimation can be measured by different types of norm, and we can choose one of the correspondant cost functions:
+\begin{enumerate}[(a)]
+ \item the sum of squared absolute errors in prices, 
+ \[
+g_{a, p}(\kappa, \theta, v_0, \sigma, \rho)=\sum_{i=1}^N \left( P_i - \tilde{Y}_i\right)^2;
+ \]
+
+  \item the sum of squared relative errors in prices, 
+ \[
+g_{r, p}(\kappa, \theta, v_0, \sigma, \rho)=\sum_{i=1}^N \left( \frac{P_i - \tilde{Y}_i}{\tilde{Y}_i}\right)^2;
+ \]
+
+  \item the sum of squared absolute errors in implied volatility, 
+ \[
+g_{a, v}(\kappa, \theta, v_0, \sigma, \rho)=\sum_{i=1}^N \left( Vol_i - \tilde{Vol}_i\right)^2,
+ \]
+where $Vol_i$ and $\tilde{Vol}_i$ are theoretical and observed implied volatilities.
+
+\item the sum of log-difference errors in prices, 
+ \[
+g_{l, p}(\kappa, \theta, v_0, \sigma, \rho)=\sum_{i=1}^N ( P_i - \tilde{Y}_i)\log\frac{P_i}{\tilde{Y}_i}.
+ \]
+\end{enumerate}
+
+As an initial guess for minimization routine we use values of $\tilde{\kappa}$, $\tilde{\theta}$ and $\tilde{v}_0$ derived from Variance swaps together with some values $\tilde{\sigma}$ and $\tilde{\rho}$ for volatility of volatility and correlation. 
+
+Fortunately, Heston model allows semi-analitical computation of vanilla options prices together with its partial derivatives on each parameter, this makes the minimization algorithms be efficient in most cases.
+It may occur however that current values of parameters come out of the reasonable range. In this case we suggest to use change of parameters that guarantee them to stay in a certain interval. For example, to be sure that $\rho$  stays in $(-1;1)$ we may express it as
+\bbe{rhochange}
+\rho = \frac{2}{\pi}\arctan t, \quad t\in\R.
+ \ee
+The range of values for other parameters may be fixed by a similar change. Of course, such a change in parameters leads to changes in expressions for cost function and its gradient.
+ 
+\subsection{Calibration schemes}
+
+We suggest a number of calibration schemes. To fix a certain scheme, one should provide the following information:
+
+\vskip0.2cm
+1. The source of the data. We can use either market data to be read from a file (see a structure of input files in the next section) or synthetic data (both vanilla prices and variance swaps) produced by a routine for some certain values of parameters. The latter may be useful to test the convergence of minimization algorithm for different initial guesses.
+
+\vskip0.2cm
+2. Change of parameters. One can choose to change parameters of the model as in \eq{rhochange} to be sure that they take values in a reasonable interval.
+
+\vskip0.2cm
+ 3. Calibration scheme. If there are no variance swaps prices available, one can choose to calibrate model using vanilla prices only. Otherwise, we can fit $\kappa$, $\theta$, and $v_0$ to variance swaps, fix their values  and then fit only two parameters $\sigma$ and $\rho$ to vanillas prices. Finally, we can $\kappa$, $\theta$, and $v_0$ fitted to variance swaps as an initial guess to fit all five parameters to vanillas prices.
+
+\vskip0.2cm
+4. Type of cost function. One can choose a cost function to be minimized from the list in the previous subsection.   In our tests, the best results were obtained with $g_{a, p}$ (absolute error in prices) and $g_{l, p}$ (log-difference error in prices).
+
+\section{Implementation} 
+
+\subsection{Input files}
+One can set all parameters of calibration scheme in dialog, an alternative is to set them in the file \textit{in.dat} as a sequence of numbers as described below.
+
+\vskip0.2cm
+\textbf{in.dat}  
+\vskip0.2cm
+\underline{ 1. Calibration scheme}:
+Possible values:
+\begin{itemize}
+\item[1:] data from file, fit to options prices only, without change of parameters. 
+
+\item[11:] data from file, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ beeing fixed, without change of parameters.
+
+\item[111:] data from file, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ not fixed, without change of parameters.
+
+\item[2:] data from file, fit to options prices only, with change of parameters as in \eq{rhochange}.
+
+\item[22:] data from file, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ beeing fixed, with change of parameters.
+
+\item[222:] data from file, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ not fixed, with change of parameters.
+
+\item[3:] synthetic data, fit to options prices only, without change of parameters.
+
+\item[33:] synthetic data, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ beeing fixed, without change of parameters.
+
+\item[333:] synthetic data, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ not fixed, without change of parameters.
+
+\item[4:] synthetic data, fit to options prices only, with change of parameters.
+
+\item[44:] synthetic data, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ beeing fixed, with change of parameters.
+
+\item[444:] synthetic data, fit to variance swaps first, then fit to options prices with $\kappa$, $\theta$, $v_0$ not fixed, with change of parameters.
+\end{itemize}
+
+\vskip0.2cm
+\underline{2. Cost function:}
+
+Possible values:
+\begin{itemize}
+\item[1:] the sum of squared absolute errors in prices;
+
+\item[2:] the sum of squared relative errors in prices;
+
+\item[3:] the sum of squared absolute errors in implied volatility;
+
+\item[4:] the sum of log-difference errors in prices.
+\end{itemize}
+
+\vskip0.2cm
+\underline{3. Number of data in the file with options prices:} the number of lines to be read from the file \textit{DataMarket.dat.}
+\vskip0.2cm
+\underline{4. Number of data in the file with options prices:} the number of lines to be read from the file \textit{VSMarket.dat.}
+\vskip0.2cm
+\underline{5. Initial guess:} the sequence of five numbers considered as an initial guess for Heston parameters $v_0$, $\kappa$, $\theta$, $\sigma$, $\rho$.
+ 
+\vskip0.2cm
+Example of \textit{in.dat} file:
+\vskip0.2cm
+
+\noindent 11\newline
+4\newline
+76\newline
+4\newline
+0.195565 7.0575 0.203 0.35 -0.4
+
+\vskip0.2cm
+This example settings are: to read data from file, to fit to variance swaps first, then to options prices with $\kappa$, $\theta$, $v_0$ beeing fixed, without change of parameters, to compute the cost function as the sum of log-difference errors in prices, to read 76 lines from the file \textit{DataMarket.dat}, to read 4 lines from the file \textit{VSMarket.dat}, and set initial guess of parameters: $v_0=0.195565$, $\kappa=7.0575$, $\theta=0.203$, $\sigma=0.35$, $\rho=-0.4$.
+
+\vskip0.5cm
+
+\textbf{DataMarket.dat}
+
+Contains observed implied volatilities of standard calls and puts, the prices to be derived from implied volatilities using Black\&Scholes formula.
+ 
+Columns:
+\begin{enumerate}[1]
+\item Type of an Option: '1' indicates call and '-1' indicates put.
+\item Maturity: should be measured in years.
+\item Strike: normilized by spot price, a positive real number. If Strike is too small or too large with respect to Spot, it may cause computational problems.
+\item Sigma implicite: implied volatility value.
+\item Interest rate: instantaneous annual interest rate. 
+\item Dividend rate: instantaneous annual dividend rate.
+\item Weighting factor: typically is equal to 1, but one can use any positive real numbers to be used as weights of corresponding option prices in the cost function.
+\end{enumerate}
+
+\vskip0.5cm
+\textbf{VSMarket.dat}
+
+Contains observed variance swaps prices in annual volatility points.
+ 
+Columns:
+\begin{enumerate}[1]
+\item Maturity measured in years.
+\item Variance swap price in annual volatility points.
+ \end{enumerate}
+
+\vskip0.5cm
+\subsection{Output files}
+As a results of calibration we print out the values of Heston model parameters fitted, the final value of cost function and its gradient, the observed and theoretical prices for vanilla options and variance swaps together with implied volatilities, absolute and relative errors. One can find outputs in three files:
+ \vskip0.5cm
+\textit{CalibResParams.txt}
+
+Containes the fitted values of the Heston model parameters $v_0$, $\kappa$, $\theta$, $\sigma$, $\rho$ (in this order), and the final values of cost function and its gradient.
+ \vskip0.5cm
+\textit{CalibRes.txt}
+
+Containes observed and theoretical prices for vanilla options together with observed and theoretical implied volatilities, and percentage errors of pricing as well.
+\vskip0.5cm
+\textit{CalibResVS.txt}
+
+Containes observed and theoretical prices for variance swaps together with  percentage errors of pricing.
+
+
+\subsection{Main routines}
+
+\begin{itemize}
+\item \textit{calib\_heston.c:} is the
+main file with function main() that realizes calibration schemes.
+
+\item \textit{calibration1.c:}
+containes routines to set parameters of minimization, to compute cost function and its gradient and to call Scilab optimization routine.
+
+\item \textit{costfunction.c:}
+containes routines to compute vanilla options prices and cost function.
+ 
+\item \textit{gradfunction.c:}
+containes routines to compute the gradient of vanilla options prices and the gradient of the cost function.
+
+\item \textit{bsvanillas.c:}
+containes routines to compute Black\&Scholes prices and implied volatilities.
+
+\item \textit{utils1.c:}
+containes routines to deal with input and output files and DataMarket structure.
+ 
+\item \textit{varswaps.c:}
+containes routines to deal with input and output files with Variance Swaps, the routines for computation of variance swap prices, fitting to a Variance Swap Market, computation of cost function and its gradient (for variance swaps).
+
+\item \textit{./utils1/*.c:} the folder containes routines that implement optimization algorithm, and routines for numerical integration.
+\end{itemize}
+%\appendix
+
+\begin{thebibliography}{000}
+
+\bibitem{PT}
+R. Lord, C. Kahl, Optimal Fourier inversion in semi-analytical option pricing, {\em Journal of Computational Finance,}  Vol. 10, No. 4, 2007, pp. 1-30
+
+\end{thebibliography}
+
+\end{document}
+
+

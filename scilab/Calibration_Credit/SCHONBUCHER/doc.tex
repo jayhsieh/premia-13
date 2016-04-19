@@ -1,0 +1,411 @@
+\documentclass[reqno,11pt,twoside,english]{report}
+
+\def\ff{{\mathbb F}}
+\def\hh{{\mathbb H}}
+\def\gg{{\mathbb G}}
+
+\def\P{\mathbb P}
+\def\Es{\mathbb E}
+\def\U{\mathbb U}
+\def\Q{\mathbb Q}
+%\def\R{\mathbb R}
+\def \os \hat{o}
+
+\usepackage{amsmath, amsfonts, amssymb, amsthm, amscd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%       Format
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\setlength{\oddsidemargin}{5mm} \setlength{\evensidemargin}{5mm}
+\setlength{\textwidth}{150mm} \setlength{\headheight}{0mm}
+\setlength{\headsep}{12mm} \setlength{\topmargin}{0mm}
+\setlength{\textheight}{220mm} \setcounter{secnumdepth}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{theoreme}{Th\'eor\`eme}
+\newtheorem{lemma}{Lemme}
+\newtheorem{Hypothese}{Assumption}
+\newtheorem{proposition}{Proposition}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{Preuve}{Preuve}
+\newtheorem{definition}{D\'efinition}
+\newtheorem{corollary}{Corollaire}
+\newtheorem{Remark}{Remark}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%�
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Calligraphic letters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\bxi}{\bar{\xi}}
+\newcommand{\cA}{\ensuremath{\mathcal A}}
+\newcommand{\cB}{\ensuremath{\mathcal B}}
+\newcommand{\cC}{\ensuremath{\mathcal C}}
+\newcommand{\cD}{\ensuremath{\mathcal D}}
+\newcommand{\cE}{\ensuremath{\mathcal E}}
+\newcommand{\cF}{\ensuremath{\mathcal F}}
+\newcommand{\cG}{\ensuremath{\mathcal G}}
+\newcommand{\cH}{\ensuremath{\mathcal H}}
+\newcommand{\cI}{\ensuremath{\mathcal I}}
+\newcommand{\cJ}{\ensuremath{\mathcal J}}
+\newcommand{\cK}{\ensuremath{\mathcal K}}
+\newcommand{\cL}{\ensuremath{\mathcal L}}
+\newcommand{\cM}{\ensuremath{\mathcal M}}
+\newcommand{\cN}{\ensuremath{\mathcal N}}
+\newcommand{\cO}{\ensuremath{\mathcal O}}
+\newcommand{\cP}{\ensuremath{\mathcal P}}
+\newcommand{\cQ}{\ensuremath{\mathcal Q}}
+\newcommand{\cR}{\ensuremath{\mathcal R}}
+\newcommand{\cS}{\ensuremath{\mathcal S}}
+\newcommand{\cT}{\ensuremath{\mathcal T}}
+\newcommand{\cU}{\ensuremath{\mathcal U}}
+\newcommand{\cV}{\ensuremath{\mathcal V}}
+\newcommand{\cW}{\ensuremath{\mathcal W}}
+\newcommand{\cX}{\ensuremath{\mathcal X}}
+\newcommand{\cY}{\ensuremath{\mathcal Y}}
+\newcommand{\cZ}{\ensuremath{\mathcal Z}}
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% Blackboard bolds
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\newcommand{\bbA}{{\ensuremath{\mathbb A}} }
+\newcommand{\bbB}{{\ensuremath{\mathbb B}} }
+\newcommand{\bbC}{{\ensuremath{\mathbb C}} }
+\newcommand{\bbD}{{\ensuremath{\mathbb D}} }
+\newcommand{\bbE}{{\ensuremath{\mathbb E}} }
+\newcommand{\bbF}{{\ensuremath{\mathbb F}} }
+\newcommand{\bbG}{{\ensuremath{\mathbb G}} }
+\newcommand{\bbH}{{\ensuremath{\mathbb H}} }
+\newcommand{\bbI}{{\ensuremath{\mathbb I}} }
+\newcommand{\bbJ}{{\ensuremath{\mathbb J}} }
+\newcommand{\bbK}{{\ensuremath{\mathbb K}} }
+\newcommand{\bbL}{{\ensuremath{\mathbb L}} }
+\newcommand{\bbM}{{\ensuremath{\mathbb M}} }
+\newcommand{\bbN}{{\ensuremath{\mathbb N}} }
+\newcommand{\bbO}{{\ensuremath{\mathbb O}} }
+\newcommand{\bbP}{{\ensuremath{\mathbb P}} }
+\newcommand{\bbQ}{{\ensuremath{\mathbb Q}} }
+\newcommand{\bbR}{{\ensuremath{\mathbb R}} }
+\newcommand{\bbS}{{\ensuremath{\mathbb S}} }
+\newcommand{\bbT}{{\ensuremath{\mathbb T}} }
+\newcommand{\bbU}{{\ensuremath{\mathbb U}} }
+\newcommand{\bbV}{{\ensuremath{\mathbb V}} }
+\newcommand{\bbW}{{\ensuremath{\mathbb W}} }
+\newcommand{\bbX}{{\ensuremath{\mathbb X}} }
+\newcommand{\bbY}{{\ensuremath{\mathbb Y}} }
+\newcommand{\bbZ}{{\ensuremath{\mathbb Z}} }
+\newcommand{\UU}{{\cal{U}}}
+
+\newcommand{\VV}{{\cal{V}}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%       Other commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ub}{\bar{u}}
+\newcommand{\fb}{\bar{f}}
+\newcommand{\bg}{\bar{g}}
+\newcommand{\bh}{\bar{h}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ld}{L^2 (W,m)}
+\newcommand{\co}{\mathbb{G}}
+
+
+
+
+
+\newcommand{\la}{\label}
+%\newcommand{\cal}{\mathcal}
+\newcommand{\scalar}[2]{\left\langle #1,#2 \right\rangle}
+\newcommand{\al}{\alpha}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\beq}{\begin{eqnarray}}
+\newcommand{\eeq}{\end{eqnarray}}
+%\newcommand{\qed}{\hspace*{\fill} $\Box$ \spazio}   %already exists
+\newcommand{\La}{\Lambda}
+\newcommand{\absol}{{<}\hspace{-0.40 em}{<}}
+\newcommand{\1}{{1} \hspace{-0.25 em}{\rm I}}
+\newcommand{\si}{\sigma}
+\newcommand{\sommen}{\sum_{j,k\in V_N}}
+\newcommand{\sommezd}{\sum_{k\in\bbZ^d}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\what}{$\clubsuit\clubsuit\clubsuit$}
+\newcommand{\mez}{\frac{1}{2}\,}
+\newcommand{\grad}{\bigtriangledown}
+\newcommand{\dimo}{\noindent{\em Proof. }}
+\newcommand{\sss}{\subset\subset}
+\newcommand{\trace}{\,{\rm Tr}\,}
+\newcommand{\Om}{\Omega}
+\newcommand{\om}{\omega}
+\newcommand{\gb}{\bar{g}}
+\newcommand{\gc}{\hat{g}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\newcommand{\Ne}{\N^{\ast}}
+\newcommand{\CC}{{\cal C}}
+\newcommand{\DD}{{\cal D}}
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\SSS}{{\cal S}}
+\newcommand{\EE}{{\cal E}}
+\newcommand{\FF}{{\cal F}}
+\newcommand{\GG}{{\cal G}}
+\newcommand{\HH}{{\cal H}}
+\newcommand{\HHl}{{\cal H}_{loc}}
+\newcommand{\II}{{\cal I}}
+\newcommand{\JJ}{{\cal J}}
+\newcommand{\KK}{{\cal K}}
+\newcommand{\LL}{{\cal L}}
+%\newcommand{\La}{\Lambda}
+\newcommand{\ft}{\tilde{f}}
+\newcommand{\tf}{\tilde{f}}
+\newcommand{\tth}{\tilde{h}}
+\newcommand{\tg}{\tilde{g}}
+\newcommand{\gt}{\tilde{g}}
+\newcommand{\et}{\tilde{E}}
+\newcommand{\ut}{\tilde{u}}
+\newcommand{\phit}{\tilde{\Phi}}
+\newcommand{\hf}{\hat{f}}
+\newcommand{\hg}{\hat{g}}
+\newcommand{\NN}{{\cal N}}
+\newcommand{\MM}{{\cal M}}
+\newcommand{\OO}{{\cal O}}
+\newcommand{\BP}{{ \bar{{\cal P}}}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\dis}{\displaystyle}
+\newcommand{\Z}{\mathbb{Z}}  % ensemble des nombres relatifs
+\newcommand{\C}{\mathbb{C}}  % ensemble des nombres complexes
+\newcommand{\ep}{\epsilon}
+\newcommand{\ind}{{\bf {1}}}
+\newcommand{\rgt}{\rightarrow}
+\newcommand{\ced}{\end{proof}}
+\newcommand{\mb}[1]{\makebox{#1}}
+\newcommand{\p}{^{\prime}}
+\newcommand{\vphi}{\varphi}
+%\newcommand{\al}{\alpha}
+%\newcommand{\si}{\sigma}
+%\newcommand{\la}{\lambda}
+\newcommand{\pa}{\partial}
+\newcommand{\para}{\parallel}
+\newcommand{\ds}{D}
+\newcommand{\gr}{\sigma^{\ast}\nabla u}
+\newcommand{\db}{d{{B}}_s}
+\newcommand{\dbt}{d{B}_t}
+%\newcommand{\Om}{\Omega}
+\newcommand{\HD}{F}
+\newcommand{\nrn}{)_{\ld}}
+\newcommand{\disp}{\displaystyle}
+\newcommand{\E}{(E^{\ast})}
+\newcommand{\dpr}{d^{\prime}}
+\newcommand{\hu}{\hat{u}}
+\newcommand{\ve}{\varepsilon}
+\setlength{\parindent}{0cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%\pagestyle{myheadings}\markboth{Armand NGOUPEYOU} {HEDGING AND
+%PRICING OF CREDIT DERIVATIVES}
+\begin{document}
+\author{Armand NGOUPEYOU}
+%\date{May, 2008}
+\title{ THE SPREAD DYNAMICS OF CDO AND  INDEX CDS}
+ \maketitle
+In this paper the main purpose is to simulate the path of the CDO spread and index CDS using itraxx data. We can't simulate the path of the spread using copula model we will use a new framework: the Schonbucher'approach.
+
+\section{CDS and CDO}
+A Credit Default Swap is a contract in which party $A$ pays $B$ a regular cash flow till maturity in exchange for a compensation payment from party $B$ in an event of default of the underlying corporate bond. The cash flow as a percentage of the notional, aka \emph{credit spread}, is determined in such a way that the contract is worth $0$ at initiation of the contract. The cash flow reflects the probability of the event of default that two parties agreed upon.
+
+A synthetic CDO is a pool of CDS, of which the cumulative loss on the pool is divided into different \emph{tranches}. A tranche holder receives regular cash flow as a percentage of the remaining balance of that tranche and pays out as loss occurs for which that tranche is responsible till maturity. For example, the holder of the $3\%-7\%$ tranche gets quarterly cashflow as a percentage of the balance. When the total loss of the pool exceeds $3\%$, the balance of $3\%-7\%$ starts to reduce. When the total loss reaches $7\%$, the balance of that tranche is gone. In this pricing module, the percentage is absolute and not relative to the total loss. 
+
+The cash flows of all the tranches are determined as the same way as CDS and they reflect the joint distribution of the default events of all the underlying CDS contracts.
+
+\section{Framework}
+The model is set up on a filtered probability space $(\Omega,{(F_t)}_{t\ge 0},\Q)$ where $\Q$ is a matingale spot, the filtration ${(F_t)}_{t\ge 0}$ satisfies all the usual conditions.There are M obliagtors which default time $\tau_i$ for $i=1\cdots M$  and we assume that all obligators have identical losses in default which we normalize to one. 
+\par\medskip
+i)The default loss process at time $t$ is defined as:
+$$L_t=\sum_{i=1}^M 1_{\{\tau_i\le t\}}$$
+\par\medskip
+
+ii)The $\Q$ vector of $L(T)$ at time $t\le T$ is described by the vector of probability $p(t,T)=(p_0(t,T),\cdots,p_M(t,T))$ given by:
+$$p_n(t,T)=P(L(T)=n\vert F_t) \qquad  0\le n\le M$$
+
+\begin{Hypothese}
+The default process $L(T)$ is a time inhomogenous markov chain then there exist a transition matrix $A(.,T)=({(a_{i,j}(t,T))}_{0\le i,j\le M})$ such:
+$${d \over dT}p(t,T)=A(t,T)p(t,T) \qquad 0\le t\le T$$
+and the coefficients of transition rates should satisfy:
+$$\sum_{k=0}^M a_{n,k}(t,T)=0 \hspace{2.5cm} 0\le n\le M$$
+\end{Hypothese}
+
+
+\par\medskip If we know the matrix of tansition rates we can get the matrix $P(t,T)={(P_{n,m}(t,T))}_{0\le n,m\le M}$ given by:
+
+\begin{equation*}
+\begin{split}
+P_{n,m}(t,T)=\left\{
+\begin{array}{l}
+0  \hspace{8.2cm} \hbox{ for } m<n\\
+\exp\left(-\int_t^T a_n(t,s)ds\right) \hspace{4.7cm} \hbox{ for } m=n\\
+P_{m,m}(t,T)\int_t^T \sum_{k=n}^{M-1}{P_{n,k}(t,s)\over P_{m,m}(t,s)}a_{k,m}(t,s)ds \hspace{1.5cm} \hbox{ for } m>n
+\end{array}
+\right
+\end{split}
+\end{equation*}
+
+\begin{Hypothese}{One step transition rate} 
+
+We will assume that we can't have more than one default in $(T,T+\Delta T)$ that means for each $n=0\cdots M$, $a_{n,k}(t,T)=0 \hspace{0.1cm} \forall k>n+1$. Then we can get a new expression of $P(t,T)$:   
+\end{Hypothese}
+
+\begin{equation*}
+\begin{split}
+P_{n,m}(t,T)=\left\{
+\begin{array}{l}
+0  \hspace{9.7cm} \hbox{ for } m<n\\
+\exp\left(-\int_t^T a_n(t,s)ds\right) \hspace{6.2cm} \hbox{ for } m=n\\
+\int_t^T P_{n,m-1}(t,s)a_{m-1}(t,s)\exp\left(-\int_s^T a_m(t,u)du\right)ds \hspace{1.5cm} \hbox{ for } m>n
+\end{array}
+\right
+\end{split}
+\end{equation*}
+
+\begin{proposition}{Intensity of the loss and time consistency assumption} 
+\newline
+i)The  loss intensity  at time $t$ is given by: $\lambda_L(t)=a_{L(t)}(t,t)$
+\newline
+ii)  The process ${(p_n(t,T))}_{t\ge 0}$ given by $p_n(t,T)=P_{L(t),n}(t,T)$ is a $\Q$ martingale.
+
+\end{proposition}
+
+If we set $$da_n(t,T)=\mu(t,T)dt+\sigma_(t,T)dW_t$$
+then by the assumption of  time consistency ii) Schonbucher show that:
+$$P_{L(t),n}(t,T)\mu_m(t,T)=-\sigma_m(t,T)v_{L(t),m}(t,T)$$
+where $v_{L(t),m}(t,T)$ is the volatility of the dynamics of $P_{L(t),n}(t,T)$
+
+\section{Spread of index CDS and Spread of CDO }
+\subsection{Spread of the CDS index}
+
+Let assume that the recovery rate $R=0$ and that $\beta_t=\exp\left(-\int_0^t r_s ds\right)$ where the interest rate is deterministc ,The payment leg at time $t$ is given by:
+
+$$PL_t=s_t\Es\left(\int_t^T {1\over \beta_s}(M-L(s))ds \vert F_t\right)=s_t\left(\int_t^T B(t,s)\sum_{n=0}^M(M-n)p_n(t,s)ds\right)$$
+and the defaut leg at time $t$ is given by:
+$$DL_t=\Es\left(\int_t^T {1\over \beta_s}dL(s)\vert F_t\right)=\int_t^T B(t,s) \sum_{n=0}^M a_n(t,s)p_n(t,s) ds$$
+
+The spread  $s_t$ at time $t$ is such that: $PL_t=DL_t$ then:
+$$s_t={ \int_t^T B(t,s) \sum_{n=0}^M a_n(t,s)p_n(t,s) ds \over \int_t^T B(t,s)\sum_{n=0}^M(M-n)p_n(t,s)$$
+
+\subsection{Spread of CDO}
+Let $(0,a_H)$ a CDO tranche and  $NU=a*M$ the upper number of default which impacted the CDO then the payment leg is given by:
+$$PL_t=s_t \Es\left(\int_t^T{1\over \beta_s}(NU-L(s))1_{\{L(s^-)<NU\}} ds \vert F_t\right)=s_t\left(\int_t^T B(t,s)\sum_{n=0}^{NU}(NU-n)p_n(t,s)ds\right)$$
+and the default leg is given by:
+$$DL_t=\Es\left(\int_t^T {1\over \beta_s}1_{\{L(s^-)<NU\}}dL(s)\vert F_t\right)=\int_t^T B(t,s)\sum_{n=0}^{NU}p_n(t,s)a_n(t,s)ds$$
+then the spread $s_t$ is given by:
+
+$$s_t={\int_t^T B(t,s)\sum_{n=0}^{NU}p_n(t,s)a_n(t,s)ds\over \int_t^T B(t,s)\sum_{n=0}^{NU}(NU-n)p_n(t,s)ds}$$
+
+In conclusion if we know the matrix of transition rate the we can simulate the path of index CDS spread or a CDO spread.. 
+
+\section{Calibration of the spread using itraxx data}
+\subsection{Simulation of the matrix of transition probability}
+In the first step to calibrate the spread we will simulate the matrix of transition probability $P(t,T)$ given the matrix of transition rates $A(t,T)$. We simulate this matrix with the function \bf proba \sl see in the file \bf tryschon.c\sl.
+\par\medskip
+\begin{equation*}
+\begin{split}
+&double ***pr\\
+&pr=proba(\hbox{ double } t,\hbox{ double } T, \hbox{ int } M,\hbox{ int }nb, \hbox{ double }**trans) 
+\end{split}
+\end{equation*}
+where  $t$  is the end of the path of the simulation of the spread, $T$ is the maturity of the spread,$M$  is the  number of firms, $nb$ is the number of step,$trans$ is the matrix of the transition rates and we get:
+
+\begin{equation*}
+\begin{split}
+p_k\left({i*t\over nb-1},t+{(T-t)*j\over nb-1}\right)=pr[k][i][(j]\qquad \forall 0 \le i,j<  nb \qquad \forall 0 \le k< M ;
+\end{split}
+\end{equation*}
+
+\subsection{Simulation of the dynamcs of the spread}
+In the second step given the matrix of transition rates we can simulate the matrix of probability and using the closd formula's of index CDS spread and CDO tranche gving in the last section. We simulate these spreads in the file \bf spread\_dynamique.c \sl  call  by \bf spread\_CDS \sl and \bf spread\_CDO\sl   
+
+\begin{equation*}
+\begin{split}
+&\hbox{ double } sp;\\
+&sp=spread\_CDS(\hbox{ double } t,\hbox{ double } T, \hbox{ int } M,\hbox{ int }nb,\hbox{ double r },\hbox{ double R}, \hbox{ double }**trans) 
+\end{split}
+\end{equation*}
+where $r$ is the interest rate and $R$ the recovery rate.
+
+\begin{equation*}
+\begin{split}
+sp=spread\_CDO(&\hbox{ double } t,\hbox{ double } T, \hbox{ int } M,\hbox{ int }nb,\hbox{ double r },\hbox{double a },\hbox{ double } b,\hbox{ double R}, \\&\hbox{ double }**trans) 
+\end{split}
+\end{equation*}
+where $(a,b)$ is the tranche CDO, $0\le a,b\le 1$
+
+
+\subsection{Calibration of the matrix of transition rates using itraxx spread}
+Given the matrix of transition rates we know how to simulate the spread of the index CDS and the spread of the CDO tranche. In this section we explain how to fit the spread of the itraxx data using  the good matrix transition rate
+\paragraph{first step: Calibration of $A(0,T)$}   $$ \hbox{ we assume that } a_n(0,s)=cste  \qquad \forall n,s \in \{NL\cdots NU\}\times (0,T_i)$$
+$T_i=3Y,5Y,7Y,10Y$ and $\{NL\cdots NU\}\in \{\{0\cdots 7\};\{7\cdots 13\};\{13\cdots 19\};\{19\cdots 26\};\{26\cdots 46\};\{46\cdots\}\}$ 
+\begin{Remark}
+NL is the lower number which reduce the CDO tranche  and NU is the upper number which reduce the tranche  for example for the itraxx assuming $M=125$ and the recovery rate $R=0.4$ the NL of  CDO tranche $(0,0.03)$ is ${0\times M\over (1-R)}$ and the $NU={0.03*M\over(1-R)}$. We take all the CDO tranches of the itraxx and we get the all the set $\{NL\cdots NU\}$  
+\end{Remark}
+
+We calibrate $A(0,T)$ with the function $initial\_rates\_CDO$ in the file \bf initial\_calibration.c \sl.
+
+\begin{equation*}
+\begin{split}
+&\hbox{ double }*init;\\
+&init=initial\_rates\_CDO(T,nb,r,spread)
+\end{split}
+\end{equation*}
+
+where spread is the itraxx spread data  for  $3Y,5Y,7Y,10 Y$, $M$ is fixed to $125$ and $R=0.4$ 
+
+\paragraph{ second step: Calibration of $A(t,T)$ , $t>0$}
+.\par\medskip
+The second step consists to simulate all the path of $A(t,T)$ given $A(0,T)$ ,we use the dynamics of $a_n(t,T)$:
+$$da_n(t,T)=\mu_n(t,T)dt +\sigma dW_t$$
+Given the volatility of the transition rates we use the consistency property to calibrate the drift  term.
+
+\begin{equation*}
+\begin{split}
+&double ***trans;\\
+& trans=calib\_rates\_CDO(t,T,nb,r,spread)
+\end{split}
+\end{equation*}
+  
+\subsection{ Simulation of the spread}
+Using the calibrated matrix of transition rates we can  simulate all the CDO tranche  $(a,b)$ with any maturity $T$, any recovery $R$ ...The function which give the path of the spread is \bf calib\_spread\_CDO \sl and we can find it in the file \bf spread\_calib.c \sl 
+
+\begin{equation*}
+\begin{split}
+&double *sp;\\
+&sp=calib\_spread\_CDO(t,T,M,nb,vol,r,a,b,R,spread)
+\end{split}
+\end{equation*}
+
+\begin{Remark}
+To calibrate the index CDS we use more and less the same assumptions and we can find it in the files $initial\_calibration.c$ and $spread\_calib.c$ which give the index CDS spread. 
+\end{Remark}
+\end{document}

@@ -1,0 +1,82 @@
+Ce répertoire contient les fichiers nécessaires aux styles LaTeX
+ pour réaliser un rapport de recherche Inria.
+
+Les fichiers ont été testés avec les versions des logiciels en service
+à l'Inria Sophia le 23 juin 1999
+ - TeX, Version TeX (Web2C 7.2) 3.14159
+ - LaTeX2e <1998/12/01>
+ - pdfTeX (Web2C 7.3) 3.14159-0.13d
+
+(le style a ete teste le 11 juillet avec latex/babel)
+
+
+Il est probable, voire certain, qu'ils necessitent une adaptation 
+sur les autres sites Inria.
+
+
+AUTEUR : Philippe LOUARN - IRISA/INRIA Rennes - louarn@irisa.fr pour
+======== la plupart des fichiers.
+         Jose' GRIMM - INRIA Sophia grimm@inria.fr pour les modifications
+         depuis le 8 septembre 1997
+
+
+VERSION : 3,7h du 11 juillet 2001
+========
+
+
+CONTENU :
+========
+ALIRE			ce fichier
+ALIRE.old		ce fichier, date du 8 septembre 1997
+NOUVEAUTE		les dernières modifs
+Logo-INRIA-Rennes-couleur.epsi  Logo INRIA avec déclinaison régionale (Rennes)
+Logo-INRIA-Lorraine-couleur.epsi idem       (Nancy/Metz)
+Logo-INRIA-Sophia-couleur.epsi  idem        (Sophia)
+Logo-INRIA-Rhones-Alpes-couleur.epsi   idem (Grenoble)
+Logo-INRIA-Rhone-Alpes-couleur.epsi   idem (Grenoble)
+Logo-INRIA-Rocq-couleur.epsi	idem        (Rocquencourt)
+Logo-INRIA-couleur.epsi Logo INRIA couleur
+Logo-INRIA-picto.epsi   Logo INRIA pictogramme seul
+Logo-INRIA.epsi         Logo INRIA n&b
+rap-rech.epsi           Fichier EPSI de couverture des rapports de recherche
+rap-tech.epsi             "                 "      des rapports techniques
+Logo-INRIA-couleur.pdf     Les memes en pdf
+Logo-INRIA-picto.pdf 
+Logo-INRIA-Lorraine-couleur.pdf 
+Logo-INRIA-Rocq-couleur.pdf 
+Logo-INRIA-Rhone-Alpes-couleur.pdf 
+Logo-INRIA-Rennes-couleur.pdf 
+Logo-INRIA-Sophia-couleur.pdf 
+rap-rech.pdf 
+rap-tech.pdf 
+
+RR.dtx              Sources
+RR.ins              fichier d'installation
+RR.ps.gz            Documentation du package
+saisie-rr.ps.gz     Ancienne documentation du package.
+
+
+RR.sty      Le style RR
+RRA4.sty    Le style RR, format A4
+squelette-rr.tex   Le squelette
+
+
+
+INSTALLATION :
+=============
+Déposer les styles LaTeX sans le répertoire de styles 
+(normalement /usr/local/lib/texmf/tex/local
+ou : /usr/local/lib/texmf/tex/inria, 
+ou : /usr/local/lib/texmf/tex/local/inria)
+
+Mettre les fichiers .ps et .epsi dans un repertoire accessible par LaTeX
+(par exemple : /usr/local/lib/texmf/tex/ps)
+(ou  /usr/local/lib/texmf/tex/epsi)
+
+Mettre les fichiers pdf dans un endroit accessible par pdfltex.
+
+
+
+
+
+                                                       Jose' Grimm

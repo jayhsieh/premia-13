@@ -1,0 +1,43 @@
+module FsPremiaInterop 
+
+    open System.Runtime.InteropServices
+
+    [<DllImport(@%DLLPATH%)>]    extern string get_error_msg();
+
+    [<DllImport(@%DLLPATH%)>]    extern int init_premia(string path);
+
+    [<DllImport(@%DLLPATH%)>]    extern int setCurrentAsset(int asset_type);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int reset();
+    
+    [<DllImport(@%DLLPATH%)>]    extern int stopWriteParameters();
+    
+    [<DllImport(@%DLLPATH%)>]    extern int setCurrentModel(int model_id);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int setCurrentOption(int family_id, int option_id);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int setCurrentMethod(int pricing_id, int method_id);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int write_double(double x);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int write_long(int64 x);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int write_int(int x);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int write_filename(string x);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int write_enum(int x);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int write_array(int sz);
+    
+    [<DllImport(@%DLLPATH%)>]    extern double get_result_double(int i);
+    
+    [<DllImport(@%DLLPATH%)>]    extern bool get_result_bool(int i);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int get_result_array_size(int i);
+    
+    [<DllImport(@%DLLPATH%)>]    extern double get_result_array_item(int i, int j);
+    
+    [<DllImport(@%DLLPATH%)>]    extern int compute_3();
+        
+

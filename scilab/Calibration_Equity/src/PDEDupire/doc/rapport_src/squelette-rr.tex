@@ -1,0 +1,81 @@
+%%
+%% This is file `squelette-rr.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% RR.dtx  (with options: `sample')
+%% ********************************************************************
+%% Copyright (C) 1997-1999 INRIA/MIAOU
+%% 
+\documentclass{article}
+\usepackage{RR}
+\usepackage{hyperref}
+%%\usepackage{french} % optionnel
+%%\usepackage[frenchb]{babel} % optionnel
+%%
+\RRdate{Septembre 1997} %  date de publication du rapport
+%%
+\RRauthor{José Grimm\thanks{Footnote for first author}% les auteurs
+  \thanks[sfn]{Shared foot note}
+  \and % \and entre chaque auteur s'il y en a plusieurs
+Philippe Louarn
+  \thanks{Footnote for second author}\thanksref{sfn} % une note
+}
+%%
+\authorhead{Grimm \& Louarn} % Ceci apparait sur chaque page paire.
+%%
+\RRtitle{Exemple de document\\ % titre francais long avec des \\ inutiles.
+ utilisant le style\\rapport de recherche\\Inria}
+%%
+\RRetitle{Example of a document using the RR style file} % english title
+%%
+\titlehead{Example of RR.sty} %titre court, sur toutes les pages.
+%%
+\RRnote{This is a note}
+\RRnote{This is a second note}
+%%
+\RRresume{Ce document montre comment utiliser le style RR.sty.
+Pour en savoir plus, consulter le fichier RR.dvi}
+\RRabstract{This document is a sample of all commands made available by the
+RR.sty style file. More is explained in the documentation of the package
+}
+%%
+\RRmotcle{calcul formel, base de formules,  %mots-clés sans rapport
+protocole, différentiation automatique, % les uns avec les autres
+génération de code,  modélisation, lien symbolique/numérique,
+matrice structurée, résolution de systèmes polynomiaux, géométrie effective}
+\RRkeyword{task placement, environment, % keywords (taken from some
+ message passing,  network management,   % random research report)
+ performances}
+%% \RRprojet{Miaou} % cas d'un seul projet
+%%
+\RRprojets{Miaou et Opéra} % cas de 2 projets.
+%%
+%% \RRtheme{4} % cas d'un seul theme
+\RRtheme{43} % cas de 2 themes
+%%
+%% \URLorraine % pour ceux qui sont à l'est
+%% \URRennes  % pour ceux qui sont à l'ouest
+%% \URRhoneAlpes % pour ceux qui sont dans les montagnes
+%% \URRocq % pour ceux qui sont au centre de la France
+%% \URFuturs % pour ceux qui sont dans le virtuel
+\URSophia % pour ceux qui sont au Sud.
+%%
+\begin{document}
+%%
+\makeRR   % cas d'un rapport de recherche
+%% \makeRT % cas d'un rapport technique.
+%% a partir d'ici, chacun fait comme il le souhaite
+\section{First section}
+Here is some text for the first section, and a label\label{sec1}.
+Uses version \RRfileversion\ of the package.\newpage
+\section{Second section}
+Text for the second section. This is closely related to the text in
+section \ref{sec1} on page \pageref{sec1}. \newpage
+\tableofcontents
+
+\end{document}
+\endinput
+%%
+%% End of file `squelette-rr.tex'.

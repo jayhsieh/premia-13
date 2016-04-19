@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage[nottoc, notlof, notlot]{tocbibind}
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\selectlanguage{english}
+\title{Pricing caps on Libor rates in Lévy models}
+\author{Audrey Drif\\
+Inria Rocquencourt Projet MATHFI\\
+email: auddrif@yahoo.fr}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+\begin{abstract}
+Here, we give an exact formula to price caps on libor rates in Lévy models. For this, we use the paper of Ernst Eberlein and Fehmi $\ddot{O}$zban\cite{Eberlein}.
+\end{abstract} 
+\section{Model}
+Let $(\Omega,F_{T^{*}},\mathbb{P}_{T^{*}},(F_{t})_{0\leq t\leq T^{*}})$ be a complete stochastic basis, and $T_{0}<T_{1}<...<T_{n}<T_{n+1}=T^{*}$ be a discrete-tenor stucture  with $\delta =T_{i+1}-T_{i}$, i=0,...,n where $T_{i}^{*}=T^{*}-i\delta$, the libor rates is then defined by:\\
+\begin{itemize}
+\item For any maturity $T_{i}$ there is a bounded deterministic function $\lambda (.,T_{i})$ which represents the volatility of the forward Libor rate process $L(.,T_{i})$.
+\item We assume a strictly decreasing and positive initial term structure B(0,T) (T$\in ]0,T^{*}]$). Consequentely the initial term structure L(0,T) of forward Libor rates is given for T$\in ]0,T^{*}-\delta]$ by 
+$$L(0,T)=\frac{1}{\delta}(\frac{B(0,T)}{B(0,T+\delta)}-1).$$ 
+\end{itemize}
+Under $\mathbb{P}_{T^{*}}$, we suppose that
+$$1+\delta L(t,T_{1}^{*})=(1+\delta L(0,T_{1}^{*}))exp(\int_{0}^{T_{1}^{*}} \lambda (s,T_{1}^{*})dL_{s}^{T^{*}})$$
+where $$L_{t}^{T^{*}}=\int_{0}^{t} b_{s}ds + \int_{0}^{t} c_{s}^{\frac{1}{2}}dW_{s}^{T^{*}} +\int_{0}^{t} \int_{\mathbb{R}} x(\mu ^{L}-\nu^{T^{*},L})(ds,dx)$$
+and $$\int_{0}^{t}\lambda(s,T_{1}^{*})b_{s}ds=-\frac{1}{2}\int_{0}^{t}c_{s}\lambda^{2}(s,T_{1}^{*})ds-\int_{0}^{t} \int_{\mathbb{R}}(e^{\lambda(s,T^{*}_{1})x}-1-\lambda(s,T^{*}_{1})x)\nu^{T^{*},L}.$$ 
+$(L_{t}^{T^{*}})_{0 \leq t \leq T^{*}}$ is a non-homogeneous Lévy process, i.e. $W^{T^{*}}$ is a brownian motion, $c_{s}$ is positive such that $\int_{0}^{t^{*}} (|b_{s}|+|c_{s}|)ds < \infty$, $\mu^{L}$ is the random measure of jumps of the process, and $\nu ^{T^{*},L}(ds,dx)=F_{s}(dx)ds$ is the $\mathbb{P}_{T^{*}}$-compensator of $\mu ^{L}$. We assume that the L$\acute{e}$vy measures $F_{s}$, which are measures on $\mathbb{R}$ with $F_{s}({0})=0$ and $\int_{0}^{T^{*}} \int_{\mathbb{R}} (x^{2}\wedge 1)F_{s}(dx)ds<\infty$, satisfy the following additionnal integrability assumption 
+$$\int_{0}^{T^{*}} \int_{{|x|>1}} exp(ux)F_{s}(dx)ds<\infty$$  
+for $|u|\leq (1+\epsilon )M$, where M,$\epsilon$>0 are constants such that $\sum_{i=1}^{n} |\lambda(.,T_{i}^{*})|\leq M$.\\
+
+Thus we postulate that $\forall j \in [0;n-1]$ the libor rate process can be written under $\mathbb{P}_{T_{j}^{*}}$ 
+$$1+\delta L(t,T_{j+1}^{*})=(1+\delta L(0,T_{j+1}^{*}))exp(\int_{0}^{t} \lambda(s,T_{j+1}^{*})dL_{s}^{T^{*}_{j}})$$
+where $$L_{t}^{T_{j}}=\int_{0}^{t} b_{s}^{T^{j}}ds + \int_{0}^{t} c_{s}^{\frac{1}{2}}dW_{s}^{T^{*}_{j}}+\int_{0}^{t}\int_{\mathbb{R}} x(\mu^{L}-\nu^{T_{j}^{*}})(ds,dx)$$
+and $$\int_{0}^{t} \lambda(s,T_{j+1}^{*})b_{s}^{T_{j}^{*}}ds=-\frac{1}{2}\int_{0}^{t}c_{s}\lambda^{2}(s,T_{j+1}^{*})ds-\int_{0}^{t} \int_{\mathbb{R}}(e^{\lambda(s,T^{*}_{j+1})x}-1-\lambda(s,T^{*}_{j+1})x)\nu^{T_{j}^{*},L}.$$\\
+and $$\frac{dP_{T_{j+1}^{*}}}{dP_{T_{j}^{*}}}=\varepsilon_{T^{*}_{j+1}}(\int_{0}^{t}\lambda(s,T^{*}_{j+1})c_{s}^{\frac{1}{2}}dW_{t}^{T^{*}_{j}}+\int_{0}^{t} \int_{R}(e^{\lambda(s,T_{j+1}^{*})x}-1)(\mu^{L}-\nu^{T^{*}_{j}})(ds,dx)$$\\
+\\ 
+and $$W_{t}^{j+1}=W_{t}^{j}-\int_{0}^{t} \lambda(s,T_{j+1}^{*})c_{s}^{\frac{1}{2}}ds$$ is a brownian motion under $\mathbb{P}_{T_{j+1}^{*}}$\\\\
+and $$\nu^{T_{j+1},L}=e^{\lambda(t,T_{j+1}^{*})x}\nu^{T_{j},L}$$ is a $\mathbb{P}_{T_{j+1}^{*}}$-compensator of $\mu^{L}$\\\\
+To implement in using this model, we must use the following assumption:
+\begin{itemize}
+\item the deterministic function $L(.,T_{i})$ is constant for $0\leq i\leq n-1$.
+\end{itemize}  
+\section{Pricing caps}
+Now, we can get an exact formula for caps price. Indeed, let $0 \leq T_{0} \leq T_{1} \leq ... \leq T_{n}$ be a tenor structure  where $T_{i+1}-T_{i}=\delta$, the price of j-th caplet at time t is given by 
+$$\mathbb{E}_{\mathbb{P}^{*}}\left[\frac{B_{t}}{B_{T_{j}}}\delta(L(T_{j-1},T_{j-1})-\mathcal{K})^{+}\Big|F_{t}\right].$$ 
+Thus, the value of cap at time t$\leq T_{0}$ is given by
+$$FC_{t}=\sum_{j=1}^{n}\mathbb{E}_{\mathbb{P}^{*}}\left[\frac{B_{t}}{B_{T_{j}}}\delta(L(T_{j-1},T_{j-1})-\mathcal{K})^{+}\Big|F_{t}\right].$$
+For $1\leq j \leq n$, let's consider the measure $\mathbb{P}_{T_{j}}$ defined by
+$$\frac{d\mathbb{P}^{*}}{d\mathbb{P}_{T_{j}}}=B_{T_{j}}B(0,T_{j}).$$
+Thus, we obtain that
+$$\sum_{j=1}^{n}B(t,T_{j})\mathbb{E}_{T_{j}}\left[\delta(L(T_{j-1},T_{j-1})-\mathcal{K})^{+}\Big|F_{t}\right].$$
+Then we suppose that dynamics of libor rates $L(t,T_{j-1})$ under the forward measure associated with the date $T_{j-1}$ is given by
+
+$$1+\delta L(T_{j-1},T_{j-1})=(1+\delta L(0,T_{j-1}))exp(X_{T_{j-1}})$$
+where $(X_{t})$ is defined by
+$$X_{t}=\int_{0}^{t}\lambda(s,T_{j-1})dL_{s}^{T_{j}}$$
+and the deterministic function $L(.,T_{i})$ is constant for $0\leq i\leq n-1$.\\\\
+To use the following theorem makes possible to find a formula to price caps. For this , we need the following result
+ $$\mathcal{X}(u)=\mathbb{E}_{\mathbb{P}_{T{j}}}\left[e^{iuX_{T_{j-1}}}\right]=\exp\left(\int_{0}^{T{j-1}}\int_{\mathbb{R}}\left(e^{iu\lambda(s,T_{j-1})x}-iue^{\lambda(s,T_{j-1})x}-(1-iu)\right)\nu^{T_{j},L}(ds,dx)\right).$$
+\begin{theorem}
+Let $\zeta_{j}=-ln(1+\delta L(0,T_{j-1}))$ and $\mathcal{K}^{'}=\delta\mathcal{K}+1$. Then $L(T_{j-1},T_{j-1})=e^{-\zeta{j}+X_{T_{j-1}}}$. Assume that mgf(-R)$<\infty$ where $mgf(u)=\mathbb{E}_{T_{j-1}}\left[e^{X_{T_{j-1}}}\right]$. Let $V_{j}(\zeta_{j},\mathcal{K}^{'})$ be the time-0 price of the j-th caplet and let $\mathrm{L}[v_{\mathcal{K}^{'}}]$ be the bilateral Laplace transform of $v_{\mathcal{K}^{'}}$, i.e.\\
+$$\: \mathrm{L}[v_{\mathcal{K}^{'}}]=\int_{-\infty}^{\infty} e^{-zx}v_{\mathcal{K}^{'}}(x)dx,\quad z=R+iu\in \mathbb{C}, u\in \mathbb{R}.$$ 
+Then
+$$V_{j}(\zeta_{j},\mathcal{K}^{'})=B(0,T_{j})\frac{e^{\zeta_{j}R}}{2\pi}\lim_{M\rightarrow\infty}\int_{M}^{M} e^{iu\zeta{_j}}\mathrm{L}[v_{\mathcal{K}^{'}}](R+iu)\mathcal{X}(iR-u)du$$
+whenever the right-hand side exists. 
+\end{theorem}
+Then, we must give the Lévy process cases that we want to use to price caps.
+\section{Program manual}
+In this program, we can choose between six differents Lévy measure cases:
+\begin{enumerate}
+\item Lévy process where the Lévy measure is defined by 
+ $$\nu=a\frac{e^{-\lambda x}}{x^{2}} \mathnormal{1}_{\{x>0\}}\quad,\lambda,a>0.$$ 
+\item Lévy process where  the Lévy measure is defined by
+$$\nu=a\frac{e^{-\lambda x}}{x} \mathnormal{1}_{\{x>0\}}\quad, \lambda,a>0.$$
+\item Lévy process where the Lévy measure is defined by
+$$\nu=a\frac{e^{-\lambda x}}{x^{\alpha +1}} \mathnormal{1}_{\{x>0\}}\quad,\:\lambda,a>0\:and\:0<\alpha<1.$$
+\item Lévy process where the Lévy measure is defined by
+$$\nu(x)=\frac{a_{-}}{|x|^{1+\alpha_{-}}}e^{-\lambda_{-}|x|}\mathrm{1}_{x<0}+\frac{a_{+}}{x^{1+\alpha_{+}}}e^{-\lambda_{+}x}\mathrm{1}_{x>0}$$ with $a_{+},a_{-},\lambda_{+},\lambda_{-}>0\:,\:\alpha_{-},\alpha_{+}\neq0,1\:and\:\alpha_{-},\alpha_{+}<2 $.
+\item Lévy process where the Lévy measure is defined by
+$$\nu(x)=\frac{a_{-}}{|x|}e^{-\lambda_{-}|x|}\mathrm{1}_{x<0}+\frac{a_{+}}{x}e^{-\lambda_{+}x}\mathrm{1}_{x>0}$$ with $a_{+},a_{-},\lambda_{+},\lambda_{-}>0$.\item Lévy process where the Lévy measure is defined by
+$$\nu(x)=\frac{a_{-}}{|x|^{2}}e^{-\lambda_{-}|x|}\mathrm{1}_{x<0}+\frac{a_{+}}{x^{2}}e^{-\lambda_{+}x}\mathrm{1}_{x>0}$$ with $a_{+},a_{-},\lambda_{+},\lambda_{-}>0$. 
+
+\end{enumerate}
+When we run the program, we have to choose between this six cases and give parameters of Lévy density that we choose for this program.
+\begin{itemize}
+\item For the first case, we have to enter 0 and after we have to enter the parameters $a,\lambda$. 
+\item For the second case, we have to enter 1 and after we have to enter the parameters $a,\lambda$.
+\item For the third case, we have to enter 2 and after we have to enter the parameters $a,\lambda,\alpha$.
+\item For the fourth case, we have to enter 3 and after we have to enter the parameters $a_{-},a_{+},\lambda_{-}, \lambda{+},\alpha_{-},\alpha_{+}.$
+\item For the fifth case, we have to enter 4 and after we have to enter the parameters $a_{-},a_{+},\lambda_{-}, \lambda{+}.$
+\item For the sixth case, we have to enter 5 and after we have to enter the parameters $a_{-},a_{+},\lambda_{-}, \lambda{+}.$\\
+\end{itemize}
+After to choose the Lévy density and enter this parameters, the program ask us  to enter the strike $\mathcal{K}$, the number of dates n, the date $T^{*}$, the volatility of the forward Libor rate process $L(.,T_{i})$ for $0\leq i \leq n-1$.\\\\
+Now, we have to calculate bond prices. For this, we have two methods:
+\begin{itemize}
+\item in the first method, we use this formula $B(0,t)=\exp(-rt)$.
+\item in the second method, the previous formula is wrong. Thus, we calculate bond prices by interpolation in using the values and dates of bond prices already known.\\
+\end{itemize}
+Thus, we have to do:
+\begin{itemize}
+\item if we choose the first method to calculate bond prices, the program ask us to enter the constant interest rate r.
+\item if we choose the second method to calculate bond prices, the program ask us to enter the number of bond prices that we know, their dates and their values.\\  
+\end{itemize}   
+\newpage
+\bibliographystyle{plain}\bibliography{bb}
+\end{document}

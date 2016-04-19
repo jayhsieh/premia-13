@@ -1,0 +1,27 @@
+Compilation
+===========
+
+In this directory to build the library just type 
+
+    make
+
+It is independent of the other files of Premia;
+
+It will compile the following algorithms
+
+1) Closed Formula for Caplet Pricing in LMM-CEV
+2) Monte Carlo algortihm for Caplet Pricing  LMM-CEV
+
+Once you have installed Premia, in order to run the
+pricer, you must execute, within a scilab window,
+the script compile.sci through the command
+exec("lmm_cev.sci",-1)
+This script cleans up the directory from old object files/libraries, 
+builds up the shared library, loads it, and  finally runs the pricer.
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************
+
+

@@ -1,0 +1,19 @@
+add_library (libvasicek1d OBJECT
+	vasicek1d.c
+	vasicek1d_stdi/cf_vasicek1d_cap.c
+	vasicek1d_stdi/cf_vasicek1d_floor.c
+	vasicek1d_stdi/cf_vasicek1d_payerswaption.c
+	vasicek1d_stdi/cf_vasicek1d_receiverswaption.c
+	vasicek1d_stdi/cf_vasicek1d_zbcalleuro.c
+	vasicek1d_stdi/cf_vasicek1d_zbputeuro.c
+	vasicek1d_stdi/cf_vasicek1d_zcbond.c
+	vasicek1d_stdi/fd_explicit_vasicek1d_capfloor.c
+	vasicek1d_stdi/fd_explicit_vasicek1d_swaption.c
+	vasicek1d_stdi/fd_explicit_vasicek1d_zbo.c
+	vasicek1d_stdi/fd_explicit_vasicek1d_zcbond.c
+	vasicek1d_stdi/fd_gauss_vasicek1d_capfloor.c
+	vasicek1d_stdi/fd_gauss_vasicek1d_swaption.c
+	vasicek1d_stdi/fd_gauss_vasicek1d_zbo.c
+	vasicek1d_stdi/fd_gauss_vasicek1d_zcbond.c
+	vasicek1d_stdi/vasicek1d_stdi.c
+	)

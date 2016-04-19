@@ -1,0 +1,53 @@
+%& --translate-file=il1-t1.tcx
+\def\filedate{1997/04/25}
+\def\fileversion{1,0}
+\def\batchfile{RR.ins}
+\input docstrip.tex
+
+\keepsilent
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%%  <RR.ins> Rapport de recherche INRIA
+%%%
+%%%  Copyright INRIA/MIAOU 1998-99
+%%%  All rights reserved
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\preamble
+********************************************************************
+Copyright (C) 1997-1999 INRIA/MIAOU
+
+\endpreamble
+
+% The packages
+\askforoverwritefalse
+\generate{%
+   \file{RR.sty}{\from{RR.dtx}{RR}}
+   \file{squelette-rr.tex}{\from{RR.dtx}{sample}}
+   \file{RRA4.sty}{\from{RR.dtx}{RRA4}}}
+
+
+\def\iispc{\space\space}
+\def\vspc{\iispc\iispc\space}
+\Msg{**********************************************************************}
+\Msg{*}
+\Msg{* To finish the installation, do the following:}
+\Msg{*}
+\Msg{*\iispc 1) Copy or move the RR.sty RRA4.sty files,}
+\Msg{*\vspc     to the some directory in yourTEXINPUTS path. }
+\Msg{*\vspc     TEXINPUTS path.}
+\Msg{*\iispc 2) Run LaTeX on the RR.dtx file to produce the documentation:}
+\Msg{ \vspc   latex  RR.dtx}
+\Msg{ \vspc makeindex -s gind.ist RR.idx}
+\Msg{ \vspc makeindex -s gglo.ist -o RR.gls RR.glo}
+\Msg{ \vspc latex  RR.dtx}
+\Msg{ \vspc latex  RR.dtx}
+\Msg{*\iispc 3) Copy the files RR.dtx, RR.dvi squelette-rr.tex}
+\Msg{*\vspc     somewhere in your documentation subdirectory.}
+\Msg{*}
+\Msg{**********************************************************************}
+\endinput
+
+
+
+

@@ -1,0 +1,21 @@
+Compilation
+===========
+
+In this directory to build the library just type 
+
+   g++ LMM-ANDERSEN-IMPLIEDVOLATILITY-CAPS.cpp -lm -o Caplet_VolSto_Libor
+
+It is independent of the other files of Premia;
+
+It will compile the following algorithms g
+
+1)  Caplet Pricer of Stochastic Volatility Libor Market Model by Andersen Method
+
+To execute the algorithm just type
+
+	Caplet_VolSto_Libor
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

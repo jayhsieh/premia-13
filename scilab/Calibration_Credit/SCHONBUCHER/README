@@ -1,0 +1,47 @@
+	**********************************
+			PREMIA
+	***********************************	
+
+/////////////////////////////////////////////////////////////////////////
+//
+//      Pricing of dynamics of the spread of CDO and the index CDS
+//	ARMAND  NGOUPEYOU (2009)
+//	ngoupeyouarmand@yahoo.fr	
+//
+//
+// 
+//
+////////////////////////////////////////////////////////////////////////
+
+ I - TO RUN SCHONBUCHER TOOLBOX
+ *********************
+
+
+ Do in the Unix directory:
+ 	
+         make 
+      
+       ./calibration
+ 
+   .
+
+II-ALGORITHMS
+*********************
+
+SCHONBUCHER TOOLBOX contains the following algorithm:
+
+	1) Newton methods
+	2) Gradient methods 
+	
+- "doc" contains all the documentation in html and latex
+
+
+--
+ARMAND NGOUPEYOU (2009)
+ngoupeyouarmand@yahoo.FR
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

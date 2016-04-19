@@ -1,0 +1,6 @@
+add_library (liblmm_stochvol_piterbarg OBJECT
+	lmm_stochvol_piterbarg.c
+	lmm_stochvol_piterbarg_stdi/lmm_stochvol_piterbarg_stdi.c
+	lmm_stochvol_piterbarg_stdi/ap_capfloor_lmmpit.c
+	lmm_stochvol_piterbarg_stdi/ap_swaption_lmmpit.c
+	)

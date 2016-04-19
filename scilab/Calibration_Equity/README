@@ -1,0 +1,46 @@
+***************************************
+
+README of the Calibration routines
+
+
+**************************************
+
+
+1) Using calibration with scilab
+________________________________
+
+
+If you  want to use the calibration module with scilab, simply run
+the file interface.sci located in the root of calibration tree.
+
+Select the method, then the parameters.
+
+For more help about parameters see the hep of each routine.
+
+
+2) Separately
+_____________
+
+
+Go to the src repertory and then go to the repertory of the method
+you want. Except for Markov which is only implemented with scilab,
+you have a Makefile which allow you to copile and run each
+program.
+
+3) Linux Interface
+_____________
+
+For Linux Interface execute
+
+exec builder.sce;
+
+in all /src subdirectory
+
+
+The PREMIA TEAM
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

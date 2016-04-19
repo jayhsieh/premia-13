@@ -1,0 +1,2582 @@
+from HTMLTags import *
+from Queue import Empty
+from multiprocessing import Process,Queue
+from time import time
+from copy import copy
+from itertools import *
+
+saved_REQUEST = REQUEST
+
+Include('import.py')
+
+from kspremia.result_kinds import *
+from kspremia import enum
+from kspremia import vector
+from kspremia import vector_compact
+from kspremia import scalar
+
+def tryGet(request, key, defaultValue):
+   return request[key] if key in request else defaultValue
+
+def tryGet3(request, key, postfunc, defaultValue):
+   return postfunc(request[key]) if key in request else defaultValue
+
+def rowEx(c1, c2, c3=''):
+   return [TD(c1,align='right')+TD(c2)+TD(c3)] 
+
+def headerEx(c1, c2, c3=''):
+   return [TH(c1,align='right')+TH(c2)+TH(c3)] 
+
+def row2(c1, c2):
+   return [TD(c1,align='right')+TD(c2)] 
+
+def spannedRowsEx(c1, c2s, c3=''):
+   return [TD(c1, Class='keys', align='right',rowspan=len(c2s)) + TD(c2s[0]) + TD(c3, Class='constraints', rowspan=len(c2s))] + \
+          [TD(c2s[i]) for i in range(1,len(c2s))]
+
+def spannedRows2(c1, c2s):
+   return [TD(c1, Class='keys', align='right',rowspan=len(c2s)) + TD(c2s[0])] + \
+          [TD(c2s[i]) for i in range(1,len(c2s))]
+
+def spannedColEx(c):
+   return [TD(c, colspan='3')]
+
+def colorizeRows(rows, suffix=""):
+   colored = []
+   color_idx = 0
+   for r in rows:
+      color_idx = color_idx + 1
+      try:
+         for rr in r:
+            cn = ("odd" if color_idx %% 2 == 1 else "even")+suffix
+            colored.append(TR(rr, Class=cn))
+      except Exception, ex:
+         print "r=(",type(r), dir(r), type(r).__name__,")"
+   return Sum(colored)
+
+
+class cached_property(object):
+    '''A read-only @property that is only evaluated once. The value is cached
+    on the object itself rather than the function or class; this should prevent
+    memory leakage.'''
+    def __init__(self, fget, doc=None):
+        self.fget = fget
+        self.__doc__ = doc or fget.__doc__
+        self.__name__ = fget.__name__
+        self.__module__ = fget.__module__
+
+    def __get__(self, obj, cls):
+        if obj is None:
+            return self
+        obj.__dict__[self.__name__] = result = self.fget(obj)
+        return result
+
+graph_t = """
+    <style type="text/css">
+      #qqq {
+        width : 600px;
+        height: 384px;
+        margin: 8px auto;
+      }
+    </style>
+  <table>
+   <tr>
+      <td>
+         <div id="qqq">
+      </td>
+      <td>
+         zzz
+      </td>
+   </tr>
+  </table>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="flashcanvas.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="premia/flotr2.min.js"></script>
+    <script type="text/javascript">
+(function basic_legend(container) {
+
+  var
+    graph;
+
+
+  function labelFn (label) {
+    return label;
+  }
+
+  // Draw graph
+  graph = Flotr.draw(container, datas, {
+    legend : {
+      position : 'se',            // Position the legend 'south-east'.
+      labelFormatter : labelFn,   // Format the labels.
+      backgroundColor : '#D2E8FF' // A light blue background color.
+    },
+    HtmlText : false,
+    spreadsheet: {
+      show: true,
+      tickFormatter: function(e) {
+          return e + "";
+      }
+   }
+  });
+})(document.getElementById('qqq'));      
+    </script>
+"""
+
+
+# object defining per-user data   
+session = Session()
+
+# Type: corrected_output_parameter_name : string
+# -> (should_it_be_in_graph_by_default : bool, its_kind_id : int)
+# here we just add a 'Time' output parameter which is not show by default
+result_kinds['Time'] = (False,-1)
+
+def checkbox(vname,checked=True, disabled = False):
+   """
+   Returns a checkbox with given name
+   checked - is the checkbox checked
+   disabled - is the checkbox disabled 
+   """
+   return INPUT(type="checkbox", 
+                name=vname, 
+                value="1", 
+                align="right", 
+                checked=checked, 
+                disabled = disabled) 
+   
+# This class contains arrays representing possible iteration over some entity parameter
+# All the arrays have the first element corresponding to No Iteration case
+# Following elemenets represent data for iterable entity parameters
+# If a parameter is of PNLVECT type of size N, these array contain N its components
+# If a parameter is of PNLVECTCOMPACT type of size N, 
+#     these array contain N its components if it is heterogenous, or 1 component if homogenous
+# If a parameter if ENUM type, its parameters, if any, appear in these arrays 
+# _iterables  - printable labels for iterable parameters. Type: string list
+# _iterables_corr - corrected names for variables. Type: string list
+# _iterables_getter - functions returning parameter's value from the entity.
+#                    Type: list<() -> (int | double)>
+# _iterables_setter - functions setting parameter's value in the entity.
+#                    Type: list<(int | double) -> ()>
+# TODO: introduce IterableParam class
+# reload : bool  - flag showing should we try to load entity params from the form sent
+class Iterables:
+
+   def __init__(self, parent):
+      # 
+      self._iterables = ['No iteration']
+      self._iterables_corr = ['']
+      self._iterables_getter = ['']
+      self._iterables_setter = ['']
+      self._iterables = ['No iteration']
+      self.reload = True
+      self.parent = parent
+      
+   def __len__(self): return len(self._iterables)
+      
+   @property
+   def entity(self):
+      return self.parent.entity
+  
+   @property
+   def labels(self):
+      return self._iterables
+      
+   def checkIdx(self, idx):
+      assert 0 <= idx and idx < len(self._iterables_corr)
+      
+   def getCorrectedName(self, idx):
+      self.checkIdx(idx)
+      return self._iterables_corr[idx]
+      
+   def lookupByCorrectedName(self, correctedName):
+      return self._iterables_corr.index(correctedName) \
+               if correctedName in self._iterables_corr else 0   
+      
+   def getGetter(self, idx):
+      self.checkIdx(idx)
+      return self._iterables_getter[idx]
+
+   def getSetter(self, idx):
+      self.checkIdx(idx)
+      return self._iterables_setter[idx]
+
+def roundIfNeeded(dstType):
+   if dstType == type(1):
+      return lambda x: int(round(x))
+   if dstType == type(1L):
+      return lambda x: long(round(x))
+   return lambda x: x
+
+def iterate(initial, limit, stepsNo):
+
+   cast = roundIfNeeded(type(initial))
+
+   for i in range(stepsNo):
+      x = initial + 1. * i / (stepsNo - 1) * (limit - initial) if stepsNo > 1 else initial
+      yield cast(x)     
+
+
+class IterationState(object):
+
+   def __init__(self, obj, iterables, idx, iterateTo, stepsNo):
+      self.obj = obj
+      self.idx = idx
+      self.label = iterables.getCorrectedName(idx) 
+      self.name = iterables.labels[idx]
+      self.getter = iterables.getGetter(idx)
+      self.setter = iterables.getSetter(idx)
+      self.iterateTo = iterateTo
+      self.stepsNo = stepsNo
+
+   @cached_property
+   def keys(self):
+      return list(iterate(self.getter(), self.iterateTo, self.stepsNo))
+
+   @cached_property
+   def serialized(self):
+      return (self.idx, self.iterateTo, self.stepsNo)
+
+
+class VisitorBase(object):
+
+   def __init__(self, obj, state = None):
+      self.state = state
+      self.entity = obj
+
+   def addError(self, msg): add_error(msg)
+
+   @property
+   def entityLabel(self):
+      return self.state.entityLabel
+
+   def comb(self, x,y): return None
+
+class Loader(VisitorBase):
+
+   def __init__(self, obj, state):
+      VisitorBase.__init__(self, obj, state)
+      self.REQUEST = REQUEST
+      self.reload = True
+      
+   def enumVisitor(self): return EnumLoader   
+
+   def get(self, key, func):
+      if key in self.REQUEST:
+         func(self.REQUEST[key])
+         return True
+      else:
+         return False
+      
+   def process(self, field):  
+      try:
+         if self.reload:
+            field.load(self)
+      except Exception, ex:
+         v.addError('Error in '+ field.propertyName +':' + str(ex))
+
+class Renderer(VisitorBase):
+
+   def __init__(self, obj, state=None):
+      VisitorBase.__init__(self,obj,state)
+   
+   def process(self, field):  
+      return field.render(self)
+
+   def comb(self, x,y): 
+      return x + y
+
+   def enumVisitor(self): return EnumRenderer
+
+   def rowEx(self, c1, c2, c3=''):
+      return [TD(c1,align='right') + TD(c2)+TD(c3)]
+
+   def spannedRowsEx(self, c1, c2s, c3=''):
+      return [TD(c1, Class='keys', align='right',rowspan=len(c2s)) + TD(c2s[0]) + TD(c3, Class='constraints', rowspan=len(c2s))] + \
+             [TD(c2s[i]) for i in range(1,len(c2s))]
+
+def row_2_3(c1, c2):
+   return [TD(c1,Class='keys') + TD(c2, Class='values', colspan="2")]
+
+def spannedRows_2_3(c1, c2s):
+   return [TD(c1, Class='keys',rowspan=len(c2s)) + TD(c2s[0], Class='values', colspan="2")] + \
+          [TD(c2s[i], Class='values', colspan="2") for i in range(1,len(c2s))]
+
+class RendererH(Renderer):
+
+   def __init__(self, obj, state):
+      Renderer.__init__(self, obj, state=state)
+
+   def rowEx(self, c1, c2):
+      return row_2_3(c1, c2)
+
+   def spannedRowsEx(self, c1, c2s):
+      return spannedRows_2_3(c1, c2s)
+
+   def process(self, field):
+      return field.renderHistoryEx(self)
+
+   def enumVisitor(self):
+      return EnumRendererH
+
+class IterablesExtractor(VisitorBase):
+
+   def __init__(self, obj, state):
+      VisitorBase.__init__(self, obj, state)
+      self.ctx = Iterables(self)
+      
+   def addError(self, msg): add_error(msg)
+      
+   def process(self, field):  field.getIterables(self)
+
+   def enumVisitor(self): return EnumIterablesExtractor   
+
+class EnumVisitorBase(object):
+
+   def __init__(self, source, member, enum):
+      self.member = member
+      self.enum = enum
+      self.source = source
+
+   def processX(self):
+      return reduce(self.source.comb, 
+                    map(lambda f: f.process(self),
+                        self.enum.getFields(self.value)), 
+                    self.header)
+
+   @cached_property      
+   def value(self):   
+      return self.enum.labels.index(self.member._labels[self.member._value.key()])
+
+   @cached_property
+   def header(self):
+      return None
+   
+   @property
+   def entityImpl(self):
+      return self.member._value
+         
+class EnumLoader(EnumVisitorBase, Loader):
+
+   def __init__(self, source, member, enum):
+      EnumVisitorBase.__init__(self, source, member, enum)
+
+      e = int(tryGet(REQUEST, self.enum.fullName, 0))
+      self.enum.initEnum(self.member, e)
+
+      Loader.__init__(self, member._value, source.state)
+
+
+class EnumRenderer(EnumVisitorBase, Renderer):
+
+   def __init__(self, source, member, enum):
+      EnumVisitorBase.__init__(self, source, member, enum)
+      Renderer.__init__(self, self.entityImpl, state = source.state)
+
+   @cached_property
+   def header(self):
+      if self.enum.should_be_reloaded:
+         L = SELECT(name = self.enum.fullName, onchange='submit();').from_list(self.enum.labels)
+      else:
+         L = SELECT(name = self.enum.fullName).from_list(self.enum.labels)
+         
+      L.select(value=self.value)
+      
+      return [self.rowEx(self.enum.friendlyName, L)]
+
+class EnumRendererH(EnumVisitorBase, RendererH):
+
+   def __init__(self, source, member, enum):
+      EnumVisitorBase.__init__(self, source, member, enum)
+      RendererH.__init__(self, self.entityImpl, state = source.state)
+
+   @cached_property
+   def header(self):
+      return [self.rowEx(self.enum.friendlyName, self.enum.labels[self.value])]
+
+class EnumIterablesExtractor(EnumVisitorBase, IterablesExtractor):
+
+   def __init__(self, source, member, enum):
+      EnumVisitorBase.__init__(self, source, member, enum)
+      IterablesExtractor.__init__(self, self.entityImpl, source.state)
+      self.ctx = source.ctx
+
+def extlist(lst,size):
+    if len(lst) < size:
+        lst.extend((size - len(lst)) * [lst[len(lst) - 1]])
+
+def enum(n,e):
+    L = SELECT(name = n, onchange="submit();").from_list(e._labels.values())
+    L.select(value=e._labels.keys().index(e._value.key()))
+    return L
+    
+def setEnumValueByIdx(e,idx):
+    e._value = e._labels.keys()[int(idx)]
+
+def enum_submit_mod(n,names,v):
+    L = SELECT(name = n, onchange="submit();").from_list(names)
+    L.select(value=names.index(v))
+    return L
+
+def enum_submit_ex(n, names, v, disabled):
+   options = []
+   for i in range(len(names)):
+      o = OPTION(names[i], value=i, SELECTED=v==names[i], DISABLED=names[i]==disabled)
+      options.append(o)
+   L = SELECT(Sum(options), name = n, onchange="submit();")
+   return L
+
+def enum_submit(n,classes,v):
+    names = [x.__name__ for x in classes]
+    L = SELECT(name = n, onchange="submit();").from_list(names)
+    L.select(value=names.index(v))
+    return L
+
+def pricing_options(model_name, family_name):
+    return eval('pricings.' + model_name + '.' + model_name + '_' + family_name + '.methods_for_options()').keys()
+
+mod_colors = ['lightgreen','white']
+opt_colors = ['#FFFFC0', 'white']
+met_colors = ['lightblue','white']
+res_colors = ['lightgray', 'white']
+
+def clr(color_table,idx): return color_table[idx%%len(color_table)]
+
+g_err_table = TABLE(Class="errors")
+g_errors = []
+
+def add_error(s): 
+    g_err_table <= TR(TD(s), bgcolor='#C00000')
+    g_errors.append(s)
+
+def myImport(m):
+   exec 'import ' + m
+   return eval(m)
+
+def getMethodModule(m,f,meth): 
+   return myImport('kspremia.mod.'+m+'.'+m+'_'+f+'.'+meth)
+
+def uriPart(key,value):
+   return '&' + key + '=' + value
+
+class StateCommonBase(object):
+   
+   @cached_property
+   def name(self):
+      """ Printable name for the entity
+      """
+      return self.ksModule.name()
+
+   @cached_property
+   def visitFields(self):
+      """ Returns a function to visit entity's fields
+      """
+      def inner(v):
+         return reduce(v.comb, map(lambda x: x.process(v), self.ksModule.fields()), [])         
+      return inner
+
+   @cached_property  # here should be a light-weight version for history case
+   def iterables(self):
+      """ Collects information about which entity fields can be iterated over
+      Returns Iterables instance
+      """
+      extractor = IterablesExtractor(self.obj, self)
+      self.visitFields(extractor)
+      return extractor.ctx
+
+   @cached_property
+   def rows(self):
+      """ Returns list of row groups to render for the entity
+      All rows in a group are rendered with the same color
+      """
+      return self.header + self.visitFields(self.createRenderer()) + self.iterationRows 
+
+   @cached_property
+   def pdf(self):
+      return self.ksModule.pdf()
+
+   @cached_property
+   def pdfRendered(self):
+      return A(IMG(src=r'premia/pdf-icon48.png', height="24", border="0"), href=self.pdf) if self.pdf != "" else Sum([])
+      #return IMG(src=r'premia/pdf_icon.gif', href=self.ksModule.pdf()) if self.ksModule.pdf() != "" else Sum([]))
+
+   @cached_property
+   def html(self):
+      return self.ksModule.html()
+
+   @cached_property
+   def htmlRendered(self):
+      return A(IMG(src=r'premia/html-icon.png', height="24", border="0"), href=self.html) if self.html != "" else Sum([])
+      #return A("[html]", href=self.ksModule.html()) if self.ksModule.html() != "" else Sum([])
+
+   @cached_property
+   def myHeaderImpl(self):
+      """ List of rows representing the entity header 
+      """
+      return [headerEx(B(self.printLabel), self.headerContent,  self.htmlRendered)]      
+
+   @cached_property
+   def header(self):
+      """ List of rows representing the entity header 
+      """
+      return self.myHeaderImpl
+
+   @cached_property
+   def toRender(self):
+      """ Returns list of Tags containing the entity rendered
+      """
+      return colorizeRows(self.rows)
+
+class Iteration(object):
+
+   def __init__(self, parent, idx=0):
+      self.parent = parent
+      self.request = parent.request
+      self.tryGet = parent.tryGet
+      self.idx = idx
+      self.suffix = "_" + str(self.idx)
+
+   @cached_property
+   def another(self):
+      return self.parent.iterations[1 - self.idx]
+      
+   @property
+   def reqItIdx(self):
+      return self.parent.reqItIdx + self.suffix
+
+   @property
+   def uriOldItIdx(self):
+      return self.parent.uriOldItIdx + self.suffix
+
+   @cached_property
+   def oldIterationIdx(self): 
+      """ Returns old iteration index for the entity (0 if None) 
+      """
+      return int(self.tryGet(self.uriOldItIdx, 0))
+
+   @cached_property
+   def srcIterationIdx(self): # tryGet 
+      """ Returns iteration index for the entity
+      """
+      return self.parent.historyIterationsIdx[self.idx] if self.parent.historyIterations[self.idx] \
+               else int(self.tryGet(self.reqItIdx, 0))
+
+   @cached_property
+   def iterables(self):
+      extractor = IterablesExtractor(self.parent.obj, self)
+      self.parent.visitFields(extractor)
+      return extractor.ctx
+
+   @cached_property
+   def iterationLabel(self):
+      """ Returns id of field being iterated if any
+      """
+      return self.tryGet('il' + self.suffix, None)
+      
+   @cached_property
+   def fixedIterationIdx(self):
+      if self.oldIterationIdx == self.iterationIdx:   # if iteration choice hasn't changed
+         if self.iterationLabel and self.iterationIdx != 0: # and we have a reasonable iteration
+            # if iteration index doesn't correspond to the iteration label
+            if self.iterationIdx >= len(self.iterables) or self.iterationLabel != self.iterables.getCorrectedName(self.iterationIdx):
+               # we try to reconstruct it from iteration label (case when user changed enum or array choice)
+               return self.iterables.lookupByCorrectedName(self.iterationLabel)
+      return self.iterationIdx
+
+   @cached_property
+   def iterateVlabel(self):
+      return 'iterate_' + self.parent.entityLabel + self.suffix
+
+   @cached_property
+   def iterateValueVlabel(self):
+      return self.iterateVlabel + '_' + self.iterables.getCorrectedName(self.fixedIterationIdx)
+
+   @cached_property
+   def oldIterationValue(self):
+      """ Returns iteration limit 
+      """
+      return self.parent.historyIterationsLimit[self.idx] if self.parent.historyIterations[self.idx] \
+         else float(self.tryGet(self.iterateValueVlabel, self.iterables.getGetter(self.fixedIterationIdx)()))
+
+   @cached_property
+   def varIterationSteps(self):
+      return 'iteration_steps'+ self.suffix
+
+   @cached_property
+   def iterationStepNumber(self):
+      """ Returns iteration step number
+      """
+      return self.parent.historyIterationsStepNo[self.idx] if self.parent.historyIterations[self.idx]\
+               else int(self.tryGet(self.varIterationSteps, 10))
+      
+   @cached_property
+   def iteration(self):
+      return IterationState(self.parent.obj, 
+                            self.iterables, 
+                            self.fixedIterationIdx, 
+                            self.oldIterationValue, 
+                            self.iterationStepNumber) \
+         if self.fixedIterationIdx else None      
+
+   @cached_property
+   def iterationIdx(self):
+      return 0 \
+         if self.parent.idChanged or self.otherItIdxChanged and not self.parent.historyIterations[self.idx] \
+         else self.srcIterationIdx
+
+   @cached_property
+   def iterationIdxChanged(self):
+      return self.oldIterationIdx != self.srcIterationIdx
+
+   @cached_property
+   def label(self):
+      return self.iterables.labels[self.fixedIterationIdx]
+
+   @cached_property
+   def iterationRows(self):
+
+      if len(self.iterables.labels) == 1:
+         return []
+
+      if self.idx == 1 and not self.parent.parent.iterations[0]:
+         return []
+
+      anotherLabel = self.another.label if (self.idx == 1 or self.iteration) and self.another.iteration else ""
+
+      mc = enum_submit_ex(self.iterateVlabel, self.iterables.labels, self.label, anotherLabel)
+
+      table = [rowEx('Iterate #'+str(self.idx), mc, '')]
+         
+      if self.fixedIterationIdx != 0:
+
+         return table + [
+            rowEx('Iterate To', INPUT(name=self.iterateValueVlabel,value=self.oldIterationValue),''), 
+            rowEx('#Iterations', INPUT(name=self.varIterationSteps,value=self.iterationStepNumber),'')
+            ]
+
+      return table
+
+   @cached_property
+   def itUri(self):
+      return uriPart(self.uriOldItIdx, str(self.iterationIdx)) \
+                  if 'uriOldItIdx' in dir(self.parent) else ''
+
+class StateBase(StateCommonBase):
+
+   def __init__(self, parent):
+      self.parent = parent
+
+   @cached_property
+   def request(self):
+      return saved_REQUEST
+
+   def tryGet(self, key, defaultValue):
+      """ If 'key' is in REQUEST, returns value for it
+      Otherwise returns 'defaultValue'
+      """
+      return tryGet(self.request, key, defaultValue)
+
+   def tryGet3(self, key, postfunc, defaultValue):
+      """ If 'key' is in REQUEST, takes its value and applies postfunc to it
+      Otherwise returns 'defaultValue'
+      """
+      return tryGet3(self.request, key, postfunc, defaultValue)
+
+   @cached_property
+   def pyType(self):
+      """ Returns pypremia class representing this entity
+      """
+      return self.ksModule.underlyingType()
+
+   @cached_property
+   def historyElement(self):
+      return state.history.toBeTakenAsCurrent
+
+   @cached_property
+   def historyObj(self):
+      return self.historyState.obj
+
+   @cached_property
+   def historyId(self):
+      return self.idFromObj(self.historyObj)
+
+   @cached_property
+   def historyIterations(self):
+      return self.historyState.iterations if self.historyElement else [None, None]
+
+   @cached_property
+   def historyIterationsIdx(self):
+      return [(self.historyIterations[i][0] if self.historyIterations[i] else None) for i in range(2)]
+
+   @cached_property
+   def historyIterationsLimit(self):
+      return [(self.historyIterations[i][1]  if self.historyIterations[i] else None) for i in range(2)]
+
+   @cached_property
+   def historyIterationsStepNo(self):
+      return [(self.historyIterations[i][2]  if self.historyIterations[i] else None) for i in range(2)]
+
+   @cached_property
+   def obj(self):
+      """ Returns pypremia class instance containing entity's data
+      """
+      if self.historyElement:
+         return self.historyObj
+      else:
+         loader = Loader(self.pyType(), self)
+         self.visitFields(loader)
+         return loader.entity
+
+   @cached_property
+   def id(self):
+      if self.historyElement:
+         return self.historyId
+      if self.predsChanged:
+         return self.idChoices[0]
+      else:
+         return self.tryGet3(self.reqLabel, lambda x: self.idChoices[int(x)], self.old_id)
+
+   @cached_property
+   def uri(self):
+      return uriPart(self.uriToken, self.id) + self.iterations[0].itUri + self.iterations[1].itUri
+
+   @cached_property
+   def idChanged(self):
+      return self.old_id != self.id
+
+   @cached_property
+   def old_id(self):
+      return self.tryGet(self.uriToken, self.defaultValue)
+
+   @staticmethod
+   def idFromObj(x):
+      return type(x).__name__
+
+   @cached_property
+   def idChoices(self):
+      return self.nameChoices
+
+   @cached_property
+   def nameChoices(self):
+      return map(lambda x: x.__name__, self.choices) 
+
+   def clrinc(self): clrinc()
+   @property
+   def currentColor(self): return clr(self.colors,clridx)
+
+   iterationType = Iteration
+
+   @cached_property
+   def iterations(self):
+      return [self.iterationType(self, 0), self.iterationType(self, 1)]
+
+   def createRenderer(self):
+      return Renderer(self.obj, state = self)
+
+   @cached_property
+   def headerContent(self):
+      return enum_submit_mod(self.reqLabel, self.nameChoices, self.name)
+
+   @cached_property
+   def iterationRows(self):
+      return self.iterations[0].iterationRows + self.iterations[1].iterationRows
+
+class AssetStateBase(object):
+
+   printLabel = 'Asset Type:'
+
+   @cached_property
+   def name(self):
+      return self.id
+
+   @cached_property
+   def pdfRendered(self):
+      return Sum([])
+
+   @cached_property
+   def htmlRendered(self):
+      return Sum([])
+
+class AssetState(AssetStateBase, StateBase):
+
+   @cached_property
+   def choices(self):
+      return assets.all()
+
+   reqLabel = 'asset_type'
+   uriToken = 'a'
+   defaultValue = 'equity_Black_Scholes_type'
+
+   @staticmethod
+   def idFromObj(x):
+      return x
+
+   @cached_property
+   def historyObj(self):
+      return self.historyElement.asset.id
+
+   @cached_property 
+   def predsChanged(self):
+      return False 
+
+class ModelStateBase(object):
+
+   colors = mod_colors
+   printLabel = 'Model:'
+
+   @cached_property
+   def ksModule(self): 
+      return myImport('kspremia.mod.' + self.id + '.model')
+
+   @cached_property
+   def header(self):
+      return self.parent.asset.header + self.myHeaderImpl
+
+class ModelIteration(Iteration):
+
+   @cached_property
+   def otherItIdxChanged(self):
+      return \
+         self.parent.parent.option.iterations[self.idx].iterationIdxChanged or \
+         self.parent.parent.method.iterations[self.idx].iterationIdxChanged
+
+class ModelState(ModelStateBase, StateBase):
+
+   @cached_property
+   def choices(self):
+      return eval('assets.' + self.parent.asset.id + '.models()')
+
+   @staticmethod
+   def idFromObj(x):
+      return x.ID()
+
+   @cached_property
+   def idChoices(self):
+      return map(self.idFromObj, self.choices)
+
+   entityLabel = 'model'
+   reqLabel = 'model'
+   uriToken = 'm'
+   defaultValue = 'BS1D'
+   uriOldItIdx = 'im'
+   reqItIdx = 'iterate_model'
+   iterationType = ModelIteration
+
+   @cached_property
+   def historyState(self):
+      return self.historyElement.model
+
+   @cached_property 
+   def predsChanged(self):
+      return self.parent.asset.idChanged 
+
+class FamilyStateBase(object):
+
+   printLabel = 'Family:'
+
+   @cached_property
+   def name(self):
+      return self.id
+
+   @cached_property
+   def pdf(self):
+      return self.parent.option.ksModule.familyPdf()
+
+   @cached_property
+   def html(self):
+      return self.parent.option.ksModule.familyHtml()
+
+
+class FamilyState(FamilyStateBase, StateBase):
+
+   @cached_property
+   def choices(self):
+      return self.parent.model.obj.families()
+
+   @cached_property
+   def nameChoices(self):
+      return self.choices
+
+   reqLabel = 'family'
+   uriToken = 'f'
+   defaultValue = 'STD'
+
+   @staticmethod
+   def idFromObj(x):
+      return x
+
+   @cached_property
+   def historyObj(self):
+      return self.historyElement.option.obj.familyName()
+
+   @cached_property 
+   def predsChanged(self):
+      return self.parent.model.idChanged
+
+class OptionStateBase(object):
+
+   @cached_property
+   def ksModule(self):
+      return myImport('kspremia.opt.'+self.parent.family.id+'.'+self.id)    
+
+   colors = opt_colors
+   printLabel = 'Option:'
+
+   @cached_property
+   def header(self):
+      return self.parent.family.header + self.myHeaderImpl
+
+class OptionIteration(Iteration):
+
+   @cached_property
+   def otherItIdxChanged(self):
+      return \
+         self.parent.parent.model.iterations[self.idx].iterationIdxChanged or \
+         self.parent.parent.method.iterations[self.idx].iterationIdxChanged
+
+
+class OptionState(OptionStateBase, StateBase):
+
+   @cached_property
+   def choices(self):
+      return pricing_options(self.parent.model.id,self.parent.family.id)
+
+   entityLabel = 'option'
+   reqLabel = 'option'
+   uriToken = 'o'
+   defaultValue = 'CallEuro'
+   uriOldItIdx = 'io'
+   reqItIdx = 'iterate_option'
+   iterationType = OptionIteration
+
+   @cached_property
+   def historyState(self):
+      return self.historyElement.option
+
+   @cached_property 
+   def predsChanged(self):
+      return self.parent.family.idChanged or self.parent.model.idChanged
+
+class ResultMemberCommonBase(object):
+
+   def __init__(self, correctedName, friendlyName, enabled=True):
+      self.friendlyName = friendlyName
+      self.correctedName = correctedName
+      self.enabled = enabled
+
+   @cached_property
+   def request(self):
+      return REQUEST
+
+   def tryGet(self, key, defaultValue):
+      return self.request[key] if key in self.request else defaultValue
+
+   @cached_property
+   def oldLabel(self):
+      return self.tryGet('showGraphLabel_'+self.correctedName, self.friendlyName)
+
+   @cached_property
+   def rows(self): 
+      return rowEx('', 
+                   INPUT(name='showGraphLabel_'+self.correctedName, value=self.oldLabel, disabled = not self.enabled), 
+                   checkbox('showGraph_'+self.correctedName, checked = self.oldChecked, disabled = not self.enabled))
+
+
+class ResultMember(ResultMemberCommonBase):
+
+   @cached_property
+   def oldChecked(self):
+      return result_kinds[self.correctedName][0] \
+               if 'showGraphLabel_' + self.correctedName not in self.request \
+             else 'showGraph_'+self.correctedName in self.request
+
+class MethodStateBase(object):
+
+   colors = met_colors
+   printLabel = 'Pricing method:'
+
+   @cached_property
+   def ksModule(self):
+      return getMethodModule(self.parent.model.id, self.parent.family.id, self.id)
+
+   @cached_property
+   def rows(self):
+      return self.superRows 
+
+class ComputeButton(object):
+
+   @cached_property
+   def toRender(self):
+      return [rowEx("",INPUT(Type="submit",name="Compute",value="Compute"))]
+
+   @cached_property
+   def value(self):
+      return 'Compute' in REQUEST
+
+session_settings = session.settings if 'settings' in dir(session) else None
+
+def tryGetSetting(name, defaultValue):
+   global session
+   return session.settings[name] if 'settings' in dir(session) and name in session.settings else defaultValue
+
+class CommonSettings(object):
+
+   @cached_property
+   def historyLen(self):
+      
+      return int(tryGet(REQUEST, 'HistoryLen', tryGetSetting('history_length', 0)))
+
+   @cached_property
+   def toRender(self):
+      L = enum_submit_ex('HistoryLen', map(str, range(20)), str(self.historyLen), str(self.historyLen)) 
+      return TD("History items to show") + TD(L)
+
+   @cached_property
+   def serialized(self):
+      return { "history_length" : self.historyLen }
+         
+
+class Settings(object):
+
+   @cached_property
+   def sizeX(self):
+      return int(tryGet(REQUEST, 'SizeX', tryGetSetting("graph_size_x", 640)))
+
+   @cached_property
+   def sizeY(self):
+      return int(tryGet(REQUEST, 'SizeY', tryGetSetting("graph_size_y", 384)))
+
+   @cached_property
+   def suffix(self):
+      return tryGet(REQUEST, 'Suffix', '')
+
+   @cached_property
+   def initial(self):
+      return 'Suffix' not in REQUEST
+
+   @cached_property
+   def inheritByDefault(self):
+      return 'InheritByDefault' in REQUEST if not self.initial else bool(tryGetSetting("inherit_by_default", True))
+
+   @cached_property
+   def showResultTable(self):
+      return 'ShowResultTable' in REQUEST if not self.initial else bool(tryGetSetting("show_result_table", False))
+
+   @cached_property
+   def serialized(self):
+      return {
+         "graph_size_x": self.sizeX,
+         "graph_size_y": self.sizeY,
+         "inherit_by_default": self.inheritByDefault,
+         "show_result_table": self.showResultTable
+      }
+
+   #@cached_property
+   #def recordHistory(self):
+   #  return 'RecordHistory' in REQUEST if not self.initial else False
+
+   @cached_property
+   def toRender(self):
+      return [
+            rowEx("Graph size X", INPUT(name="SizeX", value=self.sizeX)),
+            rowEx("Graph size Y", INPUT(name="SizeY", value=self.sizeY)),
+            rowEx("Label suffix", INPUT(name="Suffix", value=self.suffix)),
+            rowEx("Inherit by default", checkbox("InheritByDefault", self.inheritByDefault)),
+            rowEx("Show result table", checkbox("ShowResultTable", self.showResultTable)),
+            #rowEx("Record history", checkbox("RecordHistory", self.recordHistory))
+         ]
+
+class MethodIteration(Iteration):
+
+   @cached_property
+   def otherItIdxChanged(self):
+      return \
+         self.parent.parent.option.iterations[self.idx].iterationIdxChanged or \
+         self.parent.parent.model.iterations[self.idx].iterationIdxChanged
+
+
+class MethodState(MethodStateBase, StateBase):
+
+   @cached_property
+   def choices(self):
+      m = self.parent.model.id
+      f = self.parent.family.id
+      opt = self.parent.option.obj
+      return [x for x in eval('pricings.' + m + '.' + m + '_' + f + '.all()') if type(opt) in x.options()]
+
+   entityLabel = 'method'
+   reqLabel = 'pricing_method'
+   uriToken = 'meth'
+   defaultValue = 'CF_Call'
+   uriOldItIdx = 'ip'
+   reqItIdx = 'iterate_method'
+   compButton = ComputeButton()
+   settings = Settings()
+   common = CommonSettings()
+   iterationType = MethodIteration
+
+   @cached_property
+   def settingsSerialized(self):
+      return dict(list(self.common.serialized.iteritems()) + list(self.settings.serialized.iteritems()))
+
+   @cached_property
+   def historyState(self):
+      return self.historyElement.method
+
+   @cached_property
+   def superRows(self):
+      return StateBase.rows.__get__(self, None)
+
+   @cached_property
+   def rows(self):
+      return self.superRows + self.resultTable + self.compButton.toRender
+
+   @cached_property
+   def resultTable(self):
+      return \
+         self.settings.toRender + \
+         [spannedColEx('Show results in a graph')] + \
+         map(lambda t: t.rows, self.resultMembers)  \
+         if self.showResultMembers else []
+
+   @property 
+   def showResultMembers(self):
+      return self.parent.iterations[0]
+
+   @cached_property 
+   def predsChanged(self):
+      return self.parent.option.idChanged or self.parent.model.idChanged
+
+   @cached_property
+   def resultMembers(self):
+      return map(lambda t: ResultMember(t[0],t[1]), 
+                 self.ksModule.resultFields() + [('Time', 'Computation Time')]) 
+
+class ScalarResultBase(object):
+
+   @staticmethod
+   def renderScalarResultElement((k,v)):
+      return [spannedRows_2_3(k, v)] if type(v) == list else [row_2_3(k, v)]
+
+   @cached_property
+   def rows(self):
+      return reduce(lambda x,y: x+y, map(self.renderScalarResultElement, self.result),[[TH('Result')+TH()+TH()]])
+
+   @cached_property
+   def toRender(self):
+      return colorizeRows(self.rows) if self.result else Sum([])
+
+class ScalarResult(ScalarResultBase):
+
+   def __init__(self, parent):
+      self.parent = parent
+      self.computation_timeout = parent.computation_timeout
+
+   @cached_property
+   def result(self):
+      res = []
+      def F(opt, mod, q):
+         begin = time()
+         try:
+            res = self.parent.method.obj(opt, mod)
+         except Exception, exc:
+            print "Caught:", exc
+            res = [("Exception", str(exc))]
+            q.put(res)
+            return
+         end = time()
+         res.append(("Time", end - begin))
+         q.put(res)
+      try:
+         queue = Queue()
+         process = Process(target = F, args = (self.parent.option.obj,self.parent.model.obj, queue))
+         process.start()
+         try:
+            res = queue.get(timeout=self.computation_timeout)
+            if res[0][0] == "Exception":
+               add_error(res[0][1])
+               res = None
+         except Empty, exc:
+            process.terminate()
+            raise Exception("Method has worked more than " + str(self.computation_timeout) + "s. Please try another parameter combination")
+         process.join(timeout=self.computation_timeout)
+      except Exception, exc:
+         add_error(exc)
+      return res 
+
+def rowKV(k,v):
+   return [TD(k,align='right') + Sum([TD(L) for L in v])]
+
+def spannedRowsKV(k,v):
+   dim = len(v[0])
+   return [TD(k, align='right',rowspan=dim) + Sum([TD(L[0]) for L in v])] + \
+                                map(lambda i: Sum([TD(L[i]) for L in v]), range(1, dim))
+
+def script(s):
+   return SCRIPT(s, type=r"text/javascript")
+
+def todata(header, v):
+   s = "["
+   for i in range(len(v)):
+      s += "[" + str(header[i]) + "," + str(v[i]) + "],"
+   s += "]"
+   return s
+
+def todata1d(array):
+   return "[" + ','.join(map(str, array)) + "]"
+
+def todata2d(array, rowlen):
+   s = '['
+   for i in range(rowlen, len(array), rowlen):
+      s += todata1d(array[i-rowlen:i]) + ","
+   if 'i' in dir():
+      s += todata1d(array[i:])
+   s += ']'
+   return s
+
+def tooltipArray(data, keys_1, keys_2, name_1, name_2):
+   s = "["
+   for i in range(len(keys_1)):
+      for j in range(len(keys_2)):
+         idx = i * len(keys_2) + j
+         v = str(data[idx]) if idx < len(data) else "" 
+         s += quote("("+name_1+"="+str(keys_1[i])+","+name_2+"="+str(keys_2[j])+")="+v)+","
+   return s + "]"
+
+def groupByFirst(xs):
+   res = {}
+   for k,v in xs:
+      if k not in res:
+         res[k] = []
+      res[k].append(v)
+   return res
+
+def quote(s):
+   return "\'"+s+"\'"
+
+class Serie(object):
+
+   def __init__(self, label, data):
+      self.label = label
+      self.data = data
+
+   def __repr__(self):
+      return "(" + self.label + ":" + self.data + ")"
+
+
+def showGraphLabel(corrected, friendly=None):
+   return tryGet(REQUEST, 'showGraphLabel_' + corrected, friendly)
+
+def showOnGraph(corrected):
+   return 'showGraph_'+corrected in REQUEST
+
+class ResultElementBase(object):
+
+   def __init__(self, parent):
+      self.parent = parent
+      self.domain = parent.domain
+
+   @property 
+   def showGraphLabel(self):
+      return showGraphLabel(self.vlabel, self.friendly)
+
+   @property
+   def showOnGraph(self):
+      return self.visible
+
+   @cached_property
+   def labels(self):
+      return [(self.showGraphLabel, self.showOnGraph)]
+
+   @cached_property
+   def series(self):
+      return self.getSeries(self.showGraphLabel)
+
+   def getSeries(self, label):
+      return [] if not self.showOnGraph else \
+             [(self.kind, Serie(label, todata(self.parent.domain, self.data)))]
+
+   @property
+   def kind(self):
+      return result_kinds[self.label][1]
+
+   @cached_property
+   def rows(self):
+      return self.getRows(self.showGraphLabel)
+
+   def getRows(self, label):
+      return rowKV(label, self.data)
+
+   @cached_property
+   def serialized(self):
+      return (self.vlabel,self.showGraphLabel, self.data)
+
+   @cached_property
+   def selectedToBeInherited(self):
+      #print self.vlabel,"=",showOnGraph(self.vlabel),".<BR>"
+      return showOnGraph(self.vlabel)
+
+class InheritedResultElement(object):
+
+   def __init__(self, parent, h_idx, (r_idx, v_idx, label)):
+      self.parent = parent
+      self.h_idx = h_idx
+      self.r_idx = r_idx
+      self.v_idx = v_idx
+      self.source = parent.history.at(h_idx).iterationResult.at((r_idx,v_idx))
+      self.vlabel = str(self.parent.h_idx) + "_" + self.source.vlabel
+      self.friendly = label
+      self.visible = self.source.visible
+
+   @cached_property
+   def showGraphLabel(self):
+      return self.friendly
+
+   @cached_property
+   def series(self):
+      return self.source.getSeries(self.friendly)
+
+   @cached_property
+   def rows(self):
+      return self.source.getRows(self.friendly)
+
+   @property
+   def kind(self):
+      return self.source.kind
+
+
+class ResultElementVBase(object):
+
+   def __init__(self, parent, (k,f,b,v)):
+      self.parent = parent
+      self.domain = parent.domain
+      self.vlabel = k
+      self.data = v
+      self.friendly = f
+      self.visible = b
+
+   @property
+   def kind(self):
+      return result_kinds[self.vlabel][1]
+
+   def __repr__(self):
+      return type(self).__name__ + ":vlabel=" + self.vlabel + ";friendly=" + self.friendly + ";data=" + repr(self.data)
+
+   @cached_property
+   def elements(self):
+      return map(lambda i: self.vectorResultElement(self, (self.vlabel,self.friendly,self.visible,self.data), i), 
+                 range(len(self.data[0])))            
+
+   @cached_property
+   def series(self):
+      return list(chain(*map(lambda e: e.series, self.elements)))
+
+   @cached_property 
+   def showGraphLabel(self):
+      return showGraphLabel(self.vlabel, self.friendly)
+
+   @cached_property
+   def serialized(self):
+      return (self.vlabel,self.showGraphLabel, self.data)
+
+   @cached_property
+   def rows(self):
+      return self.getRows(self.friendly)
+
+   def getRows(self, label):
+      return spannedRowsKV(label, self.data)
+
+   @cached_property
+   def labels(self):
+      return chain(*map(lambda e: e.labels, self.elements))
+
+
+class CurrentResultElement(ResultElementBase):
+
+   def __init__(self, parent, (k,f,b,v)):
+      self.parent = parent
+      self.label = k
+      self.friendly = f
+      self.data = v
+      self.vlabel = k
+      self.visible = b
+
+class CurrentVectorResultElement(ResultElementBase):
+
+   def __init__(self, parent, (k,f,b,v), i):
+      self.parent = parent
+      self.label = k
+      self.data = v
+      self.vlabel = k
+      self.friendly = f
+      self.i = i
+      self.visible = b
+      self.domain = parent.domain
+      self.data = map(lambda L: L[i], v)
+
+   @cached_property 
+   def showGraphLabel(self):
+      return self.friendly+'['+str(self.i)+']'
+
+class CurrentResultElementV(ResultElementVBase):
+
+   def __init__(self, parent, (k,f,b,v)):
+      ResultElementVBase.__init__(self, parent, (k,f,b,v))
+      self.vectorResultElement = CurrentVectorResultElement
+
+class HistoryResultElementBase(ResultElementBase):
+
+   def __init__(self, parent):
+      ResultElementBase.__init__(self, parent)
+
+   @cached_property
+   def canBeInherited(self):
+      return [(self.v_idx, self.showGraphLabel, self.showOnGraph)]
+
+class HistoryResultElement(HistoryResultElementBase):
+
+   def __init__(self, parent, (k,f,b,v)):
+      HistoryResultElementBase.__init__(self, parent)
+      self.label = k
+      self.data = v
+      self.friendly = f
+      self.visible = b
+      self.h_idx = self.parent.h_idx
+      self.vlabel = str(self.h_idx) + "_" + self.label
+      
+   def __repr__(self):
+      return "HistoryResultElement("+self.vlabel+","+self.friendly+","+str(self.selectedToBeInherited)+","+str(self.visible)+","+str(self.series)+")"
+
+   @property
+   def v_idx(self): 
+      return None 
+
+class HistoryVectorResultElement(HistoryResultElementBase):
+
+   def __init__(self, parent, (k,f,b,v), i):
+      HistoryResultElementBase.__init__(self, parent)
+      self.label = k
+      self.friendly = f+"["+str(i)+"]"
+      self.visible = b
+      self.data = map(lambda x: x[i], v)
+      self.vlabel = str(parent.h_idx)+"_"+k+"_"+str(i)
+      self.v_idx = i
+
+   def __repr__(self):
+      return "HistoryVectorResultElement("+self.vlabel+","+self.friendly+","+self.showGraphLabel+","+str(self.visible)+")"
+
+class HistoryResultElementV(ResultElementVBase):
+
+   def __init__(self, parent, (k,f,b,v)):
+      ResultElementVBase.__init__(self, parent, (k,f,b,v))
+      self.vectorResultElement = HistoryVectorResultElement
+      self.h_idx = parent.h_idx
+
+   def at(self, v_idx):
+      return self.elements[v_idx]
+
+   @cached_property
+   def canBeInherited(self):
+      return list(chain(*map(lambda e: e.canBeInherited, self.elements)))
+
+
+class HStateBase(StateCommonBase):
+   
+   def createRenderer(self):
+      return RendererH(self.obj, self)
+
+   def iterationRowsImpl(self, iteration):
+      if iteration:
+         (idx, limit, steps_no) = iteration
+         friendly = self.iterables.labels[idx] 
+         r = self.createRenderer()
+
+         return [
+            r.rowEx('Iterate over', friendly),
+            r.rowEx('Iterate to', limit), 
+            r.rowEx('#Iterations', steps_no)
+         ]
+      else:
+         return []
+
+   @cached_property
+   def iterationRows(self):
+      return Sum([self.iterationRowsImpl(self.iterations[i]) for i in range(2)])
+
+   @cached_property
+   def headerContent(self):
+      return B(self.name)
+
+class AssetHState(AssetStateBase, HStateBase):
+
+   def __init__(self, parent):
+      self.id = parent.source["assetId"]
+      self.parent = parent
+
+class ModelHState(ModelStateBase, HStateBase):
+
+   def __init__(self, parent):
+      self.obj = parent.source["modelObj"]
+      self.iterations = [parent.source["iterations"][i][0] for i in range(2)]
+      self.parent = parent
+
+   @property
+   def id(self):
+      return self.obj.ID()
+
+class FamilyHState(FamilyStateBase, HStateBase):
+
+   def __init__(self, parent):
+      self.id = parent.option.obj.familyName()
+      self.parent = parent
+
+class OptionHState(OptionStateBase, HStateBase):
+
+   def __init__(self, parent):
+      self.obj = parent.source["optionObj"]
+      self.iterations = [parent.source["iterations"][i][1] for i in range(2)]
+      self.parent = parent
+
+   @cached_property
+   def id(self):
+      return type(self.obj).__name__
+
+class MethodHState(MethodStateBase, HStateBase):
+
+   def __init__(self, parent):
+      self.parent = parent
+      self.obj = parent.source["methodObj"]
+      self.iterations = [parent.source["iterations"][i][2] for i in range(2)]
+
+   @cached_property
+   def id(self):
+      return type(self.obj).__name__
+
+   @cached_property
+   def superRows(self):
+      return HStateBase.rows.__get__(self, None)
+
+class HScalarResult(ScalarResultBase):
+
+   def __init__(self, parent, result):
+      self.parent = parent
+      self.result = result
+
+class IterationResultBase(object):
+
+   @cached_property
+   def friendlyLabel(self):
+      ((label, _), _) = self.result
+      return label
+
+   @cached_property
+   def domain(self):
+      ((_, data), _) = self.result
+      return data
+
+   @cached_property
+   def results(self):
+      (_, rows) = self.result
+      return map(self.constructResultElement, rows)
+
+   @cached_property
+   def serialized(self):
+      return self.result
+
+class CanBeInherited(object):
+
+   def __init__(self, parent, r_idx, v_idx, friendly, visible, inh_idx=None):
+      self.parent = parent
+      self.compatible = parent.compatible
+      self.h_idx = parent.h_idx 
+      self.r_idx = r_idx
+      self.v_idx = v_idx
+      self.inh_idx = inh_idx if inh_idx<>None else self.h_idx
+      self.friendly = friendly
+      self.vlabel = str(self.h_idx) + "_" + str(self.inh_idx) + "_" + str(r_idx) + ("_" + str(v_idx) if v_idx <> None else "")
+      self.varInheritLabel = "inheritedLabel_" + self.vlabel
+      self.varInherit = "inherit_" + self.vlabel
+      self.visible = visible
+
+   @cached_property
+   def oldLabel(self):
+      return tryGet(REQUEST, self.varInheritLabel, self.friendly)
+
+   @cached_property
+   def oldChecked(self):
+      return self.varInherit in REQUEST
+
+   @cached_property
+   def toBeInherited(self):
+      return [(self.inh_idx, self.r_idx, self.v_idx, self.oldLabel)] if self.oldChecked else []
+
+   @cached_property
+   def toRender(self):
+      return  [TD(INPUT(name=self.varInheritLabel, value=self.oldLabel, disabled = not self.compatible)) + \
+               TD(checkbox(self.varInherit, checked=self.visible, disabled = not self.compatible))]
+
+class CanBeInheritedGroup(object):
+
+   def __init__(self, parent):
+      self.elements = []
+      self.parent = parent
+      self.h_idx = parent.h_idx
+      self.compatible = parent.compatible
+
+   def extend(self, elements):
+      self.elements.extend(elements)
+
+   def append(self, e):
+      self.elements.append(e)
+
+   @cached_property
+   def toBeInherited(self):
+      return list(chain(*map(lambda e: e.toBeInherited, self.elements)))
+
+   @cached_property
+   def toRender(self):
+      header = [[TD(B("Inherit to the current graph"), colspan='2')]]
+      rows = map(lambda e: e.toRender, self.elements)
+      colored = colorizeRows(header + rows)
+      return TABLE(colored, Class="inherit")
+
+def back(xs):
+   return xs[len(xs)-1]
+
+class HIterationResult(IterationResultBase):
+
+   def __init__(self, parent, result, iterate_labels):
+      self.parent = parent
+      self.result = result
+      self.iterate_label = iterate_labels[0]
+      self.h_idx = parent.h_idx
+
+   @cached_property
+   def header(self):
+      ((label, data), _) = self.result
+      return (label, data)
+
+   @cached_property
+   def myData(self):
+      return (self.header, map(lambda r: r.rows, self.results))
+
+   def inheritedData(self, (h_idx, res_elems)):
+      h_elem = self.parent.history.at(h_idx)
+      header = h_elem.iterationResult.header
+      rows = map(lambda e: e.rows, res_elems)
+      return (header, rows)
+
+   @cached_property
+   def toRender(self):
+
+      def tryToMerge(acc, ((label, data), rows)):
+         ((last_label, last_data),last_rows) = back(acc)
+         if data[0] == last_data[0] and len(data) == len(last_data) and back(data) == back(last_data):
+            last_rows.extend(rows)
+         else:
+            acc.append(((label,data),rows))
+         return acc
+
+      acc =reduce(tryToMerge, 
+                  map(self.inheritedData, 
+                        reversed(self.parent.inheritedAsDict.items())), 
+                  [self.myData])
+
+      def toTable((header, rows)):
+         return TABLE(colorizeRows([rowKV(*header)] + rows), Class="result1d")
+
+      return Sum(map(toTable, acc))
+
+   @cached_property
+   def compatible(self):
+      return self.iterate_label == self.parent.currentIterationLabels[0]
+
+   @cached_property
+   def headerToSave(self):
+      return (self.iterate_label, self.domain)
+
+   def at(self, (r_idx, v_idx)):
+      return self.results[r_idx] if v_idx==None else self.results[r_idx].at(v_idx)
+
+   @cached_property
+   def toBeInherited(self):
+      return list(chain(*map(lambda e: e.toBeInherited, self.canBeInherited.values())))
+
+   @cached_property
+   def canBeInherited(self):
+      res = {}
+      isCurrent = self.parent.isCurrent
+      inheritByDefault = state.method.settings.inheritByDefault
+
+      for r_idx in range(len(self.results)):
+         r = self.results[r_idx]
+         k = r.kind
+         if k not in res: # todo: replace by tryGet
+            res[k] = CanBeInheritedGroup(self)
+         res[k].extend(map(lambda (v_idx, label, visible): \
+                              CanBeInherited(res[k], r_idx, v_idx, label, inheritByDefault and isCurrent and visible), 
+                           r.canBeInherited))
+
+      for inh in self.parent.inherited:
+         k = inh.kind
+         if k not in res:  # todo: replace by tryGet
+            res[k] = CanBeInheritedGroup(self)
+         res[k].append(CanBeInherited(res[k], inh.r_idx, inh.v_idx, inh.showGraphLabel, inheritByDefault and isCurrent, inh.h_idx))
+
+      return res
+
+   @cached_property
+   def series(self):
+      return list(chain(*map(lambda e: e.series, self.results + self.parent.inherited)))
+
+   @cached_property
+   def dataSeries(self):
+      return groupByFirst(self.series)
+
+   @property  
+   def empty(self):
+      return self.result == None
+
+   @cached_property
+   def graphCode(self):
+      return chain(*map(lambda e: e.code, self.graphs))
+
+   @cached_property
+   def graphs(self):
+      keys = self.dataSeries.keys()
+      values = self.dataSeries.values()
+      def construct(i):
+         return Graph(self.graphIdx(i), values[i], self.canBeInherited[keys[i]].toRender)
+      return map(construct, range(len(values)))
+
+   def graphIdx(self, i):
+      return 100+self.parent.h_idx*100 + i
+
+   def constructResultElement(self, (k,f,b,v)):
+      return HistoryResultElementV(self, (k,f,b,v)) \
+               if type(v[0]) == list else \
+             HistoryResultElement(self, (k,f,b,v))
+
+def js_include(filename):
+   return SCRIPT(type="text/javascript", src="premia/" + filename)
+
+def shader_fs():
+   body = """
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+      
+      varying vec4 vColor;
+      varying vec3 vLightWeighting;
+      
+      void main(void)
+      {
+         gl_FragColor = vec4(vColor.rgb * vLightWeighting, vColor.a);
+      }   
+   """
+   return SCRIPT(body, id="shader-fs", type="x-shader/x-fragment")
+
+def shader_vs():
+   body = """
+      attribute vec3 aVertexPosition;
+      attribute vec3 aVertexNormal;
+      attribute vec4 aVertexColor;
+      
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      uniform mat3 uNMatrix;
+      varying vec4 vColor;
+      
+      uniform vec3 uAmbientColor;
+      uniform vec3 uLightingDirection;
+      uniform vec3 uDirectionalColor;
+      varying vec3 vLightWeighting;
+      
+      void main(void)
+      {
+          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          
+          vec3 transformedNormal = uNMatrix * aVertexNormal;
+          float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+          vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting; 
+
+          vColor = aVertexColor;
+      }
+   """
+   return SCRIPT(body, id="shader-vs", type="x-shader/x-vertex")
+
+def axes_shader_fs():
+   body = """
+      precision mediump float;
+      varying vec4 vColor;
+      
+      void main(void)
+      {
+         gl_FragColor = vColor;
+      }
+   """
+   return SCRIPT(body, id="axes-shader-fs", type="x-shader/x-fragment")
+
+def axes_shader_vs():
+   body = """
+      attribute vec3 aVertexPosition;
+      attribute vec4 aVertexColor;
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      varying vec4 vColor;
+      uniform vec3 uAxesColour;
+      
+      void main(void)
+      {
+         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+         vColor =  vec4(uAxesColour, 1.0);
+      } 
+   """
+   return SCRIPT(body, id="axes-shader-vs", type="x-shader/x-vertex")        
+
+def  texture_shader_fs():
+   body = """
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+      
+      varying vec2 vTextureCoord;
+      
+      uniform sampler2D uSampler;
+      
+      void main(void)
+      {
+          gl_FragColor = texture2D(uSampler, vTextureCoord);
+      }
+   """
+   return SCRIPT(body, id="texture-shader-fs", type="x-shader/x-fragment")
+
+def texture_shader_vs():
+   body = """
+      attribute vec3 aVertexPosition;
+      
+      attribute vec2 aTextureCoord;
+      varying vec2 vTextureCoord;
+      
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      
+      void main(void)
+      {
+          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          vTextureCoord = aTextureCoord; 
+      }
+   """
+   return SCRIPT(body, id="texture-shader-vs", type="x-shader/x-vertex")
+
+def graph3d(h_idx, label, friendly, data, keys_1, keys_2, name_1, name_2):
+   body = """
+   function setUp()
+   {
+      var surfacePlot;
+      var keys_1 = KEYS_1;
+      var keys_2 = KEYS_2;
+      var numRows = keys_1.length;
+      var numCols = keys_2.length;
+      
+      var tooltipStrings = TOOLTIP;
+      var values = VALUES;
+      var data = {nRows: numRows, nCols: numCols, formattedValues: values};
+      
+      h_idx = H_IDX
+      surfacePlot = new SurfacePlot(document.getElementById("surfacePlotDiv"+h_idx));
+      
+      // Don't fill polygons in IE. It's too slow.
+      var fillPly = true;
+      
+      // Define a colour gradient.
+      var colour1 = {red:0, green:0, blue:255};
+      var colour2 = {red:0, green:255, blue:255};
+      var colour3 = {red:0, green:255, blue:0};
+      var colour4 = {red:255, green:255, blue:0};
+      var colour5 = {red:255, green:0, blue:0};
+      var colours = [colour1, colour2, colour3, colour4, colour5];
+      
+      // Axis labels.
+      var xAxisHeader   = "X_AXIS";
+      var yAxisHeader   = "Y_AXIS";
+      var zAxisHeader   = "Z_AXIS";
+
+      sizeX = XXX;
+      sizeY = YYY;
+      
+      var renderDataPoints = false;
+      var background = '#ffffff';
+      var axisForeColour = '#000000';
+      var hideFloorPolygons = true;
+      var chartOrigin = {x: sizeX/2, y:sizeY/2};
+      
+      // Options for the basic canvas pliot.
+      var basicPlotOptions = {fillPolygons: fillPly, tooltips: tooltipStrings, renderPoints: renderDataPoints }
+      
+      // Options for the webGL plot.
+      var xLabels = keys_1;
+      var yLabels = keys_2;
+      var glOptions = {xLabels: xLabels, yLabels: yLabels ,autoCalcZScale: true};
+      
+      // Options common to both types of plot.
+      var options = {xPos: 0, yPos: 0, width: sizeX, height: sizeY, colourGradient: colours, 
+         xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, 
+         backColour: background, axisTextColour: axisForeColour, hideFlatMinPolygons: hideFloorPolygons, origin: chartOrigin};
+      
+      surfacePlot.draw(data, options, basicPlotOptions, glOptions);
+   }
+
+   setUp();
+   """
+   sizeX = state.method.settings.sizeX + 100
+   sizeY = state.method.settings.sizeY + 100
+   keys1 = todata1d(keys_1)
+   keys2 = todata1d(keys_2)
+   values = todata2d(data, len(keys_2))
+   tooltip = tooltipArray(data, keys_1, keys_2, name_1, name_2)
+   body = body\
+            .replace("XXX", str(sizeX))\
+            .replace("YYY", str(sizeY))\
+            .replace("H_IDX", quote(str(h_idx)+label))\
+            .replace("KEYS_1", keys1)\
+            .replace("KEYS_2", keys2)\
+            .replace("VALUES", values)\
+            .replace("TOOLTIP", tooltip)\
+            .replace("X_AXIS", name_1)\
+            .replace("Y_AXIS", name_2)\
+            .replace("Z_AXIS", friendly)
+   return script(body)
+
+def surfaceDiv(h_idx, label):
+   sizeX = state.method.settings.sizeX + 100
+   sizeY = state.method.settings.sizeY + 100
+   s = "width: XXXpx; height: YYYpx;" \
+         .replace("XXX",str(sizeX)) \
+         .replace("YYY",str(sizeY))
+
+   return TABLE(TR(TD(DIV(id='surfacePlotDiv'+str(h_idx)+label, style=s))))
+
+def graph3dprologue():
+   return Sum([
+         js_include('SurfacePlot.js'),
+         js_include('ColourGradient.js'),
+         js_include('glMatrix-0.9.5.min.js'),
+         js_include('webgl-utils.js'),
+         shader_fs(),
+         shader_vs(),
+         axes_shader_fs(),
+         axes_shader_vs(),
+         texture_shader_fs(),
+         texture_shader_vs(),
+      ])
+
+g_prologue3d = []
+
+def graph3dcode(h_idx, label, friendly, data, keys_1, keys_2, name_1, name_2):
+   prologue = [graph3dprologue()] if g_prologue3d == [] else []
+
+   code = Sum(prologue + [
+         surfaceDiv(h_idx, label),
+         graph3d(h_idx, label, friendly, data, keys_1, keys_2, name_1, name_2)
+      ])
+
+   g_prologue3d.extend(prologue)
+
+   return code
+
+
+
+
+class HIterationResult2D(object):
+
+   def __init__(self, parent, res2d, labels):
+      self.parent = parent
+      self.keys_1 = res2d["keys_1"][1]
+      self.name_1 = res2d["keys_1"][0]
+      self.keys_2 = res2d["keys_2"][1]
+      self.name_2 = res2d["keys_2"][0]
+      self.data = res2d["data"]
+      #print labels
+
+   @cached_property
+   def toRender(self):
+
+      showTable = state.method.settings.showResultTable 
+
+      def render(((label, friendly, show), data)):
+
+         if not show:
+            return Sum([])
+
+         if data != [] and type(data[0]) == list:
+            res = []
+            for i in range(len(data[0])):
+               suff = "["+str(i)+"]"
+               res.append(render(((label+suff, friendly+suff, show), map(lambda v: v[i], data))))
+            return Sum(res)
+
+         def at(i_1, i_2):
+            idx = len(self.keys_2) * i_1 + i_2
+            return data[idx] if idx < len(data) else ""
+
+
+         k_1 = TD(self.name_1, valign='center', rowspan=len(self.keys_1)+2, bgcolor='grey')
+         header = TR(k_1 + TD(self.name_2, align='center', colspan=len(self.keys_2)+1), bgcolor='grey')
+         keys_2 = TR(TD() + Sum(map(TD, self.keys_2)), bgcolor='grey')
+
+         def row(i_1):
+            return TD(self.keys_1[i_1], bgcolor='grey') + Sum([TD(at(i_1, i_2)) for i_2 in range(len(self.keys_2))])
+
+         return H3(friendly)\
+            + graph3dcode(self.parent.h_idx, label, friendly, data, self.keys_1, self.keys_2, self.name_1, self.name_2) \
+            + (TABLE(header + keys_2 + Sum([TR(row(i_1)) for i_1 in range(len(self.keys_1))]), Class="result2d") if showTable else Sum([]))
+
+      return Sum(map(render, self.data))
+
+class HistoryElement(object):
+
+   def __init__(self, parent, source, h_idx):
+      self.parent = parent
+      self.source = source
+      self.iterate_labels = self.source["iterationLabels"]
+      self.h_idx = h_idx
+      self.asset = AssetHState(self)
+      self.model = ModelHState(self)
+      self.option = OptionHState(self)
+      self.family = FamilyHState(self)
+      self.method = MethodHState(self)
+      self.inheritedRaw = self.source["toBeInherited"]
+      
+   @cached_property
+   def history(self):
+      return  self.parent.history
+
+   @cached_property
+   def inheritedAsDict(self):
+      return dict(map(\
+               lambda (h_idx, res_indices): \
+                  (h_idx, map(lambda idxs: InheritedResultElement(self,h_idx,idxs), res_indices)), 
+               self.inheritedRaw.items()))
+
+   @cached_property
+   def inherited(self):
+      return list(reversed(list(chain(*self.inheritedAsDict.values()))))
+
+   @cached_property
+   def currentIterationLabels(self):
+      return self.parent.iterationLabels
+
+   @cached_property
+   def scalarResult(self):
+      return HScalarResult(self, self.source["scalarResult"]) if self.source["scalarResult"] else None
+
+   @cached_property
+   def iterationResult(self):
+      return HIterationResult(self, self.source["iterationResult"], self.source["iterationLabels"]) if self.source["iterationResult"] else None 
+
+   @cached_property
+   def iterationResult2D(self):
+      return HIterationResult2D(self, self.source["iterationResult2D"], self.source["iterationLabels"]) if self.source["iterationResult2D"] else None 
+
+   def at(self, idx):
+      return self.iterationResult.at(idx)
+
+   @cached_property
+   def toBeInherited(self):
+      return self.iterationResult.toBeInherited if self.iterationResult else []
+
+   @cached_property
+   def isCurrent(self):
+      return self.h_idx == len(self.parent.workspace)
+
+   @cached_property
+   def varMakeCurrent(self):
+      return "MakeCurrent_"+str(self.h_idx)
+
+   @cached_property
+   def toBeTakenAsCurrent(self):
+      return self.varMakeCurrent in REQUEST
+
+   @cached_property
+   def toRender(self):
+
+      iterationTable = TABLE(self.iterationResult.toRender, Class="result1d") if self.iterationResult and state.method.settings.showResultTable else Sum([])
+
+      iterationResult = iterationTable + Sum(self.iterationResult.graphCode) \
+                           if self.iterationResult \
+                        else self.iterationResult2D.toRender if self.iterationResult2D \
+                           else Sum([])
+
+      if not self.isCurrent:
+
+         model = self.model.toRender
+         option = self.option.toRender
+         method = self.method.toRender
+         scalarResult = self.scalarResult.toRender if self.scalarResult else Sum([])
+         makeCurrentButton = TR(TD()+TD(INPUT(Type="submit",name=self.varMakeCurrent,value="Make current"))+TD())
+
+         return  DIV(H3("#"+str(self.h_idx))+\
+                  TABLE(TR(TD(TABLE(model, Class="model"),valign='top')\
+                         +TD(TABLE(option, Class="option"),valign='top')\
+                         +TD(TABLE(method + scalarResult + makeCurrentButton, Class="pricing_method"),valign='top')), Class="history")  \
+                  + iterationResult, Class="history_element")
+
+      else:
+
+         return iterationResult 
+
+class History(object):
+
+   def __init__(self, parent):
+      self.parent = parent
+      N = self.historyLen
+      self.elements = map(lambda i: HistoryElement(parent, self.parent.workspace[N-i-1], N-i-1), range(N))
+
+   @cached_property
+   def historyLen(self):
+      return len(self.parent.workspace)
+
+   @cached_property
+   def toBeTakenAsCurrent(self):
+      global workspace_jump
+      if workspace_jump:
+         return self.elements[0] if self.elements != [] else None
+
+      for x in self.elements:
+         if x.toBeTakenAsCurrent:
+            return x
+      return None
+
+   def at(self, h_idx):
+      N = self.historyLen
+      return self.elements[N-h_idx-1]
+
+   @cached_property
+   def renderedCurrentState(self):
+      if self.parent.iterationResult or self.parent.iterationResult2D:
+         N = self.historyLen
+         current = HistoryElement(self.parent, self.parent.serialized, N)
+         return current.toRender
+      else:
+         return Sum([])
+
+   @cached_property
+   def toRender(self):
+      return self.renderedCurrentState \
+          +  Sum([e.toRender for e in self.elements[:state.method.common.historyLen]])
+
+   @cached_property
+   def toBeInherited(self):
+      res = {}
+      for h in self.elements:
+         for (h_idx, r_idx, v_idx, label) in h.toBeInherited:
+            if h_idx not in res: # todo: tryGet
+               res[h_idx] = []
+            res[h_idx].append((r_idx, v_idx, label))
+      return res
+
+class Graph(object):
+
+   def __init__(self, id, series, rightside=None):
+      self.id = str(id)
+      self.series = series
+      self.rightside = Sum([]) if rightside==None else rightside
+
+   @cached_property
+   def code(self):
+         res = [script("data"+self.id+" = [];")]
+
+         if self.series <> []:
+            return res + \
+               [script("data"+self.id+".push({ data : "+e.data+", label : "+quote(e.label)+" });") for e in self.series] +\
+               [TEXT(graph_t\
+                  .replace('qqq','containers' + self.id)\
+                  .replace("datas", "data"+self.id)\
+                  .replace('zzz', str(self.rightside))\
+                  .replace('600px', str(int(state.method.settings.sizeX))+'px')\
+                  .replace('384px', str(int(state.method.settings.sizeY))+'px'))]
+
+         return res
+
+
+
+class IterationResult(IterationResultBase):
+
+   def __init__(self, parent):
+      self.parent = parent
+      self.computation_timeout = parent.computation_timeout
+
+   def constructResultElement(self, (k,f,b,v)):
+      return CurrentResultElementV(self, (k,f,b,v)) \
+               if type(v[0]) == list \
+               else CurrentResultElement(self, (k,f,b,v))
+
+   @cached_property
+   def result(self):
+      suffix = self.parent.method.settings.suffix
+      if self.resultRaw == []:
+         return None
+      return (self.resultRaw[0], 
+              map(lambda (corrected,data): \
+                     (corrected, showGraphLabel(corrected)+suffix, showOnGraph(corrected), data), 
+                  self.resultRaw[1:]))
+
+   @cached_property
+   def resultRaw(self):
+
+      iteration = self.parent.iterations[0]
+
+      def G(opt, mod, q):
+         for x in iteration.keys:
+             
+             iteration.setter(x)
+                  
+             begin = time()
+             try:
+               res = (self.parent.method.obj(opt, mod))
+             except Exception, exc:
+               res = [("Exception", str(exc))]
+               q.put(res)
+               continue
+
+             end = time()
+             res.insert(0, (iteration.name, x))
+             res.append(("Time", end - begin))
+             q.put(res)
+      
+      res_t = []
+      try: 
+         queue = Queue()
+         process = Process(target = G, args = (self.parent.option.obj,self.parent.model.obj, queue))
+         try:            
+            process.start()
+
+            begin = time()
+            iterations = iteration.stepsNo
+            for i in range(iterations):
+              q = queue.get(timeout=begin + self.computation_timeout - time())
+              if q[0][0] == "Exception":
+                  add_error(q[0][1])
+              else:
+                 if res_t == []:
+                     for k,v in q:
+                         res_t.append((k,[v]))
+                 else:
+                     idx = 0
+                     for k,v in q:
+                         assert res_t[idx][0] == k
+                         res_t[idx][1].append(v)
+                         idx = idx + 1
+                             
+         except Empty, exc:
+            process.terminate()
+            raise Exception("Method has worked more than " + str(self.computation_timeout) + "s. Please try another parameter combination")
+                     
+         process.join(timeout=self.computation_timeout)
+
+      except Exception, exc:
+         add_error(exc)
+      return res_t
+
+   def graphIdx(self, i): return i
+
+class IterationResult2D(object):
+
+   def __init__(self, parent):
+      self.parent = parent
+      self.computation_timeout = parent.computation_timeout
+
+   @cached_property
+   def result(self):
+
+      suffix = self.parent.method.settings.suffix
+      iteration_1, iteration_2 = self.parent.iterations
+
+      def G(opt, mod, q):
+         for x_1 in iteration_1.keys:
+            for x_2 in iteration_2.keys:
+               iteration_2.setter(x_2)
+               iteration_1.setter(x_1)
+               
+               begin = time()
+               res = (self.parent.method.obj(opt, mod))
+               end = time()
+               res.append(("Time", end - begin))
+               q.put((x_1, x_2, res))
+      
+      res_t = {
+         "keys_1" : (iteration_1.name, iteration_1.keys),
+         "keys_2" : (iteration_2.name, iteration_2.keys),
+         "data" : []
+      }
+      try: 
+         queue = Queue()
+         process = Process(target = G, args = (self.parent.option.obj,self.parent.model.obj, queue))
+         try:            
+            process.start()
+
+            begin = time()
+            iterations = iteration_1.stepsNo * iteration_2.stepsNo
+            data = res_t["data"]
+            for i in range(iterations):
+               x_1, x_2, q = queue.get(timeout=begin + self.computation_timeout - time())
+               if len(data) == 0:
+                  for k,v in q:
+                     data.append(((k, showGraphLabel(k,k)+suffix, showOnGraph(k)), [v]))
+               else:
+                  idx = 0
+                  for k,v in q:
+                      assert data[idx][0][0] == k
+                      data[idx][1].append(v)
+                      idx += 1
+
+         except Empty, exc:
+            process.terminate()
+            raise Exception("Method has worked more than " + str(self.computation_timeout) + "s. Please try another parameter combination")
+                     
+         process.join(timeout=self.computation_timeout)
+
+      except Exception, exc:
+         print exc
+         add_error(exc)
+      return res_t
+
+"""
+Class representing a single run.
+"""
+class State(object):
+
+   def __init__(self):
+      self.history = History(self)
+      self.asset = AssetState(self)
+      self.model = ModelState(self)
+      self.family = FamilyState(self)
+      self.option = OptionState(self)
+      self.method = MethodState(self)
+      self.h_idx = len(self.history.elements)
+
+   @cached_property
+   def inheritedAsDict(self):
+      return dict(map(\
+               lambda (h_idx, res_indices): \
+                  (h_idx, map(lambda idxs: InheritedResultElement(self,h_idx,idxs), res_indices)), 
+               self.history.toBeInherited.items()))
+
+   @cached_property
+   def inherited(self):
+      return list(chain(*self.inheritedAsDict.values()))
+
+   @cached_property
+   def scalarResult(self):
+      return ScalarResult(self) if self.runComputation and not self.iterations[0] else None
+
+   @cached_property
+   def iterationResult(self):
+      return IterationResult(self) if self.runComputation and self.iterations[0] and not self.iterations[1] else None
+
+   @cached_property
+   def iterationResult2D(self):
+      return IterationResult2D(self) if self.runComputation and self.iterations[0] and self.iterations[1] else None      
+
+   @cached_property
+   def iterations(self):
+      return [self.model.iterations[i].iteration or self.option.iterations[i].iteration or self.method.iterations[i].iteration for i in range(2)]
+
+   @cached_property
+   def iterationsSerialized(self):
+      return [(self.model.iterations[i].iteration.serialized if self.model.iterations[i].iteration else None, 
+               self.option.iterations[i].iteration.serialized if self.option.iterations[i].iteration else None, 
+               self.method.iterations[i].iteration.serialized if self.method.iterations[i].iteration else None) \
+                  for i in range(2)]
+
+   @cached_property
+   def iterationLabels(self):
+      return [self.iterations[i].label if self.iterations[i] else '_' for i in range(2)]
+
+   @cached_property
+   def uri(self):
+      return   uriPart('workspace', self.workspace_name) + \
+               self.asset.uri + \
+               self.model.uri + \
+               self.family.uri + \
+               self.option.uri + \
+               self.method.uri + \
+               uriPart('il_0',self.iterationLabels[0]) + \
+               uriPart('il_1',self.iterationLabels[1])
+
+   @cached_property
+   def serialized(self):
+      return {
+         "assetId" : self.asset.id,     # 0
+         "modelObj" : self.model.obj,    # 1
+         "optionObj" : self.option.obj,   # 2
+         "methodObj" : self.method.obj,   # 3
+         "scalarResult" : self.scalarResult.result if self.scalarResult else None,       # 4
+         "iterationResult" : self.iterationResult.result if self.iterationResult else None,  # 5
+         "iterationResult2D" : self.iterationResult2D.result if self.iterationResult2D else None,
+         "iterationLabels" : self.iterationLabels,  # 6
+         "toBeInherited" : self.history.toBeInherited, 
+         "iterations" : self.iterationsSerialized
+      }
+              
+
+   @cached_property
+   def hasResult(self):
+      return self.scalarResult or self.iterationResult or self.iterationResult2D
+
+   @cached_property
+   def request(self):
+      return saved_REQUEST
+
+   computation_timeout = 30
+
+   @cached_property
+   def runComputation(self):
+      return g_errors == [] and self.method.compButton.value
+
+   @property
+   def workspace_name(self):
+      global workspace_name
+      return workspace_name
+
+   @property
+   def workspace(self):
+      global workspace
+      return workspace
+
+   @cached_property
+   def workspacesRendered(self):
+      global session
+      workspaces = session.workspaces.keys()
+
+      btnDelete = INPUT(Type="submit",name="DeleteWorkspace",value="Delete current")
+      btnCreate = INPUT(Type="submit",name="CreateWorkspace",value="Create new")
+      
+      btnClear = Sum([])
+      if workspace != [] or state.hasResult:
+         btnClear = INPUT(Type="submit",name="ClearHistory",value="Clear history")
+
+      workspaces.sort()
+      L = enum_submit_ex('JumpToWorkspace', workspaces, self.workspace_name, self.workspace_name) 
+      return TABLE(TR(TD('Jump to workspace:') + TD(L) + TD(btnDelete) + TD(btnCreate) + TD(btnClear) + self.method.common.toRender),
+                      Class="workspace")
+
+   @cached_property
+   def toRender(self):
+
+      model = self.model.toRender
+      option = self.option.toRender
+      method = self.method.toRender
+      scalarResult = self.scalarResult.toRender if self.scalarResult else Sum([])
+      t = self.hasResult and self.hasResult.result # forcing result evaluation
+
+      err_table = g_err_table if len(g_errors) > 0 else Sum([])
+
+      return err_table + \
+             TABLE(TR(TD(TABLE(model, Class="model"),valign='top') + \
+                      TD(TABLE(option, Class="option"),valign='top') + \
+                      TD(TABLE(method+scalarResult, Class="pricing_method"),valign='top')), Class="current") + \
+               self.workspacesRendered
+
+
+   
+if 'workspaces' not in dir(session):
+   session.workspaces = {}
+
+def genName():
+   for i in range(1000000):
+      if str(i) not in session.workspaces:
+         return str(i)
+   return ""
+
+workspace_name = tryGet(REQUEST, 'workspace', genName())
+workspace_jump = False
+
+if "CreateWorkspace" in REQUEST:
+   workspace_name = genName()
+
+if "DeleteWorkspace" in REQUEST:
+   workspace_jump = True
+   if workspace_name in session.workspaces:
+      del session.workspaces[workspace_name]
+   if session.workspaces == {}:
+      session.workspaces['0'] = []
+   workspace_name = session.workspaces.keys()[0]
+
+if 'JumpToWorkspace' in REQUEST and not workspace_jump and "CreateWorkspace" not in REQUEST:
+   ws = session.workspaces.keys()
+   ws.sort()
+   ws_idx = int(REQUEST['JumpToWorkspace'])
+   if ws[ws_idx] != workspace_name:
+      workspace_jump = True
+      workspace_name = ws[ws_idx]
+      
+
+if workspace_name not in session.workspaces:
+   session.workspaces[workspace_name] = []
+
+if 'ClearHistory' in REQUEST:
+   session.workspaces[workspace_name] = []
+   
+workspace = session.workspaces[workspace_name]
+
+state = State()
+
+form = FORM(action='/index?'+ state.uri[1:],method="post")
+
+g_table = state.toRender
+
+form <= g_table
+
+form <= state.history.toRender
+
+session.settings = state.method.settingsSerialized
+
+if state.hasResult:
+   workspace.append(state.serialized)
+print """
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <link rel="stylesheet" type="text/css" href="premia/style.css" />
+   <link rel="stylesheet" type="text/css" href="premia/hsd-flotr2.css" />
+</head>
+"""
+
+
+footer = TEXT("""
+<table border="0" cellpadding="0" cellspacing="0" width="754px" align="center" class="footer">
+
+  <tbody>
+    <tr>
+      <td align="center">
+      <div style="margin: 20px;" align="center"> <br>
+      <a href="https://www.rocq.inria.fr/mathfi/Premia/index.html"><img src="premia/premia_logo.png" align="left" alt="" title=""></a> <br>
+      <a href="https://www.rocq.inria.fr/mathfi/Premia/index.html"><img src="premia/premia_slogan.png" alt="" title=""></a> <br>
+ <a href="http://premia.fr" target="_blank">Premia</a> is developed by the <a href="http://www.inria.fr/equipes/mathfi" target="_blank">Math-Risk</a> 
+team which gathers research scientists from <a href="http://www.inria.fr/">INRIA</a> (the French
+national institute for research in computer science and control), <a href="http://cermics.enpc.fr/">Ecole des Ponts
+ParisTech</a> (CERMICS laboratory on applied mathematics and computing),
+and the <a href="http://www.univ-mlv.fr/"> University
+of Marne la Vall&eacute;e.</a><br>
+      </div>
+      <div align="center"> <a href="https://www.rocq.inria.fr/mathfi/"><img src="premia/INRIA-CORPO-RVB.jpg" alt="Premia" title=""></a>&nbsp;&nbsp;&nbsp;
+      <a href="http://cermics.enpc.fr/"><img src="premia/cermics.gif" alt="Premia" title=""></a>&nbsp;&nbsp;&nbsp;
+      <a href="http://www.univ-mlv.fr/"><img src="premia/univ-mlv.gif" alt="Premia" title=""></a> </div>
+      Bug found? Please contact premia -at- inria.fr or anton.kolotaev -at- gmail.com.
+      </td>
+    </tr>
+    <tr>
+      <td class="bottomnav padlt10" align="right" height="15">Copyright
+&copy; 2012 Premia. All rights reserved.</td>
+    </tr>
+    <tr>
+      <td height="15"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+""")
+
+print form
+print footer

@@ -1,0 +1,113 @@
+Return-Path: marie-pierre.durollet@inria.fr
+Delivery-Date: Thu Nov 28 13:42:01 2002
+Return-Path: <marie-pierre.durollet@inria.fr>
+Received: from nez-perce.inria.fr (nez-perce.inria.fr [192.93.2.78])
+	by shoshone.inria.fr (8.11.1/8.11.1) with ESMTP id gASCg1I00622
+	for <cognet@distrib-mail.inria.fr>; Thu, 28 Nov 2002 13:42:01 +0100
+Received: from luberon.inria.fr (luberon.inria.fr [128.93.19.3])
+	by nez-perce.inria.fr (8.11.1/8.11.1) with ESMTP id gASCg0114749;
+	Thu, 28 Nov 2002 13:42:00 +0100 (MET)
+Received: from luberon.inria.fr (localhost [127.0.0.1])
+	by luberon.inria.fr (8.11.1/8.11.1) with ESMTP id gASCfxn13098;
+	Thu, 28 Nov 2002 13:41:59 +0100 (MET)
+Message-Id: <200211281241.gASCfxn13098@luberon.inria.fr>
+X-Mailer: exmh version 2.1.1 10/15/1999
+To: Jean-Marc Cognet <Jean-Marc.Cognet@inria.fr>
+cc: rapport.gescap@inria.fr, Agnes.Sulem@inria.fr, Frederic.Bonnans@inria.fr,
+   Sophie.Volle@raisepartner.com
+Subject: Re: Rapport Inria 
+In-Reply-To: Message from Jean-Marc Cognet <Jean-Marc.Cognet@inria.fr> 
+   of "Wed, 27 Nov 2002 14:51:01 +0100." <200211271351.gARDp1X17964@smile.inria.fr> 
+Mime-Version: 1.0
+Content-Type: multipart/mixed ;
+	boundary="==_Exmh_-16083275120"
+Date: Thu, 28 Nov 2002 13:41:59 +0100
+From: Marie-Pierre Durollet <marie-pierre.durollet@inria.fr>
+
+This is a multipart MIME message.
+
+--==_Exmh_-16083275120
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+
+
+--==_Exmh_-16083275120
+Content-Type: text/plain ; name="RR-4648"; charset=iso-8859-1
+Content-Description: RR-4648
+Content-Disposition: attachment; filename="RR-4648"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+Voici la notice de votre rapport avec le no attribue.                       
+Si vous souhaitez des exemplaires papier, adressez-vous a : Marie-Jo.Cardet@in
+ria.fr.                                                             
+Marie-Pierre Durollet
+
+==========================================================================
+ REFERENCE |RR-4648
+ TITRE     |Estimation de la volatilité locale d'actifs financiers par une
+           |méthode d'inversion numérique
+ AUTEUR    |Frédéric, J. / Cognet, Jean-Marc / Volle, Sophie
+ DATE      |Novembre 2002
+ U.R.      |Rocquencourt
+ THEME     |4
+ PROJET    |MATHFI/SYDOCO
+ C. ANALYT.|21148
+ PAGES     |60 p.
+ Resume    | Nous nous intéressons à un problème de calibration rencontré en
+           |finance qui consiste à identifier la volatilité locale à partir de
+           |prix d'options observés sur le marché. Nous formulons le problème
+           |sous la forme d'un problème inverse. Le problème direct (pricing),
+           |qui consiste à calculer les prix
+           |d'options en résolvant l'équation aux dérivées partielles de
+           |Dupire, est résolu par différences finies. Le problème inverse
+           |(calibration) revient ensuite à résoudre un problème
+           |d'optimisation dans lequel il s'agit de déterminer la volatilité
+           |optimale telle que les prix calculés avec cette
+           |volatilité soit le plus proche possible des prix observés sur le
+           |marché. Ce problème inverse mal posé est régularisé en paramétrant
+           |la volatilité par des splines bicubiques et en adoptant une
+           |approche multiéchelle. De plus, nous utilisons l'algorithme de
+           |Quasi-Newton (avec ou sans bornes) pour
+           |résoudre le problème d'optimisation. Notre algorithme de
+           |calibration est testé sur des donnés synthétiques (simulées par
+           |notre modèle) et sur des données réelles du marché.
+ Abstract  | We consider a problem arising in finance that consists in
+           |identifying the local volatility from option prices provided by
+           |the market. The problem is formulated as an inverse problem. The
+           |direct problem (pricing), which consists in computing option
+           |prices by solving Dupire's partial differential
+           |equation, is solved by finite differences. Then, the inverse
+           |problem (calibration) consists in solving an optimization problem
+           |where we have to determine the optimal volatility such that the
+           |prices computed with this volatility are as close as possible to
+           |the prices given by the market. This
+           |ill-posed inverse problem is regularized by parameterizing the
+           |volatility using bicubic splines and by employing a multiscale
+           |approach. Moreover, we use the Quasi-Newton algorithm (with or
+           |without bounds) to solve the optimization problem. Our algorithm
+           |of calibration is tested on synthetic data
+           |(simulated with our model) and on real data provided by the market.
+ MOTS-CLES |FINANCE / CALIBRATION / EDP DE DUPIRE / DIFFÉRENCES FINIES /
+           |PROBLÈME INVERSE / OPTIMISATION
+ KEY-WORDS |FINANCE / CALIBRATION / DUPIRE'S PDE / FINITE DIFFERENCES /
+           |INVERSE PROBLEM / OPTIMIZATION
+ Couleur   |12, 15, 18, 22, 23, 24, 25, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38
+==========================================================================
+
+--==_Exmh_-16083275120
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+===========================================================================
+Marie-Pierre Durollet			|Mel: gescap@inria.fr 
+INRIA - DISC				|Tel: 01 39 63 53 92
+============================================================================
+
+
+
+--==_Exmh_-16083275120--
+

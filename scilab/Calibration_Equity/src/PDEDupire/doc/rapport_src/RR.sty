@@ -1,0 +1,532 @@
+%%
+%% This is file `RR.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% RR.dtx  (with options: `RR')
+%% ********************************************************************
+%% Copyright (C) 1997-1999 INRIA/MIAOU
+%% 
+\def\RRfiledate{2001/07/18}
+\def\RRfileversion{3,8a}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{RR}
+       [\RRfiledate\space v\RRfileversion\space
+         Copyright INRIA/MIAOU 2002]
+\newif\if@RRfrench \@RRfrenchfalse
+\newif\if@tone@encoding
+\newif\if@no@inputenc \@no@inputencfalse
+\DeclareOption{T1}{\@tone@encodingtrue}
+\DeclareOption{OT1}{\@tone@encodingfalse}
+\DeclareOption{noinputenc}{\@no@inputenctrue}
+\ExecuteOptions{T1}
+\@ifundefined{pdfoutput}{}{\@tone@encodingfalse}
+\ProcessOptions\relax
+
+\if@tone@encoding
+\def\psenc{T1}
+\def\degre{{\char '6}}
+\else
+\def\psenc{OT1}
+\def\degre{{\char '027{}}}
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\if@no@inputenc
+\else
+  \RequirePackage[latin1]{inputenc}
+  \if@tone@encoding
+     \RequirePackage[T1]{fontenc}
+   \else
+     \RequirePackage[OT1]{fontenc}
+  \fi
+\fi
+\@ifundefined{pdfoutput}{
+\RequirePackage[dvips]{graphicx}
+\RequirePackage{textcomp}
+\def\@logoext{epsi}}%
+{\RequirePackage[pdftex]{graphicx}
+\def\textdegree{o}
+\def\@logoext{pdf}}
+\@twosidetrue
+\newcommand\twentytb{\fontencoding\psenc\fontfamily{ptm}\fontseries{b}%
+   \fontshape{it}\fontsize{\@xxpt}{25pt}\selectfont}
+\newcommand\fifteentb{\fontencoding\psenc\fontfamily{ptm}\fontseries{b}%
+   \fontshape{n}\fontsize{15pt}{20pt}\selectfont}
+\newcommand\twelvetr{\fontencoding\psenc\fontfamily{ptm}\fontseries{m}%
+   \fontshape{n}\fontsize{12pt}{14pt}\selectfont}
+\newcommand\tentm{\fontencoding\psenc\fontfamily{ptm}\fontseries{m}%
+   \fontshape{n}\fontsize{10pt}{12pt}\selectfont}
+\newcommand\eighttm{\fontencoding\psenc\fontfamily{ptm}\fontseries{m}%
+   \fontshape{n}\fontsize{8pt}{10pt}\selectfont}
+\newcommand\tenhv{\fontencoding\psenc\fontfamily{phv}\fontseries{m}%
+   \fontshape{n}\fontsize{10pt}{12pt}\selectfont}
+\let\titlehead=\undefined
+\newcommand\titlehead[1]{\gdef\@titlehead{#1}}
+\newcommand\authorhead[1]{\gdef\@authorhead{#1}}
+\titlehead{}
+\authorhead{}
+\newbox\@myatxybox%
+\newif\if@myatxy\@myatxyfalse
+\long\def\myatxy(#1,#2)#3{\global\setbox\@myatxybox=\hbox
+ {\unhbox\@myatxybox
+  \vtop to 0pt{\kern #2\hbox to 0pt{\kern #1\relax #3\hss}\vss}}%
+ \global\@myatxytrue}
+\def\@usemyatxy{\if@myatxy{%
+  \if@twoside
+    \ifodd\count\z@
+         \let\@themargin\oddsidemargin
+    \else \let\@themargin\evensidemargin
+    \fi
+  \fi
+  \vtop to 0pt{\kern-\headsep \kern-\topmargin \kern-\headheight
+               \kern-1in \kern-\voffset
+    \hbox to 0pt{\kern-\@themargin \kern-1in \kern-\hoffset
+\unhbox\@myatxybox \hss}\vss}}%
+            \fi\global\@myatxyfalse}% --bg
+\toks0={\setbox255=\vbox{\@usemyatxy \unvbox255}}
+\output=\expandafter{\the\toks0\the\output}
+\def\foo{
+\let\par\@@par%
+  \ifnum\outputpenalty <-\@M\@specialoutput\else%
+  \@makecol\@opcol\@floatplacement\@startcolumn%
+  \@whilesw\if@fcolmade \fi{\@opcol\@startcolumn}\fi%
+  \global\vsize\ifnum\outputpenalty >-\@Miv \@colroom%
+                  \else \maxdimen\fi}%
+\newcommand\RRNo[1]{%
+    \gdef\@RRNo{#1}%
+    \count1=0#10
+    \count0=0#1
+    \divide\count1 by 10
+    \advance\count1 by -\count0
+    \ifnum \count0=0
+     \gdef\@RRNo{????}\@latex@error{Ne pas mettre de numéro bidon: #1}\@eha\fi
+    \ifnum \count1=0 \else
+    \gdef\@RRNo{????}\@latex@error{Ne pas mettre de numéro bidon: #1}\@eha\fi
+    \gdef\@RRdigits{#1}%
+}
+\newcommand\@RRNo{????}
+\newcommand\@RRdigits{0123456789}
+\newcommand\RRdate[1]{\gdef\@RRdate{#1}}
+\newcommand\@RRdate{%
+ \xdef\@RRdate{
+ \ifcase\the\month
+ \or Janvier\or Février\or Mars\or Avril\or Mai\or Juin%
+ \or Juillet\or Août\or Septembre\or Octobre\or Novembre\or Décembre\fi\space
+ \number\the\year}%
+ \@RRdate%
+ \@warning{*** Pas de \string\RRdate \space :
+         \@RRdate\space par défaut. ***}}
+\newcommand\RRauthor[1]{\gdef\@RRauthor{#1}\gdef\@authorhead{#1}}
+\newcommand\@RRauthor{??\@warning{***Il manque le nom d'auteur,^^J
+   utilisez \string\RRauthor{Prenom1 NOM1\string\and \space Prenom2 NOM
+   \string\and \space... ***}}}
+\newcommand\RRtitle[1]{\gdef\@RRtitle{#1}}
+\newcommand\RRetitle[1]{\gdef\@RRetitle{#1}}
+\def\set@titlehead{{\def\tempa{french}\def\tempb{frenchb}%
+   \ifx\bbl@main@language\tempa\global\@RRfrenchtrue\fi
+   \ifx\bbl@main@language\tempb\global\@RRfrenchtrue\fi
+   \@ifundefined{ifFrench}{}{\global\@RRfrenchtrue}%
+   \def\tempa{}%
+   \ifx\@titlehead\tempa \if@RRfrench \gdef\@titlehead{\@RRtitle} \else
+     \gdef\@titlehead{\@RRetitle}\fi\fi}}
+\AtBeginDocument{\set@titlehead}
+\newcommand\@RRtitle{??\@warning{*** Pas de titre français,
+     utilisez \string\RRtitle. ***}}
+\newcommand\@RRetitle{??\@warning{*** Pas de titre anglais,
+      utilisez \string\RRetitle. ***}}
+\newcommand\RRnote[1]{\begingroup
+  \let\protect\@unexpandable@protect
+  \xdef\@RRnote{\@RRnote \protect\footnotetext[0]{#1\par}}%
+  \endgroup}
+\newcommand\@RRnote{}
+
+\newcommand\n@mth@m[1]{\ifcase#1 ~
+  \or Réseaux~et~systèmes
+  \or Génie~logiciel\\et~calcul~symbolique
+  \or Interaction~homme-machine,\\images,~données,~connaissances
+  \or Simulation~et~optimisation\\de~systèmes~complexes
+  \else ~\@warning{*** Numéro de thème incorrect. ***}
+  \fi}
+\newcount\@compteur@theme
+\@compteur@theme=0
+\newcount\@compteur@theme@un\newcount\@compteur@theme@deux
+\newcommand\@RRthmnum{?\@warning{*** Il manque un numéro de thème INRIA ;
+  utilisez \string\RRtheme ***}}
+\newcommand\@RRthmname{(hors thème INRIA)}
+\newcommand\@RRTHMTYPE{THÈME}
+\newcommand\@RRthmtype{Thème}
+\newcommand\RRtheme[1]{%
+    \bgroup
+      \edef\foo{\ifnum 0<0#1x\else y\fi}\def\bar{x}%
+      \ifx\foo\bar
+        \global\@compteur@theme=#1
+      \else \global\@compteur@theme=0 \@latex@error{Pas un thème #1}\@eha\fi
+    \egroup
+  \ifnum\@compteur@theme=0
+     \gdef\@RRthmnum{1}
+     \gdef\@RRthmname{\n@mth@m{1}}
+   \else
+  \ifnum\@compteur@theme<10
+     \gdef\@RRthmnum{#1}
+     \gdef\@RRthmname{\n@mth@m{#1}}
+   \else
+   \ifnum\@compteur@theme>99
+        \@warning{*** Pas plus de 2 thèmes INRIA ***}
+   \else
+        \gdef\@RRTHMTYPE{THÈMES}
+        \def\@RRthmtype{Thèmes}
+        \@compteur@theme@un=\@compteur@theme \divide\@compteur@theme@un by 10
+        \@compteur@theme@deux=\@compteur@theme@un
+        \multiply\@compteur@theme@deux by 10
+        \advance\@compteur@theme@deux by -\@compteur@theme
+        \@compteur@theme@deux=-\@compteur@theme@deux
+        \gdef\@RRthmnum{\the\@compteur@theme@un\space et \the\@compteur@theme@deux}
+        \gdef\@RRthmname{\n@mth@m{\@compteur@theme@un} ---
+          \n@mth@m{\@compteur@theme@deux}}
+\fi\fi\fi}
+\newcommand\@RRprjtype{Projet}
+\newcommand\RRprojet[1]{\gdef\@RRprojet{#1}}
+\newcommand\RRprojets[1]{\gdef\@RRprjtype{Projets}\gdef\@RRprojet{#1}}
+\newcommand\@RRprojet{??\@warning{*** Pas de nom de projet ;
+       utilisez \string\RRprojet ***}}
+\newcommand\RRnbpage[1]{\gdef\@RRnbpage{#1}}
+\newcommand\@RRnbpage{\@ifundefined{r@RRlastpageofreport}{??}
+  {\pageref{RRlastpageofreport}}}
+\newcommand\@RRURnum{0}
+\newcommand\URLorraine{\gdef\@RRURnum{2}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Lorraine\\
+         LORIA, Technopôle de Nancy-Brabois, Campus scientifique,\\
+         615, rue du Jardin Botanique, BP 101,
+         54602 Villers-L\`es-Nancy (France)\\
+    \eighttm
+         T\'el\'ephone :  +33 3  83 59 30 00 ---
+         Télécopie : +33 3  83 27 83 19}
+    \gdef\@title@logo@name{Logo-INRIA-Lorraine-couleur}}
+\newcommand\URRennes{\gdef\@RRURnum{3}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Rennes\\
+      IRISA, Campus universitaire de Beaulieu,
+            35042 Rennes Cedex (France)\\
+ \eighttm
+      T\'el\'ephone :  +33 2 99 84 71 00 ---
+      Télécopie : +33 2 99 84 71 71}
+    \gdef\@title@logo@name{Logo-INRIA-Rennes-couleur}}
+\newcommand\URRhoneAlpes{\gdef\@RRURnum{4}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Rh\^one-Alpes\\
+      655, avenue de l'Europe, 38330 Montbonnot-St-Martin (France)\\
+ \eighttm
+      T\'el\'ephone : +33 4 76 61 52 00 ---
+      Télécopie  +33 4 76 61 52 52}
+    \gdef\@title@logo@name{Logo-INRIA-Rhone-Alpes-couleur}}
+\newcommand\URRocq{\gdef\@RRURnum{5}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Rocquencourt\\
+         Domaine de Voluceau, Rocquencourt, BP 105,
+         78153 Le Chesnay Cedex (France)\\
+        \eighttm  T\'el\'ephone : +33 1 39 63 55 11 ---
+         Télécopie :  +33 1 39 63 53 30}
+    \gdef\@title@logo@name{Logo-INRIA-Rocq-couleur}
+}
+\newcommand\URFuturs{\gdef\@RRURnum{1}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Futurs\\
+         Domaine de Voluceau, Rocquencourt, BP 105,
+         78153 Le Chesnay Cedex (France)\\
+        \eighttm  T\'el\'ephone : +33 1 39 63 55 11 ---
+         Télécopie :  +33 1 39 63 53 30}
+    \gdef\@title@logo@name{Logo-INRIA-Futurs-couleur}
+}
+\newcommand\URSophia{\gdef\@RRURnum{6}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Sophia Antipolis\\
+         2004, route des Lucioles, BP 93,
+            06902 Sophia Antipolis Cedex (France)\\
+       \eighttm
+         T\'el\'ephone : +33 4 92 38 77 77 ---
+         Télécopie : +33 4 92 38 77 65\\
+    }
+    \gdef\@title@logo@name{Logo-INRIA-Sophia-couleur}}
+\newcommand\@comspace{ : }
+\newif\if@mustprint
+\newcommand\@printUR[2]{%
+ \@mustprintfalse
+ \ifx#21
+   \if #1\@RRURnum \@mustprinttrue\fi
+ \else\if #1\@RRURnum \else\@mustprinttrue\fi\fi
+ \if@mustprint
+ \ifx#21\tentm\let\@RRoptret\\
+   \else\eighttm\let\@RRoptret\@comspace\fi
+ \ifcase #1
+ \or
+   Unité de recherche INRIA Futurs\@RRoptret
+   Domaine de Voluceau - Rocquencourt - BP 105 -
+   78153~Le~Chesnay~Cedex (France)
+ \or
+   Unité de recherche INRIA Lorraine\@RRoptret
+   LORIA, Technopôle de Nancy-Brabois - Campus scientifique\\
+   615, rue du Jardin Botanique - BP~101 -
+   54602~Villers-lès-Nancy Cedex (France)
+ \or
+   Unité de recherche INRIA Rennes\@RRoptret
+   IRISA, Campus universitaire de Beaulieu - 35042~Rennes~Cedex (France)
+ \or
+   Unité de recherche INRIA Rhône-Alpes\@RRoptret
+   655, avenue de l'Europe -  38330  Montbonnot-St-Martin (France)
+ \or
+   Unité de recherche INRIA Rocquencourt\@RRoptret
+   Domaine de Voluceau - Rocquencourt - BP 105 -
+   78153~Le~Chesnay~Cedex (France)
+  \or
+   Unité de recherche INRIA Sophia Antipolis\@RRoptret
+   2004, route des Lucioles -
+   BP~93 - 06902~Sophia Antipolis Cedex (France)
+  \fi
+   \ifx#21\\[2mm]\else \\\fi
+\fi}
+\newcommand\lastRRpage{%
+  \clearpage\thispagestyle{empty}%
+  \label{RRlastpageofreport}
+  \addtocounter{page}{-1}
+  \null\vfill
+  \myatxy(1.5cm,163mm){\vbox{\hsize=18cm
+    \centerline{\includegraphics[height=1.4cm]{Logo-INRIA-picto.\@logoext}}
+    \vskip1cm
+    \vbox to 6cm{%
+       \hrule\vfill
+       \begin{tiny}
+        \begin{center}
+          \@printUR 11\@printUR21\@printUR31\@printUR41\@printUR51\@printUR61
+          \@printUR 10\@printUR20\@printUR30\@printUR40\@printUR50\@printUR60
+         \end{center}
+       \end{tiny}%
+       \vfill\hrule}
+   \vskip5mm
+   \begin{center}\eighttm \'Editeur\\
+     INRIA - Domaine de Voluceau - Rocquencourt, BP~105 -
+     78153~Le~Chesnay~Cedex (France)\\
+     \tentm \textsf{http://www.inria.fr}\\[.5mm]
+     ISSN 0249-\ifcase\cpt@type\or 6399\or 0803\fi
+   \end{center}}}
+   \clearpage
+}
+\AtEndDocument{\lastRRpage}
+\newcommand\RRresume[1]{%
+    \long\def\@resume{\noindent{\bf Résumé : }\french #1\par}}
+\newcommand\RRabstract[1]{%
+    \long\def\@abstract{\noindent{\bf Abstract: }\english #1\par\french}}
+\RRresume{Pas de résumé}
+\RRabstract{No abstract}
+\newcommand\motcle[1]{%
+   \def\@motcle{\noindent{\bf Mots-clés : } \french #1\par}}
+\newcommand\keyword[1]{%
+   \def\@keyword{\noindent{\bf Key-words: } \english #1\par\french}}
+\motcle{Pas de motclef}
+\keyword{No keywords}
+
+\let\resume=\RRresume \let\abstract=\RRabstract
+\let\RRmotcle=\motcle \let\RRkeyword=\keyword
+\def\@nothanks{\@ifnextchar[{\@xnothanks}{\@gobble}}
+\def\@xnothanks[#1]#2{\relax}
+\def\@xthanks[#1]#2{\orig@thanks{#2}%
+  \expandafter\edef\csname @footnote@#1\endcsname{\the\c@footnote}}
+\def\thanksref#1{\footnotemark[\csname @footnote@#1\endcsname]}
+
+\newcommand\ps@titrr{%
+  \def\@oddhead{\hbox to\textwidth{%
+      \hfill
+      \vbox to \headheight{%
+\hbox{\includegraphics[width=5.7cm]{\@title@logo@name.\@logoext}}\vss}%
+      \hfill
+   }}
+  \def\@oddfoot{\relax}
+   \let\@evenfoot\@oddfoot
+   \let\@evenhead\@oddhead
+}
+\newcommand\@out@UR{%
+  \setbox0\hbox to\textwidth{\vbox{%\hrule%
+      \begin{center}\tentm\@RRURaddress\end{center}%
+   }}%
+  \dimen0=29cm
+  \advance\dimen0 -\ht0
+  \dimen1=1in
+  \advance\dimen1\oddsidemargin
+  \myatxy(\dimen1,\dimen0){\box0}%
+  \dimen1=1in
+  \advance\dimen1\topmargin
+  \advance\dimen1\headheight
+  \advance\dimen1\headsep
+  \advance\dimen1\textheight
+  \advance\dimen1\footskip
+  \ifdim \dimen1>\dimen0
+     \advance\dimen1 -\dimen0 \enlargethispage{-\dimen1}\fi}
+\newcommand\makeRR{\cpt@type=1{\@makeRRorRT}}
+\newcommand\makeRT{\cpt@type=2{\@makeRRorRT}}
+\newcount\cpt@type
+\cpt@type=1
+\newcommand\@makeRRorRT{%
+   \let\orig@thanks\thanks
+   \def\thanks{\@ifnextchar[ {\@xthanks}{\orig@thanks}}%
+   \@ifundefined{english}{%
+     \def\french{\language=1 }\def\english{\language=0 }
+   }{}
+   \ifnum 0= \@RRURnum \@latex@error{Pas d'unité de recherche!}\@eha\fi
+   \def\and{ --- }
+   \@restonecolfalse
+   \if@twocolumn\@restonecoltrue\onecolumn\fi
+   \thispagestyle{empty}
+  \def\@makefnmark{\rlap{\@textsuperscript{\@thefnmark}}}
+  \ifcase\cpt@type
+   \or \myatxy(1.05cm,1.625cm){\includegraphics{rap-rech.\@logoext}}
+   \or \myatxy(1.05cm,1.625cm){\includegraphics{rap-tech.\@logoext}}
+   \else\@warning{*** Problème avec le type de rapport.
+       Prévenez la maintenance ***}
+   \fi
+   \myatxy(77mm,2cm)
+       {\includegraphics[width=5.7cm]{Logo-INRIA-couleur.\@logoext}}
+   {%
+   \parskip=0pt
+   \@tempdima=5cm
+   \advance \@tempdima -1in
+   \advance\@tempdima -\topmargin
+   \advance\@tempdima -\headheight
+   \advance\@tempdima -\headsep
+   \advance\@tempdima -\topskip
+   \null \vskip\@tempdima
+   \setbox0\hbox to 14cm{%
+     \noindent\hfill
+     {\tentm INSTITUT NATIONAL DE RECHERCHE
+            EN INFORMATIQUE ET EN AUTOMATIQUE}%
+      \hfill}
+   \@tempdima=1in\advance\@tempdima\evensidemargin
+   \advance\@tempdima-3.5cm
+   \noindent\kern-\@tempdima\hbox to0pt{\box0\hss}
+   }%
+   \vskip1.5cm
+   \setbox0\vbox to 10cm{%
+   \hsize=16cm
+   \begin{center}
+     \def\footnote##1{\relax}%
+     \let\thanks\@nothanks
+     \def\footnotemark{%
+         \@ifnextchar[\my@xfootnotemark\relax}
+     \def\my@xfootnotemark[##1]{\relax}%
+      \baselineskip20pt
+      \twentytb \if@RRfrench {\@RRtitle}\else {\@RRetitle}\fi
+      \\[1cm]
+      {\twelvetr \@RRauthor}%
+      \vfill
+      {\fifteentb N\textdegree\ \@RRNo}\\
+      {\twelvetr \@RRdate}\\
+   \end{center}}%
+   \@tempdima=1in\advance\@tempdima\evensidemargin
+   \advance\@tempdima-2.5cm
+   \noindent\kern-\@tempdima\hbox to0pt{\box0\hss}
+   \myatxy(70mm,175mm) {\hbox to 72mm{%
+      \hrulefill\tenhv ~\@RRTHMTYPE~\@RRthmnum~ \hrulefill}}
+      \vfill
+      \c@page\z@
+      \newpage
+      \thispagestyle{empty}
+      \c@page\z@
+      \null
+      \vfill
+      \newpage
+%%\def\@fnsymbol##1{\ifcase##1 \or * \or {**} \or {***} \or {****}
+%% \or {*****} \else\@ctrerr \fi\relax}
+   \gdef\and{, }
+   \def\thefootnote{\fnsymbol{footnote}}
+   \setcounter{footnote}{0}
+   \def\@makefnmark{\hbox{\@textsuperscript{\@thefnmark}}}
+   \long\def\@makefntext##1{\parindent 1em\noindent
+            \hb@xt@1.8em{%
+                \hss\@textsuperscript{\normalfont\@thefnmark}} ##1}%
+   \let\footnoterule\relax
+   \null  \vskip 30pt
+   \thispagestyle{titrr}
+   \@out@UR
+   \begin{center}
+      {\Large\bf \if@RRfrench \@RRtitle\else\@RRetitle\fi \par}
+      \vskip 2em
+      {\large \lineskip .75em \@RRauthor \par}
+      \vskip 1em
+      {\normalsize \@RRthmtype~\@RRthmnum{}  --- \@RRthmname\par}
+      {\normalsize \@RRprjtype~\@RRprojet \par}\vskip 1em
+      {\normalsize
+        \ifcase\cpt@type\or Rapport de recherche \or Rapport technique\fi
+        \space n\textdegree{} \@RRNo{} --- \@RRdate{} ---
+       \@RRnbpage{} pages\par}
+   \end{center}
+   \@RRnote
+   \@thanks
+   \vfil
+   \if@RRfrench
+      \@resume \par\vskip2mm \@motcle \else
+      \@abstract\par\vskip2mm \@keyword\fi
+   \vfil
+%%   \pagebreak[4]
+     \newpage
+     \thispagestyle{empty}
+   {\Large\bf \begin{center}
+       \if@RRfrench \@RRetitle\else \@RRtitle \fi
+        \end{center}}
+    \pagebreak[0]
+    \if@RRfrench \@abstract\par\vskip2mm \@keyword \french\else
+        \@resume \par\vskip2mm \@motcle \english\fi
+    \vfil
+    \null
+%%    \thispagestyle{empty}
+   \newpage
+   \if@restonecol\twocolumn\fi
+  \setcounter{footnote}{0}
+  \global\def\thanks##1{\relax}
+  \let\maketitle\relax
+}
+\newcommand\@inibe{%
+      \let\\\space
+      \let\thanks\@nothanks%
+      \def\footnotemark[##1]{\relax}}
+\newcommand\ps@pi{\let\@mkboth\@gobbletwo%
+     \def\@oddhead{\vbox{\hbox to \textwidth{%
+         \normalsize\it{\@inibe\@titlehead}\hfil\rm\thepage}%
+          \hbox{\rule[-1ex]{\textwidth}{.03cm}}}}
+     \def\@oddfoot{{\footnotesize \ifcase\cpt@type\or RR \or RT\fi
+          \space n\textdegree{} \@RRdigits{}}\hfill}
+     \def\@evenhead{\vbox{\hbox to \textwidth{%
+            \rm\thepage\normalsize\it\hfil{\@inibe\@authorhead}}
+            \hbox{\rule[-1ex]{\textwidth}{.03cm}}}}%
+     \def\@evenfoot{\hfill{\footnotesize INRIA}}}
+\let\ps@plain\ps@pi
+\def\@myhyperlink[#1]#2#3#4{#4}
+\def\RR@testdef #1#2#3{%
+  \def\reserved@a{#3}%
+  \expandafter \ifx \csname #1@#2\endcsname \reserved@a
+  \else
+    \ifx #1b%
+      {\let\hyper@@link\@myhyperlink
+       \edef\XX@{#3}\edef\XX@@{\csname #1@#2\endcsname}%
+       \ifx\XX@\XX@@  \else \wlog{Reference #1-#2 changed}\@tempswatrue\fi}%
+    \else \wlog{Reference #1-#2 changed}\@tempswatrue\fi
+ \fi}
+\newcommand\RRtestdef{\global\let\@testdef\RR@testdef}
+\setcounter{topnumber}{5}
+\def\topfraction{1}
+\setcounter{bottomnumber}{4}
+\def\bottomfraction{1}
+\setcounter{totalnumber}{10}
+\def\textfraction{0}
+\def\floatpagefraction{.5}
+\clubpenalty=10000
+\widowpenalty=10000
+\hfuzz=1pt
+\vfuzz=5pt
+\headheight1cm
+\headsep1cm
+\pagestyle{pi}
+\@ifundefined{chapter}{\relax}
+   {\def\chapter{\cleardoublepage \thispagestyle{pi}
+   \global\@topnum\z@ \@afterindentfalse \secdef\@chapter\@schapter}}
+\textwidth14cm
+\textheight18cm
+\evensidemargin0.96cm
+\oddsidemargin0.96cm
+\footskip2cm
+\endinput
+%%
+%% End of file `RR.sty'.

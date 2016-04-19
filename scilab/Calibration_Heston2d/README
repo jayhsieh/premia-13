@@ -1,0 +1,19 @@
+**************************************
+		PREMIA
+**************************************
+**The calibration toolbox for equity Heston 2d model**
+
+
+The program directory the following files:
+
+- source files : Heston2D_Calib.c 
+
+Compilation 
+===========
+
+Compilation command under Linux: gcc Heston2D_Calib.c 
+
+Execution
+=========
+
+Type ./a.out to run the calibration program. 

@@ -1,0 +1,256 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{color}
+\def\dps{\displaystyle}
+\def\N{\mathcal{N}}
+%
+\title{Calibration of Stochastic Volatility model with Jumps}
+\author{A. Ben Haj Yedder}
+\begin{document}
+\maketitle
+%
+The evolution process of the Heston model, for the stochastic
+volatility,  and Merton model, for the jumps, is:
+%
+\[
+\left\{
+\begin{array}{lll}
+\dps \frac{d S_t}{S_t} &=& (r-d) dt + \sqrt{V_t} dW_t^1 + (e^J - 1) dN_t\\
+\dps  d V_t &=& \kappa (\theta - V_t) dt + \sigma_v \sqrt{V_t} dW_t^2  \\
+S(t=0) &=& S_0 \\
+V(t=0) &=& V_0
+\end{array}
+\right.
+\]
+ where $d<W^1,W^2>_t = \rho dt$ and $J \sim \N(m,v)$.
+
+For European options, two pricing formula are giving based on the
+Fourier transform  method \cite{sepp}. In this document, we use
+the following notaton: $\varphi=+1$ for a call and $\varphi=-1$
+for a put; $\tau=T-t$; $x_t=\ln(S_t)$ and $X = ln(S_t/K) +
+(r-d)\tau $.
+%
+
+\section{The characteristic formula}\label{SecCF}
+The price $F(x_t,t)$ is given by:
+%\footnote{In \cite{sepp}, formula (3.7) the term $e^{-(T-t)r}$, before
+%  $f(x,V,\lambda,t)$ was forgotten.}:
+\[F(x_t,t)=\frac{1+\varphi}{2}e^{x_t-(T-t)d}+\frac{1-\varphi}{2}e^{1-(T-t)r}K - e^{-(T-t)r}f(x,V,\lambda,t)\]
+where
+\[f(x,V,\lambda,\tau)=\frac{K}{\pi}\int_0^\infty\Re\left[ \frac{Q(k,x,V,\lambda,\tau)}{k^2+1/4}\right] dk\]
+with
+\[Q(k,x,V,\lambda,\tau) = e^{(-ik+1/2)X+ A(k,\tau) + B(k,\tau) V_0
++ C(k,\tau) + D(k,\tau)\lambda}
+\]
+The hedge $\delta$ is given by:
+\[
+\delta = \frac{1+\varphi}{2}e^{-(T-t)d} - e^{-(T-t)r}
+\frac{K}{\pi}\int_0^\infty\Re\left[\frac{(1/2-ik)}{S_t}
+\dot  \frac{Q(k,x,V,\lambda,\tau)}{k^2+1/4}\right] dk 
+\]
+The coefficients  $A(k,\tau)$, $B(k,\tau)$, $C(k,\tau)$ and
+$D(k,\tau)$ are specified as follows:
+\begin{enumerate}
+\item Volatility: \\
+\begin{itemize}
+\item Constant volatility : \\
+$A(k,\tau)=0$, $B(k,\tau)=-1/2(k^2+1/4)\tau$.
+\item Stochastic
+volatility (Heston) :\\
+$\dps A(k,\tau)=-\frac{\kappa\theta}{\sigma_v^2}\left[\psi_+ \tau
++
+    2ln\left( \frac{\psi_-+\psi_+e^{-\tau\zeta}}{2\zeta}\right) \right] $ \\
+ $\dps B(k,\tau)=-(k^2+1/4)\frac{1-e^{-\tau\zeta}}{\psi_-+\psi_+e^{-\tau\zeta}} $ \\
+where $\dps \psi_\pm = \mp (u+ik\rho\sigma_v) + \zeta$, $\dps
+\zeta=\sqrt{k^2\sigma_v^2(1-\rho^2) + 2ik\rho\sigma_vu
++u^2+\sigma_v^2/4}$ and $u=\kappa-\rho\sigma_v/2$.
+\end{itemize}
+%
+\item Jumps :\\
+\begin{itemize}
+\item Merton model : constant jump rate intensity and log-normal jump size distribution \\
+$C(k,\tau)=0$, $D(k,\tau)=\tau\Lambda(k)$ where \\
+$\dps \Lambda(k) = e^{-ik(m+v^2/2) - (k^2-1/4)v^2/2 + 1/2m)} -1 -
+(-ik+1/2)(e^{m+v^2/2}-1)$.
+\end{itemize}
+\end{enumerate}
+%
+\section{The Black-Scholes-style fomula}\label{SecBS}
+
+The price $F(x_t,t)$ is given by
+\[F(x_t,t) = \varphi\left(
+e^{-d(T-t)}S_t P_1(\varphi) - e^{-r(T-t)}K
+  P_2(\varphi)\right)\]  and the hedge $\delta$ by
+  \[\delta = \varphi e^{-d(T-t)} P_1(\varphi) \]
+
+  where
+$P_j(\varphi) = \frac{1-\varphi}{2} + \varphi \Pi_j$ for $j
+\in\{1,2\}$
+  with \\
+$$\Pi_j = \frac{1}{2} +  \frac{1}{\pi} \int_0^\infty \Re\left[ \frac{\phi_j(k)}{i
+  k}\right] dk$$
+where  the characteristic functions $\phi_j$, for $j\in \{1,2\}$,
+are given by: \[\dps \phi_j(k) = e^{i k X + A(k,\tau) + B(k,\tau)
+V_0 + C(k,\tau) + D(k,\tau)\lambda}]\]
+
+ Using the notations : \[ \left\{
+\begin{array}{lll}
+u = +1,\;\;  I=1, \; \; b = \kappa - \rho \sigma_v &if& j=1 \\
+u = -1,\;\;  I=0, \; \; b = \kappa &if& j=2
+\end{array}
+\right. \] the coefficients $A(k,\tau)$, $B(k,\tau)$,
+$C(k,\tau)$ and  $D(k,\tau)$  are given as follows: \\
+
+
+\begin{enumerate}
+\item Volatility: \\
+\begin{itemize}
+\item Constant volatility : \\
+$A(k,\tau)=0$, $B(k,\tau)=-1/2(k^2-uik)\tau $. \item Stochastic
+volatility (Heston) :\\
+
+$\dps A(k,\tau)=-\frac{\kappa\theta}{\sigma_v^2}\left[\psi_+ \tau
++ 2ln\left( \frac{\psi_-+\psi_+e^{-\tau\zeta}}{2\zeta}\right) \right] $ \\
+$\dps
+B(k,\tau)=-(k^2-uik)\frac{1-e^{-\tau\zeta}}{\psi_-+\psi_+e^{-\tau\zeta}}
+$
+
+where $\dps\psi_\pm = \mp (b-\rho\sigma_vik) + \zeta$ and
+$\dps\zeta=\sqrt{(b-\rho\sigma_vik)^2 + \sigma_v^2(k^2-iuk)}$.
+\end{itemize}
+%
+\item Jumps :\\
+\begin{itemize}
+\item Merton model : constant jump rate intensity and log-normal jump size distribution \\
+$C(k,\tau)=0$, $D(k,\tau)=\tau\Lambda(k)$ where \\
+$\dps\Lambda(k) = e^{(m+Iv^2) ik - v^2 k^2 /2 + I(m+v^2/2)} -1 +
+ (ik+I)(e^{m+v^2/2}-1)$.
+\end{itemize}
+\end{enumerate}
+%
+\section{Numerical integration}
+%
+In order to compute the infinite integrals, needed in the pricing
+formulas, we use the approximation: 
+\[ 
+\int_0^\infty f(x)dx \simeq \sum_{j=0}^N \int_{jh}^{(j+1)h}f(x)dx.
+\]
+The number $N$ of the sub-integrals used is determinated when the
+contribution of the last strip $[jh,(j+1)h]$ is smaller than a given
+tolerance $\epsilon$. Each sub-integral $\dps\int_{jh}^{(j+1)h}f(x)dx$
+is computed using a Gaussian quadrature.
+%
+\section{Implementation of the pricing routines}
+\subsection{The {\tt svj.c} file}
+This file contains the pricing routines, giving the price of an european
+call or put in the Merton/Heston/Merton+Heston models. Any of the two pricing
+formulas presented in Sections~\ref{SecCF} and~\ref{SecBS} can be used.
+\subsection{The {\tt ft\_\emph{Opt}\_\emph{Model}.c} files}
+%
+\emph{Opt} is the option type, \emph{call} or \emph{put}. \emph{Model}
+is the model used, \emph{merton} for the Merton model, \emph{heston} for
+the Heston model and \emph{hestmert} for the combined model
+Heston+Merton. 
+In each file, we set the option type and the model parameters, next, we
+call the {\tt calc\_price\_svj} rountine from {\tt svj.c } file. The
+default pricing method used is the Black-Scholes like formula given in
+\ref{SecBS}. 
+%
+\section{Computing the gradients}
+%
+For each model (Merton/Heston/Merton+Heston) we need to compute the
+gradient of an option (call/put) price with respect of the different
+parameters of the model. 
+
+The parameters are: $V_0$, $\lambda$, $m$ and
+$v$ for Merton model, $V_0$, $\kappa$, $\theta$, $\sigma_v$ and $\rho$
+for Heston model, and $V_0$, $\kappa$, $\theta$, $\sigma_v$, $\rho$,
+$V_0$, $\lambda$, $m$ and $v$ for Heston+Merton model. 
+
+These gradients can be called from {\tt
+  grad\_ft\_\emph{Opt}\_\emph{Model}.c} files
+which sets the option type, and the model parameters then calls the
+{\tt calc\_grad\_svj } routine from {\tt  grad\_svj.c }. This routine
+analytically computes the gradient of the pricing formulas (Sections~\ref{SecCF}
+and~\ref{SecBS})  with respect of each parameter of the given
+model. The integration procedure is similaire to the one used from the
+pricing formulas.  
+%
+\section{Calibration}
+%
+The goal is to find a parameter set $\alpha =(x_1,\dots,x_n)$ of a
+model (Heston/Merton/Heston+Merton) fitting a given observed market
+data (call/put prices or implied volatility surface). For an option
+with a stike $K_i$ and a maturity $T_i$ we notice $P_i^{obs}$
+(resp. $\sigma_i^{imp,obs}$) the observed option price (resp. implied
+volatility) and $P_i$ (resp. $\sigma_i$) the model price (resp.
+implied volatility). 
+In order to measure the distance between the model and the market
+prices, we define the following norms :
+\begin{itemize}
+\item prices norm: $\dps f^1_i = ||P_i^{obs} - P_i ||^2$
+\item relative prices norm: $\dps f^2_i = ||\frac{P_i^{obs} - P_i}{P_i^{obs}}||^2$
+\item implied volatility norm:  $\dps f^3_i = ||\sigma_i^{imp,obs} - \sigma_i||^2$
+\end{itemize}  
+%
+The calibration is then the minimization of one the these norms for
+the considered options: 
+\[
+\min_{x} f^j(x) = \min_{x} \sum_{i=1}^{N} w_i f^j_i
+\]
+where $w_i$ is a ponderation weight option $i$. 
+%
+%\subsection{General remarks}
+The calibration strategies described in the next section are
+developped and tested on synthetic data. Even if the case of real
+market data is different, some conclusions on the behaviour of the
+models are still valid, and the ideas proposed can be usefull for the
+the elaboration of a robust calibration on real market data.
+
+The synthetic market data are generated by pricing different option
+of stikes $K_i$ and maturities $T_i$ with a model having a set of
+parameters $x^\star = (x^\star_i,\dots,x^\star_n)$.  Then, starting 
+with a random initial guess $x^0 = (x^0_i,\dots,x^0_n)$, the
+calibration is considered as successful if it can find the parameter
+$x^\star$. 
+
+A first general remark is that the choice of the norm could be crucial
+for the success of the calibration. In fact, the form of the surfaces we
+are optimizing ($f^1$, $f^2$ or $f^3$) is different from a norm to
+another: local minimum or flat surface in one case and convex in one
+other. As expected, the norm $f^1$ is not appropriate as it gives very
+different weigths for options out of the money or in the money for
+example. The choice is then to alternate the norms $f^2$ and $f^3$. 
+
+One model can have different sensitivities to each one of its
+paramters. The Heston model, for example, is less sensitive to a
+variation of $\kappa$  than to a variation of an other paramter.  
+Some paramters can have a conjugate effects: a similtanious variation
+of two parameters have less effects than a single variation. This is
+the case for parameters $m_0$ and $v$ in the Merton model. 
+On strategy proposed is to perfom search in subspace of the search
+space: for example by locking, in the Heston model, all the parameters
+expect $\kappa$ and then searching only in that direction. 
+
+We notice that for Heston model and especially the Heston+Merton
+model, we can find a parameter $x\neq x^\star$ where $f^2(x) \simeq
+f^3(x) \simeq 0$. In other words, we can find two different set of
+parameters giving very close (or even the same) smile surface. This
+point is important for the stability of the calibration on real market
+data.
+
+%
+%\subsection{Calibration strategies}
+%strategie par model
+%
+\begin{thebibliography}{1}
+\bibitem{sepp}
+Artur Sepp.
+\newblock {\em Pricing European-Style Options under Jump Diffusion
+  Processes with Stochastic Volatility: Applications of Fourier
+  Transform,}
+\newblock Proceedings of the 7th Tartu Conference on Multivariate
+  Statistics, (2004).
+\newblock http://www.hot.ee/seppar/papers/stochjumpvols.pdf
+\end{thebibliography}
+%
+\end{document}

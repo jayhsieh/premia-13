@@ -1,0 +1,251 @@
+\section{Objects}
+
+\subsection{The top-level object}
+
+The PnlObject structure is used to simulate some inheritance between the
+ojbects of Pnl.  It must be the first element of all the objects existing in
+Pnl so that casting any object to a PnlObject is legal
+
+\describestruct{PnlObject}
+\begin{verbatim}
+typedef unsigned int PnlType; 
+
+typedef void (DestroyFunc) (void **);
+typedef PnlObject* (CopyFunc) (PnlObject *);
+typedef PnlObject* (NewFunc) (PnlObject *);
+typedef void (CloneFunc) (PnlObject *dest, const PnlObject *src);
+struct _PnlObject
+{
+  PnlType type; /*!< a unique integer id */
+  const char *label; /*!< a string identifier (for the moment not useful) */
+  PnlType parent_type; /*!< the identifier of the parent object is any,
+                          otherwise parent_type=id */
+  DestroyFunc *destroy; /*!< frees an object */
+  NewFunc     *constructor; /*!< New function */
+  CopyFunc    *copy; /*!< Copy function */
+  CloneFunc   *clone; /*!< Clone function */
+};
+\end{verbatim}
+
+Here is the list of all the types actually defined
+\begin{table}
+  \centering
+  \begin{tabular}{l|l}
+    \hline
+    PnlType & Description \\
+    \hline
+    PNL_TYPE_VECTOR & general vectors  \\
+    PNL_TYPE_VECTOR_DOUBLE & real vectors \\
+    PNL_TYPE_VECTOR_INT & integer vectors \\
+    PNL_TYPE_VECTOR_COMPLEX & complex vectors \\
+    PNL_TYPE_MATRIX & general matrices  \\
+    PNL_TYPE_MATRIX_DOUBLE & real matrices \\
+    PNL_TYPE_MATRIX_INT & integer matrices \\
+    PNL_TYPE_MATRIX_COMPLEX & complex matrices \\
+    PNL_TYPE_TRIDIAG_MATRIX & general tridiagonal matrices \\
+    PNL_TYPE_TRIDIAG_MATRIX_DOUBLE & real  tridiagonal matrices \\
+    PNL_TYPE_BAND_MATRIX & general band matrices \\
+    PNL_TYPE_BAND_MATRIX_DOUBLE & real band matrices \\
+    PNL_TYPE_HMATRIX & general hyper matrices \\
+    PNL_TYPE_HMATRIX_DOUBLE & real hyper matrices \\
+    PNL_TYPE_HMATRIX_INT & integer hyper matrices \\
+    PNL_TYPE_HMATRIX_COMPLEX & complex hyper matrices \\
+    PNL_TYPE_BASIS & bases \\
+    PNL_TYPE_RNG & random number generators \\
+    PNL_TYPE_LIST & doubly linked list
+  \end{tabular}
+  \caption{PnlTypes}
+  \label{types}
+\end{table}
+
+We provide several macros for manipulating PnlObejcts.
+\begin{itemize}
+\item \describemacro{PNL_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlObject
+
+\item \describemacro{PNL_VECT_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlVectObject
+
+\item \describemacro{PNL_MAT_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlMatObject
+
+\item \describemacro{PNL_HMAT_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlHmatObject
+
+\item \describemacro{PNL_BAND_MAT_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlBandMatObject
+
+\item \describemacro{PNL_TRIDIAGMAT_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlTridiagMatObject
+
+\item \describemacro{PNL_BASIS_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlBasis
+
+\item \describemacro{PNL_RNG_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlRng
+
+\item \describemacro{PNL_LIST_OBJECT}{o}
+  \sshortdescribe Cast any object into a PnlList
+
+\item \describemacro{PNL_GET_TYPENAME}{o}
+  \sshortdescribe Return the name of the type of any object inheriting from PnlObject
+
+\item \describemacro{PNL_GET_TYPE}{o}
+  \sshortdescribe Return the type of any object inheriting from PnlObject
+  
+\item \describemacro{PNL_GET_PARENT_TYPE}{o}
+  \sshortdescribe Return the parent type of any object inheriting from PnlObject
+\end{itemize}
+
+\begin{itemize}
+\item \describefun{\refstruct{PnlObject}\ptr }{pnl_object_create}{PnlType t}
+  \sshortdescribe Create an empty PnlObject of type \var{t} which can any of
+  the registered types, see Table~\ref{types}.
+\end{itemize}
+
+\subsection{List object}
+
+This section describes functions for creating an manipulating lists. Lists are
+internally stored as doubly linked lists.
+
+The structures and functions related to lists are declared in
+\verb!pnl/pnl_list.h!.
+
+\describestruct{PnlList}\describestruct{PnlCell}
+\begin{verbatim}
+typedef struct _PnlCell PnlCell;
+struct _PnlCell
+{
+  struct _PnlCell *prev;  /*!< previous cell or 0 */
+  struct _PnlCell *next;  /*!< next cell or 0 */
+  PnlObject *self;       /*!< stored object */
+};
+
+
+typedef struct _PnlList PnlList;
+struct _PnlList
+{
+  /**
+   * Must be the first element in order for the object mechanism to work
+   * properly. This allows any PnlList pointer to be cast to a PnlObject
+   */
+  PnlObject object; 
+  PnlCell *first; /*!< first element of the list */
+  PnlCell *last; /*!< last element of the list */
+  PnlCell *curcell; /*!< last accessed element,
+                         if never accessed is NULL */
+  int icurcell; /*!< index of the last accessed element,
+                     if never accessed is NULLINT */
+  int len; /*!< length of the list */
+};
+\end{verbatim}
+
+\begin{itemize}
+\item \describefun{\refstruct{PnlList} \ptr }{pnl_list_new}{}
+  \sshortdescribe Create an empty list
+\item \describefun{\refstruct{PnlCell} \ptr }{pnl_cell_new}{}
+  \sshortdescribe Create an cell list
+\item \describefun{\refstruct{PnlList}\ptr }{pnl_list_copy}{const \refstruct{PnlList}\ptr A}
+  \sshortdescribe Create a copy of a \refstruct{PnlList}. Each element of the
+  list \var{A} is copied by calling the its copy member.
+\item \describefun{void}{pnl_list_clone}{\refstruct{PnlList} \ptr dest, const
+  \refstruct{PnlList}\ptr src}
+  \sshortdescribe Copy the content of \var{src} into the already existing
+  list \var{dest}. The list \var{dest} is automatically resized. This is a
+  hard copy, the contents of both lists are independent after cloning.
+\item \describefun{void}{pnl_list_free}{\refstruct{PnlList}  \ptr \ptr L}
+  \sshortdescribe Free a list
+\item \describefun{void}{pnl_cell_free}{\refstruct{PnlCell}  \ptr \ptr c}
+  \sshortdescribe Free a list
+\item \describefun{\refstruct{PnlObject}\ptr}{pnl_list_get}{
+    \refstruct{PnlList} \ptr L, int i}
+  \sshortdescribe This function returns the content of the \var{i}--th cell of
+  the list \var{L}. This function is optimized for linearly accessing all the
+  elements, so it can be used inside a for loop for instance.
+\item \describefun{void}{pnl_list_insert_first}{\refstruct{PnlList}  \ptr L,
+    \refstruct{PnlObject}  \ptr o}
+  \sshortdescribe Insert the object \var{o} on top of the list \var{L}. Note that
+  \var{o} is not copied in \var{L}, so do  {\bf not} free \var{o} yourself, it
+  will be done automatically when calling \reffun{pnl_list_free}
+\item \describefun{void}{pnl_list_insert_last}{\refstruct{PnlList}  \ptr L,
+    \refstruct{PnlObject}  \ptr o}
+  \sshortdescribe Insert the object \var{o} at the bottom of the list \var{L}. Note that
+  \var{o} is not copied in \var{L}, so do  {\bf not} free \var{o} yourself, it
+  will be done automatically when calling \reffun{pnl_list_free}
+\item \describefun{void}{pnl_list_remove_last}{\refstruct{PnlList}  \ptr L}
+  \sshortdescribe Remove the last element of the list \var{L} and frees it.
+\item \describefun{void}{pnl_list_remove_first}{\refstruct{PnlList}  \ptr L}
+  \sshortdescribe Remove the first element of the list \var{L} and frees it.
+\item \describefun{void}{pnl_list_remove_i}{\refstruct{PnlList}  \ptr L, int i}
+  \sshortdescribe Remove the \var{i-th} element of the list \var{L} and frees it.
+\item \describefun{void}{pnl_list_concat}{\refstruct{PnlList}  \ptr L1,
+    \refstruct{PnlList}  \ptr L2}
+  \sshortdescribe Concatenate the two lists \var{L1} and \var{L2}. The
+  resulting list is store in \var{L1} on exit. Do {\bf not} free \var{L2}
+  since concatenation does not actually copy objects but only manipulates
+  addresses.
+\item \describefun{void}{pnl_list_print}{const \refstruct{PnlList}  \ptr L}
+  \sshortdescribe Only prints the types of each element. When  the
+  \refstruct{PnlObject} object has a print member, we will use it.
+\end{itemize}
+
+\subsection{Array object}
+
+This section describes functions for creating and manipulating arrays of
+PnlObjects.
+
+The structures and functions related to arrays are declared in
+\verb!pnl/pnl_array.h!.
+
+\describestruct{PnlArray}
+\begin{verbatim}
+typedef struct _PnlArray PnlArray;
+struct _PnlArray
+{
+  /**
+   * Must be the first element in order for the object mechanism to work
+   * properly. This allows any PnlArray pointer to be cast to a PnlObject
+   */
+  PnlObject object; 
+  int size;
+  PnlObject **array;
+  int mem_size;
+};
+\end{verbatim}
+
+\begin{itemize}
+\item \describefun{\refstruct{PnlArray} \ptr }{pnl_array_new}{}
+  \sshortdescribe Create an empty array
+\item \describefun{\refstruct{PnlArray} \ptr }{pnl_array_create}{int n}
+  \sshortdescribe Create an array of length \var{n}.
+\item \describefun{\refstruct{PnlArray}\ptr }{pnl_array_copy}{const \refstruct{PnlArray}\ptr A}
+  \sshortdescribe Create a copy of a \refstruct{PnlArray}. Each element of the
+  array \var{A} is copied by calling the \var{A[i].object.copy}.
+\item \describefun{void}{pnl_array_clone}{\refstruct{PnlArray} \ptr dest, const
+  \refstruct{PnlArray}\ptr src}
+  \sshortdescribe Copy the content of \var{src} into the already existing
+  array \var{dest}. The array \var{dest} is automatically resized. This is a
+  hard copy, the contents of both arrays are independent after cloning.
+\item \describefun{void}{pnl_array_free}{\refstruct{PnlArray}  \ptr \ptr}
+  \sshortdescribe Free an array and all the objects hold by the array.
+\item \describefun{int}{pnl_array_resize}{\refstruct{PnlArray} \ptr  T, int size}
+  \sshortdescribe Resize \var{T} to be \var{size} long. As much as possible of
+  the original data is kept.
+\item \describefun{\refstruct{PnlObject}\ptr}{pnl_array_get}{
+    \refstruct{PnlArray} \ptr T, int i}
+  \sshortdescribe This function returns the content of the \var{i}--th cell of
+  the array \var{T}. No copy is made.
+\item \describefun{\refstruct{PnlObject}\ptr}{pnl_array_set}{
+    \refstruct{PnlArray} \ptr T, int i, \refstruct{PnlObject}\ptr O}
+  \sshortdescribe \var{T[i] = O}. No copy is made, so the object \var{O} must
+  not be freed manually.
+\item \describefun{void}{pnl_array_print}{\refstruct{PnlArray}  \ptr}
+  \sshortdescribe Not yet implemented because it would require that the
+  structure \refstruct{PnlObject} has a field copy.
+\end{itemize}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "pnl-manual"
+%%% End: 

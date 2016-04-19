@@ -1,0 +1,294 @@
+
+\section{Libor Market Model}
+
+
+We suppose  $t \leq T_0 < T_1 <..<T_M $ with  $T_i=T_0+i \tau$ and  $T_{i+1}-T_i=\tau $ 
+ 
+
+Recall that 
+
+\ban
+1+\tau L(t,T_i,\tau)=\frac{B(t,T_i)}{B(t,T_{i+1})} 
+\ean
+
+and
+
+\ban
+S(t,T_s,T_M)=\frac{B(t,T_s)-B(t,T_M)}{\sum_{j=s+1}^{M}\tau B(t,T_j)}
+\ean
+
+\ban
+\frac{B(t,T_i)}{B(t,T_s)}=\prod_{j=s}^{i-1}\frac{1}{1+\tau L(t,T_j,\tau)}
+\ean
+
+as such the forward swap rate as a function of the forward rates is given by the relation
+
+\ba
+S(t,T_s,T_M)=\frac{1 - \prod_{j=s}^{M-1}\frac{1}{1+\tau L(t,T_j,\tau)} }{\sum_{j=s+1}^{M}\tau \prod_{k=s}^{j-1}\frac{1}{1+\tau L(t,T_k,\tau)}} \label{tswaptfor}
+\ea
+
+In the libor market model we suppose the following dynamic for the forward Libor rates
+
+
+\ban
+dL(t,T_i,\tau)=L(t,T_i,\tau)\gamma(t,T_i,\tau)dW^{Q^{T_{i+1}}}
+\ean
+
+where $\lbrace W^{Q^{T_{i+1}}}_t; t\geq 0 \rbrace$ is a $d$ dimensional brownian motion under the forward probability $Q^{T_{i+1}}$ associated with the numeraire $B(t,T_{i+1})$ and  $\gamma(t,T_i,\tau)$ is a deterministic function. 
+
+Furthermore we know that 
+
+\ban
+d\left(\frac{B(t,T_i)}{B(t,T_{i+1})}\right)=\left( \frac{B(t,T_i)}{B(t,T_{i+1})} \right) (\sigma_B(t,T_i)-\sigma_B(t,T_{i+1}))dW^{Q^{T_{i+1}}}_t
+\ean
+
+where $\sigma_B(t,T)$ stands for the volatility of the zero coupon bond so from 
+
+\ban
+\frac{dL(t,T_i,\tau)}{L(t,T_i,\tau)}=\frac{1+\tau L(t,T_i,\tau)}{\tau L(t,T_i,\tau)}(\sigma_B(t,T_i)-\sigma_B(t,T_{i+1}))dW^{Q^{T_{i+1}}}_t
+\ean
+
+we get the relation
+
+\ba
+\frac{\gamma(t,T_i,\tau)\tau L(t,T_i,\tau)}{1+\tau L(t,T_i,\tau)}=\sigma_B(t,T_i)-\sigma_B(t,T_{i+1}) \label{volforvolzc}
+\ea
+
+
+this equation leads  from  (\ref{volforvolzc}) we have for  $j>i$
+
+\ban
+\sigma_B(t,T_j)-\sigma_B(t,T_i)=-\sum_{k=i}^{j-1}\frac{\gamma(t,T_k,\tau)\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}
+\ean
+
+it is well known that 
+
+\ban
+dW_t^{Q^{T_i}}+\sigma_B(t,T_i)dt=dW_t^{Q^{T_j}}+\sigma_B(t,T_j)dt
+\ean
+
+changing from zero coupon bond volatilities to forward rate volatilities we have for  $j>i$
+
+\ban
+dW_t^{Q^{T_i}}=dW_t^{Q^{T_j}}-\sum_{k=i}^{j-1}\frac{\gamma(t,T_k,\tau)\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}dt
+\ean
+
+\subsection{Pricing a caplet in the LMM framework}
+
+
+Within the LMM the forward libor rate $L(t,T_i,\tau)$ follows the dynamic 
+
+\ban
+dL(t,T_i,\tau)=L(t,T_i,\tau)\gamma(t,T_i,\tau)dW^{Q^{T_{i+1}}}_t
+\ean
+
+
+suppose   $t<T_j<T_{j+1}$ and  $Cplt(t,T_j,K,\tau,N)$ a european  caplet with  maturity $T_j$,  strike $K$, nominal $N$  on the spot libor rate $L(t,t,\tau)$ then at time $T_{j+1}=T_j+\tau$ the cash flow is 
+
+\ban
+\tau (L(T_j,T_j,\tau)-K)_+N
+\ean
+
+
+\ban
+Cplt(t,T_j,K,\tau,N)&=&E^Q_t\left[\frac{B(t)}{B(T_{j+1})}\tau (L(T_j,T_j,\tau)-K)_+N \right]\\
+&=&E^{Q^{T_{j+1}}}_t\left[\frac{B(t,T_{j+1})}{B(T_{j+1},T_{j+1})}\tau (L(T_j,T_j,\tau)-K)_+N \right]\\
+&=&B(t,T_{j+1}) N\tau E^{Q^{T_{j+1}}}_t\left[(L(T_j,T_j,\tau)-K)_+ \right]\\
+&=& N \tau B(t,T_{j+1}) \left( L(t,T_{j},\tau)N(d_1)-KN(d_2)\right)
+\ean
+
+\ban
+d_1&=&\frac{ln \frac{L(t,T_j,\tau)}{K} + \frac{1}{2}\int_t^{T_j}\gamma(u,T_j,\tau)^2du}{\sqrt{\int_t^{T_j}\gamma(u,T_j,\tau)^2 du}}\\
+d_2&=&d_1 -\sqrt{\int_t^{T_j}\gamma(u,T_j,\tau)^2 du}
+\ean
+
+
+we get a formula consistent with market practice which quotes option through black volatility
+
+\subsection{Pricing a swaption in the LMM framework}\label{DerPrdcts}
+
+We briefly present the pricing of a swaption within the LMM framework and refer to \cite{braceGatarekMusiela}. Recall that 
+
+\ban
+Swpt(t,T_s,T_M,K,\tau)&=&\sum_{i=s+1}^ME^Q_t\left[ \frac{B(t)}{B(T_i)}\tau (S(T_s,T_s,T_M)-K)_+ \right]\\
+&=&\tau \sum_{i=s+1}^MB(t,T_i)E^{Q^{T_i}}_t\left[L(T_s,T_{i-1},\tau){\bf 1}_{D}\right] \\
+&-&\tau \sum_{i=s+1}^MB(t,T_i)E^{Q^{T_i}}_t\left[K{\bf 1}_{D}\right]
+\ean
+
+where
+
+\ban
+{\bf 1}_{D}&=&{\bf 1}_{\left( S(T_s,T_s,T_M)>K \right)}\\
+&=&{\bf 1}_{\left( 1>B(T_s,T_M)+K\sum_{i=s+1}^MB(T_s,T_i)\right) }\\
+&=&{\bf 1}_{\left( 1>\sum_{i=s+1}^Mc_iB(T_s,T_i)\right) }\\
+&=&{\bf 1}_{\left( 1>\sum_{j=s+1}^Mc_j\prod_{k=0}^{j-1}\frac{1}{1+\tau L(T_s,T_j,\tau)} \right) } 
+\ean
+
+
+under  $Q^{T_i}$ we have  
+
+\ban
+dL(t,T_{i-1},\tau)=L(t,T_{i-1},\tau)\gamma(t,T_{i-1},\tau)dW^{Q^{T_{i}}}_t
+\ean
+
+for  $i>j+1$ 
+
+\ban
+\frac{dL(t,T_j,\tau)}{L(t,T_j,\tau)}=\gamma(t,T_j,\tau)dW^{Q^{T_i}}_t - \sum_{k=j+1}^{i-1}\frac{\tau L(t,T_k,\tau) \gamma(t,T_k,\tau) \gamma(t,T_j,\tau) }{1+\tau L(t,T_k,\tau)}dt
+\ean
+
+for  $j\geq i$ 
+
+\ban
+\frac{dL(t,T_j,\tau)}{L(t,T_j,\tau)}=\gamma(t,T_j,\tau)dW^{Q^{T_i}}_t +\sum_{k=i}^{j}\frac{\tau L(t,T_k,\tau)\gamma(t,T_k,\tau)\gamma(t,T_j,\tau)}{1+\tau L(t,T_k,\tau)}dt
+\ean
+ 
+\paragraph{Computing  $E^{Q^{T_i}}_t\left[L(T_s,T_{i-1},\tau){\bf 1}_{D}\right]$: }
+
+
+Brace, Gatarek and Musiela  \cite{braceGatarekMusiela} propose to freeze the drift: under  $Q^{T_i}$ for  $i>j+1$ and $u \in [t \; T_s]$
+
+\ban
+\frac{dL(u,T_j,\tau)}{L(u,T_j,\tau)}=\gamma(u,T_j,\tau)dW^{Q^{T_i}}_u - \sum_{k=j+1}^{i-1}\frac{\tau L(\textcolor{red}{t},T_k,\tau) \gamma(u,T_k,\tau) \gamma(u,T_j,\tau) }{1+\tau L(\textcolor{red}{t},T_k,\tau)}du  
+\ean
+
+under  $Q^{T_i}$ for  $i\leq j$ and  $u \in [t \; T_s]$
+
+\ban
+\frac{dL(u,T_j,\tau)}{L(u,T_j,\tau)}=\gamma(u,T_j,\tau)dW^{Q^{T_i}}_u +\sum_{k=i}^{j}\frac{\tau L(\textcolor{red}{t},T_k,\tau)\gamma(u,T_k,\tau)\gamma(u,T_j,\tau)}{1+\tau L(\textcolor{red}{t},T_k,\tau)}dt
+\ean
+
+
+under this assumption the forward rates are lognormal
+
+
+for $i>j+1$
+
+\ban
+L(T_s,T_j,\tau)&=&L(t,T_j,\tau)e^{\int_t^{T_s}\gamma(u,T_j,\tau)dW_u^{Q^{T_i}}-\frac{1}{2}\int_t^{T_s}\gamma(u,T_j,\tau)^2du}\\
+& & e^{-\sum_{k=j+1}^{i-1}\frac{\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)} \int_t^{T_s}\gamma(u,T_k,\tau) \gamma(u,T_j,\tau) du  }
+\ean
+
+for $j \geq i$
+
+\ban
+L(T_s,T_j,\tau)&=&L(t,T_j,\tau)e^{\int_t^{T_s}\gamma(u,T_j,\tau)dW_u^{Q^{T_i}}-\frac{1}{2}\int_t^{T_s}\gamma(u,T_j,\tau)^2du}\\
+& & e^{+\sum_{k=i}^{j}\frac{\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}\int_t^{T_s} \gamma(u,T_k,\tau) \gamma(u,T_j,\tau) du  }
+\ean
+
+\newpage
+we can write 
+
+\ban
+L(T_s,T_j,\tau)&=&L(t,T_j,\tau)e^{\int_t^{T_s}\gamma(u,T_j,\tau)dW_u^{Q^{T_i}}-\frac{1}{2}\int_t^{T_s}\gamma(u,T_j,\tau)^2du}\\
+ &+& e^{\sum_{k=1}^{i-1}\frac{\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}\int_t^{T_s} \gamma(u,T_k,\tau) \gamma(u,T_j,\tau) du}
+e^{- \sum_{k=1}^{j}\frac{\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}\int_t^{T_s} \gamma(u,T_k,\tau) \gamma(u,T_j,\tau) du  }
+\ean
+
+
+
+
+\ban
+\xi_j^i&=&\int_t^{T_s}\gamma(u,T_j,\tau)dW_u^{Q^{T_i}}\\
+\nu_{kj}&=&\int_t^{T_s} \gamma(u,T_k,\tau) \gamma(u,T_j,\tau) du \\
+\beta_j^i&=&\sum_{k=1}^{i}\frac{\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}\int_t^{T_s} \gamma(u,T_k,\tau) \gamma(u,T_j,\tau) du\ean
+
+
+\ban
+L(T_s,T_j,\tau)&=&L(t,T_j,\tau)e^{\xi_j^i  -\frac{1}{2}\nu_{jj} + \beta_j^{i-1}-\beta_j^j  }
+\ean
+
+
+
+$\nu=(\nu_{kj})$ is variance covariance of the rates.
+
+{\bf Rank one approximation}
+
+There is a vector $\alpha=(\alpha_{s+1},\alpha_{s+2},..,\alpha_{M})^t$ with $\alpha_j\geq 0$ such that $\nu\sim\alpha \alpha^t $
+
+then
+ 
+
+\ban
+\xi_j^i& \sim & \alpha_{j}X  \quad \textrm{with}  \quad X \quad {\cal N}(0,1)\\
+\nu_{kj}& \sim & \alpha_{k}\alpha_{j} \\
+\beta_j^i& \sim &\alpha_{j} \sum_{k=1}^{i}\frac{\tau L(t,T_k,\tau)}{1+\tau L(t,T_k,\tau)}\alpha_{k}\\
+& \sim &\alpha_{j}d^i
+\ean
+
+
+\ban
+L(T_s,T_j,\tau)&=&L(t,T_j,\tau)e^{\alpha_{j}X -\frac{1}{2}\alpha_{jj} + \alpha_j(d^{i-1}-d^j) }
+\ean
+
+
+\ban
+&&E^{Q^{T_i}}_t\left[L(T_s,T_{i-1},\tau){\bf 1}_{D}\right]=\\
+&&E^{Q^{T_i}}_t\left[L(t,T_{i-1},\tau)e^{ \alpha_{i-1}X -\frac{1}{2}\alpha_{i-1}\alpha_{i-1} } {\bf 1}_{\left( 1>\sum_{j=1}^Mc_j\prod_{k=0}^{j-1}\frac{1}{1+\tau L(t,T_k,\tau)} e^{\alpha_{k}X -\frac{1}{2}\alpha_{k}\alpha_k + \alpha_{k}(d^{i-1}-d^k)} \right)    }\right]
+\ean
+
+we note 
+
+\ban
+\phi_{i-1}(x)=\sum_{j=1}^Mc_j\prod_{k=0}^{j-1}\frac{1}{1+\tau L(t,T_k,\tau)} e^{\alpha_{k}x -\frac{1}{2}\alpha_{kk} + \alpha_{k}(d^{i-1}-d^k)}
+\ean
+
+recall that  $c_k\geq 0$ and $c_M > 1$ 
+
+\ban
+\lim_{x \rightarrow -\infty}\phi_{i-1}(x)&=&0\\
+\lim_{x \rightarrow +\infty}\phi_{i-1}(x)&=&+\infty\\
+\phi_{i-1}'(x)&>&0 
+\ean  
+
+so there is a unique $\bar x_{i-1}$ such that $\phi_{i-1}(\bar x_{i-1})=1$, finally the expectation is given by  
+
+\ban
+E^{Q^{T_i}}_t\left[L(T,T_{i-1},\tau){\bf 1}_{D}\right]=\int_{\bar x_{i-1}}^{+ \infty} L(t,T_{i-1},\tau)e^{\alpha_{i-1}x -\frac{1}{2}\alpha_{i-1}\alpha_{i-1}} \frac{1}{\sqrt {2\pi}}e^{-\frac{x^2}{2}}dx
+\ean
+
+and we have $\bar x_{i}=\bar x_{i-1}+d^{i-1}-d^{i}$
+
+It is possible to use a rank k approximation, see Brace \cite{brace1}.
+
+
+\paragraph{ The spot measure}
+
+In  the HJM framework, where interest rates are continuously coumpounded,  one usually uses the cash as risk free asset which follows the dynamic
+
+\ban
+dB(t)=B(t)r(t)dt
+\ean
+
+In the LMM framework we deal with simple interest rates as such it is possible to define the discret tenor bank account noted $B_d(t)$ as follow:
+
+
+$\eta(t)$ such that  $\eta(t)=n $ if $t \in [T_{n-1} \; T_{n}[$
+
+\ban
+B_d(0)&=&1\\
+B_d(t)&=&\prod_{j=0}^{\eta(t)}(1+\tau L(T_j,T_j,\tau))B(t,T_{\eta(t)})
+\ean
+
+which is an asset with unit value at time $t=0$ and discretly compounded in the spot rates
+
+using $B_d(t)$ as numeraire we can define the ``spot libor measure'' $Q^d$ under which  $L(t,T_i,\tau)$ follows the dynamic
+
+\ban
+\frac{dL(t,T_i,\tau)}{L(t,T_i,\tau)}= \sum_{k=\eta(t)}^{i}\frac{\tau L(t,T_k,\tau)\gamma(t,T_k,\tau)\gamma(t,T_i,\tau)}{1+\tau L(t,T_k,\tau)}dt + \gamma(t,T_i,\tau)dW^{Q^d}_t
+\ean
+
+
+\paragraph{ Pricing under $Q^d$}: the value at time $t=0$ of a security paying $\xi$ at $T_n$ is given by
+
+\ban
+\pi(0)=E^{Q^d}\left[ \frac{B^d(0)}{B^d(T_n)}\xi \right]
+\ean
+
+Remark: suppose $\xi=1$ then $\pi(0)=B(0,T_n)$
+
+\ban
+B(0,T_n)=E^{Q^d}\left[ \prod_{i=0}^{n-1}\frac{1}{(1+\tau L(T_i,T_i,\tau))} \right]
+\ean
+
+one should recover bond values from the forwards.

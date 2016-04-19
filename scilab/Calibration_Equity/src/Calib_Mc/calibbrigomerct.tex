@@ -1,0 +1,119 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb}
+\begin{document}
+\subsection*{Calibration of log-normal mixture dynamics}
+For $1\leq j\leq J$, let $S^j_t$ solve the following Black-Scholes
+equation with time-dependent volatility $\sigma_j(t)$
+\begin{equation*}
+   \begin{cases}
+      dS^j_t=\sigma_j(t)S^j_tdW_t+(r-\delta)S^j_tdt\\
+S^j_0=S_0.
+   \end{cases}
+\end{equation*}
+The density $p_j(t,x)$ of $S^j_t$ is lognormal
+$$p_j(t,x)=1_{\{x>0\}}\frac{1}{x\sqrt{2\pi\Sigma_j(t)}}\exp\left(-\frac{\log(x/S_0)-(r-\delta)t+\Sigma_j(t)/2}{2\Sigma_j(t)}\right),$$
+where $\Sigma_j(t)=\int_0^t\sigma^2_j(s)ds$.
+Let $\lambda_1,\hdots,\lambda_J$ be non-negative weights such that
+$\sum_{j=1}^J\lambda_j=1$. For $t>0$,
+$p(t,x)=\sum_{j=1}^J\lambda_jp_j(t,x)$ is a lognormal mixture probability
+density on ${\mathbb R}_+^*$.
+Multiplying the Fokker-Planck equation satisfied by $p_j(t,x)$
+$$\partial_tp_j(t,x)=\frac{1}{2}\partial_{xx}(\sigma_j^2(t)x^2p_j(t,x))-(r-\delta)\partial_x(xp_j(t,x))
+$$ by $\lambda_j$ and summing over $j$ one obtains following forward
+equation for $p(t,x)$ 
+$$\partial_tp(t,x)=\frac{1}{2}\partial_{xx}\left(\frac{\sum_{j=1}^J\sigma_j^2(t)p_j(t,x)}{\sum_{j=1}^Jp_j(t,x)}x^2p(t,x)\right)-(r-\delta)\partial_x(xp(t,x))$$
+By comparison with the Fokker-Planck equation
+$$\partial_tp(t,x)=\frac{1}{2}\partial_{xx}(\sigma^2(t,x)x^2p(t,x))-(r-\delta)\partial_x(xp(t,x))$$
+associated with the densities of the general local
+volatility model 
+\begin{equation}
+ dS_t=\sigma(t,S_t)S_tdW_t+(r-\delta)S_tdt,\label{sde}  
+\end{equation}
+one obtains that for the choice
+\begin{equation}
+   \sigma(t,x)=\sqrt{\frac{\sum_{j=1}^J\sigma_j^2(t)p_j(t,x)}{\sum_{j=1}^Jp_j(t,x)}},\label{defsig}
+\end{equation}
+$S_t$ should have the density $p(t,x)$ i.e. (\ref{sde}) should be the local volatility
+dynamics associated with the densities $p(t,x)$.\\
+The theory of effective volatility introduced in \cite{DerKan} also
+leads to this result. Indeed if $\gamma$ is a random variable
+independent of the Brownian motion $W$ such that ${\mathbb
+  P}(\gamma=j)=\lambda_j$ for $1\leq j\leq J$, then for $t>0$,
+$S^\gamma_t$ has the density $p(t,x)$. The square of the effective volatility
+associated with the dynamics
+$dS^\gamma_t=\sigma_\gamma(t)S^\gamma_tdW_t+(r-\delta)S^\gamma_tdt$ is
+\begin{align*}\sigma_{\mbox{eff}}^2(t,x)&={\mathbb
+  E}(\sigma^2_\gamma(t)|S^\gamma_t=x)=\sum_{j=1}^J\sigma^2_j(t){\mathbb
+  P}(\gamma=j|S^\gamma_t=x)\\
+&=\sum_{j=1}^J\sigma^2_j(t){\mathbb
+  P}(S^\gamma_t=S^j_t|S^\gamma_t=x)=\sum_{j=1}^J\sigma^2_j(t)\frac{p_j(t,x)}{\sum_{l=1}^Jp_l(t,x)}.\end{align*}
+
+In case the functions $\sigma_j(t)$ are continuous and satisfy the
+additional technical assumption \begin{equation}
+   \exists \sigma_0,\epsilon>0,\;\forall
+1\leq j\leq J,\;\forall t\leq\epsilon,\;\forall x\in{\mathbb
+  R}_+^*,\;\sigma_j(t,x)=\sigma_0,\label{hyptec}
+\end{equation}
+Brigo and Mercurio \cite{BRME} \cite{BRME2} prove rigorously existence
+of a unique solution $(S_t)_{t\geq 0}$ for the stochastic differential equation \eqref{sde} with
+$\sigma(t,x)$ given by \eqref{defsig}. In addition for $t>0$, $S_t$ has
+the density $\sum_{j=1}^J\lambda_jp_j(t,x)$. The technical assumption
+\eqref{hyptec} ensures that $\sigma(t,x)$ is equal $\sigma_0$ for $t\leq
+\epsilon$ and does not become a singular function of $x$ as
+$t\rightarrow 0$.\par
+In order to obtain a more general model, they introduce the following
+affine transformation
+$$A_t=\alpha A_0e^{(r-\delta)t}+S_t$$
+The process $(A_t)_{t\geq 0}$ solves the following stochastic
+differential equation :
+$$dA_t=\sigma(t,A_t-\alpha A_0e^{(r-\delta)t})(A_t-\alpha
+A_0e^{(r-\delta)t})dW_t+(r-\delta)A_tdt.$$
+When $K>\alpha A_0e^{(r-\delta)T}$ the price of a Call option with
+Strike $K$ and maturity $T$ written on $A_t$ is easily obtained :
+\begin{align}
+   {\mathbb E}\bigg(e^{-rT}&(A_T-K)^+\bigg)={\mathbb
+  E}\left(e^{-rT}(S_T-(K-\alpha A_0e^{(r-\delta)T}))^+\right)\notag\\&=\sum_{j=1}^J\lambda_jC_{BS}\left((1-\alpha)A_0,K-\alpha
+  A_0e^{(r-\delta)T},
+  \sqrt{\Sigma_j(T)/T}\right)\label{prixoptat},
+\end{align}
+where $C_{BS}(x,K,\eta)$ denotes the price of a Call option with Strike
+  $K$ and maturity $T$ in the Black-Scholes model with initial spot $x$,
+  volatility $\eta$, interest rate $r$ and dividend rate $\delta$.\par
+Let $T_1\leq T_2\leq \hdots\leq T_I$ denote the maturities of the
+  calibration Call options and for $1\leq i\leq I$, let $K_{i,1}\leq
+  K_{i,2}\leq \hdots\leq K_{i,l_i}$ be the strikes of those with
+  matutirity $T_i$. For fixed $J$, the parameters $\alpha$,
+  $(\lambda_j)_{1\leq j\leq J}$, $(\Sigma_j(T_i))_{1\leq i\leq I,1\leq
+  j\leq J}$ giving the dynamics of $(A_t)_{t\geq 0}$
+  are optimized in order to minimize some criterion measuring the difference
+  between the market prices of the Call options and the prices of the
+  same options written on $(A_t)_{t\geq 0}$ (computed thanks
+  to \eqref{prixoptat}) under the following
+  constraints
+\begin{equation*}
+   \begin{cases}
+      \forall 1\leq j\leq J,\;\lambda_j\geq 0\mbox{ and
+      }\sum_{j=1}^J\lambda_j=1\\
+\forall 1\leq j\leq J,\;\Sigma_j(T_1)\leq \Sigma_j(T_2)\leq\hdots \leq
+      \Sigma_j(T_I)\\
+\forall 1\leq i\leq I,\;K_{i,1}\geq \alpha A_0e^{(r-\delta)T_i}
+   \end{cases}
+\end{equation*}
+\begin{thebibliography}{1}
+\bibitem{BRME}
+D.~Brigo and F.~Mercurio,
+\emph{Displaced and Mixture Diffusions for Analytically-Tractable Smile Models}.
+Mathematical Finance - Bachelier Congress 2000, 151-174, Springer, 2001
+2002
+
+\bibitem{BRME2}
+D.~Brigo and F.~Mercurio,
+\emph{Lognormal mixture dynamics and calibration to market volatility smiles}.
+International Journal of Theoretical and Applied Finance, 5(4), 427-446, 2002
+
+\bibitem{DerKan}
+E.~Derman and I.~Kani,
+\emph{Stochastic Implied Trees : Arbitrage Pricing with Stochastic Term
+  and Strike Structure of Volatility}.
+International Journal of Theoretical and Applied Finance, 1(1), 61-110, 1998\end{thebibliography}
+\end{document}

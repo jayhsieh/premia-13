@@ -1,0 +1,28 @@
+
+Compilation
+===========
+
+In this directory to build the library just type 
+
+  g++ HJM-LEVY-EBERLEIN-KLUGE-CAPS.cpp -lm -o Cap_Levy_Hjm
+  g++ HJM-LEVY-EBERLEIN-KLUGE-SWAPTIONS.cpp -lm -o Swaptions_Levy_Hjm
+
+It is independent of the other files of Premia;
+
+It will compile the following algorithms g
+
+1)  Option on ZCB Pricer of Levy HJM Model by Eberlein-Kluge Algorithm
+2)  Option on Coupon Bond Pricer of Levy HJM Model by Eberlein-Kluge Algorithm
+To execute the algorithm just type
+
+	Cap_Levy_Hjm
+	Swaptions_Levy_Hjm
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************
+
+
+
+

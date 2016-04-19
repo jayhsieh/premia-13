@@ -1,0 +1,4 @@
+fichier_latex : documentation_code
+option  : 6
+figure  : nofig
+fichier_fig : macro

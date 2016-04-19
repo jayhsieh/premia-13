@@ -1,0 +1,742 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4}
+\usepackage{amsmath}
+\usepackage{english}
+\usepackage{rotating}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{array}
+
+\input{macro.tex}
+
+\title{Documentation of the calibration's code}
+\author{Sophie Volle and Jean-Marc Cognet \\ \\
+INRIA Rocquencourt - MATHFI project \\ 
+Domaine de Voluceau \\ 
+B.P. 105 \\
+78153 Le Chesnay Cedex}
+\date{november 2002}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\clearpage
+
+\section{Introduction}
+
+The algorithm of calibration described in~\cite{bcv:inria:02} has 
+been implemented in C. The five main programs contained in the 
+subdirectory ./src are:
+\begin{itemize}
+\item 
+simul.c: (pricing) computes option prices with Dupire's PDE or 
+Black-Scholes formulae. This program is used to compare 
+Dupire/Black-Scholes and to build synthetic data;
+\item
+calib.c: (calibration) computes a local volatility from option 
+prices;
+\item
+rafsig.c: computes the degrees of freedom of the volatility on a finer 
+grid. This program is used to perform a multiscale approach;
+\item
+visusig.c: allows us to visualize a volatility from its bicubic 
+spline degrees of freedom;
+\item
+impsig.c: computes implied volatilities.
+\end{itemize}
+Each program is described with more details in 
+section~\ref{SEC:PROGRAMS}. Notice that each program is controlled 
+by a file ended by .in (e.g. simul.in for the program simul.c) 
+containing the parameters and the names of the in/out files.
+
+\section{Compilation, execution and useful scripts}
+
+The source files of the calibration code are in the 
+subdirectory: ./src. To compile the five programs simul, calib, 
+rafsig, visusig and impsig:
+
+\begin{verbatim}
+cd ./src
+make or make all
+\end{verbatim}
+or you can compile each program separately:
+\begin{verbatim}
+make simul
+make calib
+etc.
+\end{verbatim}
+
+You can execute each program from other test subdirectories 
+(e.g. by creating ./tests). Make sure that the subdirectory 
+./src containing the programs (after compilation) is in 
+your Unix environment variable PATH. 
+
+To execute a program, e.g. calib, from a test subdirectory, 
+you have to edit a file ended by .in, calib.in in this case. 
+You can find examples of files simul.in, calib.in, etc. 
+in the subdirectory ./src/examples.
+
+The subdirectory ./src/matlab contains useful programs 
+to visualize the results with Matlab. For instance, 
+vprice.m (type help vprice in Matlab to have the documentation) 
+allows us the visualize option prices or volatilities 
+(files ended by .visu in the given examples).
+
+The Perl scripts decroi1 and decroi2 contained in ./src/scripts 
+are useful to extract the decrease of the cost function from 
+a file containing the output of a calib execution. Use decroi1 
+if the output is given by the Quasi-Newton algorithm without 
+constraints and decroi2 if the output is given by the Quasi-Newton 
+algorithm with bounds.
+
+The subdirectory ./doc contains this documentation. \\
+See the file ./doc/documentation\_code.ps. 
+
+\section{Implementation}
+
+We give here the list of the files containing the different routines
+used for:
+\begin{itemize}
+\item
+Dupire's PDE and bicubic splines: DupirePDE.c, solveSystem.c, 
+sparse.c, spline.c;
+\item
+Objective function and its gradient: objFunction.c, grad.c, 
+gradFiniteDiff.c, utilsGrad.c. Notice that, in this version of 
+the code, the gradient of the objective function is computed by 
+finite differences (gradFiniteDiff.c). However, a computation 
+using an adjoint state technique has been implemented and tested 
+(grad.c, utilsGrad.c) but the code, which has not been 
+optimized, is lower than a computation by finite differences. 
+The computation by adjoint state could be improved in a 
+next version;
+\item
+Quasi-Newton without constraints: QuasiNewton.c, BFGSupdate.c, 
+cholesky.c, lineSearch.c, stopping.c, testing.c. 
+See Barette~\cite{bar:optim:02} for details concerning this 
+optimization algorithm;
+\item
+Quasi-Newton with bounds: routines.f. See Nocedal 
+{\em et~al.}~\cite{noce:siam:95,noce:acm:97} for more details. 
+Notice that this code written in Fortran has been interfaced with 
+our C program calib.c;
+\item 
+in/out files: inout.c. 
+\end{itemize}
+
+\section{Programs}
+\label{SEC:PROGRAMS}
+
+\subsection{Program simul}
+\label{SSEC:SIMUL}
+
+The program simul computes option prices from given $S_0$, $r$, $q$ 
+and volatility ($\sigma$) parameters :
+\begin{itemize}
+\item
+using Dupire's PDE; 
+\item
+using Black-Scholes formulae with $\sigma = {\rm Constant}$;
+\item
+using Black-Scholes formulae with $\sigma = \sigma(t)$.
+\end{itemize}
+If Dupire is used, $\sigma$ can be given by the function sigma\_func 
+(defined in spline.c) or by its bicubic spline degrees of freedom 
+on a coarse grid $n \times m$, given by the file name\_ddl. This 
+file contains: 
+$n$, $m$, $y_0$, ..., $y_n$, $t_0$, ..., $t_m$, ddl $\rightarrow$ 
+$(n+3)(m+3)$ values.\\
+If Black-Scholes (with $\sigma = {\rm Constant}$) is used, $\sigma$ is 
+given by sigmaCte.\\
+If Black-Scholes (with $\sigma = \sigma(t)$) is used, the function 
+intSigma (defined in DupirePDE.c) has to be defined:
+$$
+{\rm intSigma} = \frac{1}{T-t_0}\int_{t_0}^T \sigma^2(t)dt.
+$$
+The option prices can be computed:
+\begin{itemize}
+\item
+on a rectangular grid given by the file name\_in\_visu. This file 
+contains:
+$n_{visu}$, $m_{visu}$, $K_0$, ..., $K_{n_{visu}}$, $t_0$, ..., 
+$t_{m_{visu}}$. In this case, the prices are saved in the file 
+name\_out\_visu: $n_{visu}$, $m_{visu}$, $K_0$, ..., $K_{n_{visu}}$, 
+$t_0$, ..., $t_{m_{visu}}$, $V_{0,0}$, ..., $V_{0,m_{visu}}$, ..., 
+$V_{n_{visu},0}$, ..., $V_{n_{visu},m_{visu}}$  
+where 
+$$
+V_{i,j} = V(K_i,T_j);
+$$
+\item
+for strikes-maturities $(K_i,T_j)$ given by the file name\_in\_data.
+In this case, the prices are saved in the file name\_out\_data containing 
+three columns: $K_i$ $T_j$ $V_{i,j}$.
+\end{itemize}
+
+The input file simul.in contains the following data:
+\begin{verbatim}
+###################### VARIABLES S_0, R, Q AND OPTIONTYPE ######################
+S_0 : price of the underlying asset at t=t_0
+r : risk-free rate     
+q : dividends (continuously compounded) 
+optionType : type of the option (1 for call, 0 for put)  
+########################### DUPIRE OR BLACK-SCHOLES ? ##########################
+optionSimul :
+  1 for PDE Dupire                --> t_0, T_max, y_min, y_max, N, M, gridType
+                                  --> theta, name_ddl or sigma_func (spline.c)
+  2 for Black-Scholes (sigma cte) --> sigmaCte
+  3 for Black-Scholes (sigma(t))  --> intSigma (DupirePDE.c)
+########################### IF OPTIONSIMUL=1 (DUPIRE) ##########################
+t_0 : time origin
+T_max : maximal maturity (in year)
+y_min : --> S_min=exp(y_min)     
+y_max : --> S_max=exp(y_max)
+N : number of space steps of the fine grid
+M : number of time steps of the fine grid
+gridType : type of the y_fineGrid (0 for regular, 1 for tanh)
+theta : type of scheme used
+name_ddl : name of the file containing the degrees of freedom of sigma
+  Type "_" if sigma has to be defined from the function sigma_func (spline.c)
+############# IF OPTIONSIMUL=2 (B-S WITH SIGMA CONSTANT) #######################
+sigmaCte : value of sigma
+################################# FILES IN/OUT #################################
+name_in_visu : name of the file containing the visualization parameters
+  Type "_" if no visualization is required
+name_out_visu : name of the out file containing the prices to be visualized
+  used if name_in_visu is not given by "_"
+name_in_data : name of the file containing Ki and Tj
+  Type "_" if no data have to be computed
+name_out_data : name of the out file containing Ki, Tj and the prices Vij
+  used if name_in_data is not given by "_"
+\end{verbatim}
+
+\subsection{Program calib}
+\label{SSEC:CALIB}
+
+The program calib computes the volatility $\sigma$ from given values of 
+$S_0$, $r$, $q$ and option prices, by minimizing the following cost 
+function: 
+$$
+F(\sigma) = G(\sigma) + \lambda F_1(\sigma) 
+= \frac{1}{2} \| V(\sigma) - \tilde{V} \|^2 + 
+\lambda \| \nabla \sigma \|^2
+$$
+with : 
+\begin{itemize}
+\item
+$V(\sigma)$ denotes the computed option prices with Dupire's PDE;
+\item
+$\tilde{V}$ the option prices given by the market;
+\item
+$\|.\|$ the Euclidean norm;
+\item
+$\lambda$ the coefficient of regularization.
+\end{itemize}
+The data prices are contained in the file name\_in\_data which has three 
+columns: $K_i$ $T_j$ $\tilde{V}_{i,j}$ with 
+$$
+\tilde{V}_{i,j} = \tilde{V}(K_i,T_j).
+$$
+The minimization algorithm is defined by choice\_optim:
+\begin{itemize}
+\item
+$1$ $\rightarrow$ Quasi-Newton without constraints (implemented by 
+V. Barette~\cite{bar:optim:02});
+\item
+$2$ $\rightarrow$ Quasi-Newton with bounds (implemented by Nocedal 
+et al.~\cite{noce:siam:95,noce:acm:97}).
+\end{itemize}
+In each case, some parameters concerning the optimization can be 
+defined by the file name\_in\_optim.\\
+If ${\rm choice\_optim} = 1$ (Q-N), name\_in\_optim contains:
+\begin{itemize}
+\item 
+gradtol : tolerance on the relative gradient;
+\item 
+steptol : tolerance on the relative change of $x$;
+\item 
+verbosity : level of printed information ($0 \rightarrow 3$);
+\item 
+saveSuccessiveXinFile : save successive x0 in the file data.out 
+($0$ or $1$);
+\item 
+maxCounter : maximum number of iterations;
+\item 
+$\lambda$ : coefficient of $F_1$ in the objective function: 
+$F = G + \lambda F_1$.
+\end{itemize}
+If ${\rm choice\_optim} = 2$ (Q-N with bounds), name\_in\_optim 
+contains:
+\begin{itemize}
+\item 
+pgtol : tolerance on the infinity norm of the projected gradient;
+\item 
+factr : tolerance on the change of the objective function;
+\item 
+iprint : level of printed information;
+\item 
+maxCounter : maximum number of iterations;
+\item 
+$\sigma_{min}$ : minimal bound on sigma;
+\item 
+$\sigma_{max}$ : maximal bound on sigma;
+\item
+$\lambda$ : coefficient of $F_1$ in the objective function: 
+$F = G + \lambda F_1$.
+\end{itemize}
+The initial volatility is given by its bicubic spline degrees of 
+freedom on a coarse grid $n \times m$, given by the file 
+name\_in\_sigmainit\_ddl. This file contains: 
+$n$, $m$, $y_0$, ..., $y_n$, $t_0$, ..., $t_m$, ddl $\rightarrow$ 
+$(n+3)(m+3)$ values. At the end of the calibration algorithm, the 
+degrees of freedom are saved in the file name\_out\_sigmaest\_ddl. 
+In order to visualize the volatilities, the initial and the estimated 
+$\sigma$ can also be computed on a rectangular grid given by the file 
+name\_in\_sigma\_visu. This file contains: 
+$n_{visu}$, $m_{visu}$, $S_0$, ..., $S_{n_{visu}}$, $t_0$, ..., 
+$t_{m_{visu}}$. The values of the initial and the estimated $\sigma$ on 
+the rectangular grid are saved in the files name\_out\_sigmainit\_visu 
+and name\_out\_sigmaest\_visu respectively. These files contain:
+$n_{visu}$, $m_{visu}$, $S_0$, ..., $S_{n_{visu}}$, $t_0$, ..., 
+$t_{m_{visu}}$, $\sigma_{0,0}$..$\sigma_{0,m_{visu}}$ ... 
+$\sigma_{n_{visu},0}$..$\sigma_{n_{visu},m_{visu}}$ where 
+$$
+\sigma_{i,j} = \sigma_{S_i,t_j}.
+$$
+
+The input file calib.in contains the following data:
+\begin{verbatim}
+###################### VARIABLES S_0, R, Q AND OPTIONTYPE ######################
+S_0 : price of the underlying asset at t=t_0
+r : risk-free rate     
+q : dividends (continuously compounded) 
+optionType : type of the option (1 for call, 0 for put)  
+##################################### DUPIRE ###################################
+t_0 : time origin
+T_max : maximal maturity (in year)
+y_min : --> S_min=exp(y_min)     
+y_max : --> S_max=exp(y_max)
+N : number of space steps of the fine grid
+M : number of time steps of the fine grid
+gridType : type of the y_fineGrid (0 for regular, 1 for tanh)
+theta : type of scheme used
+################################## OPTIMIZATION ################################
+choice_optim : choice of the optimization method (1-->QN, 2-->QN with bounds)
+################################# FILES IN/OUT #################################
+name_in_optim : name of the file containing the optimization parameters
+name_in_data : name of the file containing the data prices
+name_in_sigmainit_ddl : name of the file containing the degrees of freedom of
+  the initial sigma
+name_out_sigmaest_ddl : name of the file containing the degrees of freedom of
+  the estimated sigma
+name_in_sigma_visu : name of the file containing the visualization parameters
+  Type "_" if no visualization is required
+name_out_sigmainit_visu : name of the out file containing the initial sigma 
+  to be visualized (Type "_" is no visualization is required)
+name_out_sigmaest_visu : name of the out file containing the estimated sigma
+  to be visualized (Type "_" is no visualization is required)
+\end{verbatim}
+
+\subsection{Program rafsig}
+\label{SSEC:RAFSIG}
+
+The program rafsig computes the bicubic spline degrees of freedom 
+of the volatility $\sigma$ on a grid $n_2 \times m_2$, from its degrees 
+of freedom on a coarser grid $n_1 \times m_1$. The volatility on the grid 
+$n_1 \times m_1$ is given by the file name\_in\_sigma1\_ddl. This file 
+contains: $n_1$, $m_1$, $y_0$, ..., $y_{n_1}$, $t_0$, ..., $t_{m_1}$, 
+ddl $\rightarrow$ $(n+3)(m+3)$ values. The grid $n_2 \times m_2$ is 
+obtained by splitting the grid $n_1 \times m_1$ in $nbsplit_y$ 
+subdivisions in $y$ and $nbsplit_T$ subdivisions in $T$. The subdivisions 
+are regular on the grid $[K,T]$: 
+Grid1 $[Y,T]$ $\rightarrow$ Grid1 $[K,T]$ splitted regularly w.r.t 
+$nbsplit_y$ and $nbsplit_T$ $\rightarrow$ Grid2 $[K,T]$ $\rightarrow$ 
+Grid2 $[Y,T]$. The volatility on the grid $n_2 \times m_2$ is saved in the 
+file name\_out\_sigma2\_ddl: 
+$n_2$, $m_2$, $y_0$, ..., $y_{n_2}$, $t_0$, ..., $t_{m_2}$, 
+ddl $\rightarrow$ $(n+3)(m+3)$ values.
+
+The input file rafsig.in contains the following data:
+\begin{verbatim}
+################################# FILES IN/OUT #################################
+name_in_sigma1_ddl : name of the file containing the ddl
+nbsplit_y : number (integer) of subdivisions in y
+nbsplit_T : number (integer) of subdivisions in T
+name_out_sigma2_ddl : name of the out file containing the new ddl
+\end{verbatim}
+
+\subsection{Program visusig}
+\label{SSEC:VISUSIG}
+
+The program visusig computes the volatility $\sigma$ on a rectangular 
+grid from its bicubic spline degrees of freedom. It is useful to 
+visualize $\sigma$. The volatility on the grid $n \times m$ is given by 
+the file name\_in\_sigma\_ddl. This file contains: 
+$n$, $m$, $y_0$, ..., $y_n$, $t_0$, ..., $t_m$, 
+ddl $\rightarrow$ $(n+3)(m+3)$ values. The rectangular grid is given by 
+the file name\_in\_sigma\_visu containing: 
+$n_{visu}$, $m_{visu}$, $S_0$, ..., $S_{n_{visu}}$, $t_0$, ..., 
+$t_{m_{visu}}$. The values of $\sigma$ on the rectangular grid are saved 
+in the file name\_out\_sigma\_visu: 
+$n_{visu}$, $m_{visu}$, $S_0$, ..., $S_{n_{visu}}$, $t_0$, ..., 
+$t_{m_{visu}}$, $\sigma_{0,0}$..$\sigma_{0,m_{visu}}$ ... 
+$\sigma_{n_{visu},0}$..$\sigma_{n_{visu},m_{visu}}$ where 
+$$
+\sigma_{i,j} = \sigma_{S_i,t_j}.
+$$
+
+The input file visusig.in contains the following data:
+\begin{verbatim}
+################################# FILES IN/OUT #################################
+name_in_sigma_ddl : name of the file containing the ddl
+name_in_sigma_visu : name of the file containing the visualization parameters
+name_out_sigma_visu : name of the out file containing sigma 
+\end{verbatim}
+
+\subsection{Program impsig}
+\label{SSEC:IMPSIG}
+
+The program impsig computes the implied volatilities from given 
+$S_0$, $r$, $q$, optionType, $t_0$ and option prices. The data prices 
+are contained in the file name\_in\_data which has three 
+columns: $K_i$ $T_j$ $V_{i,j}$ with 
+$$
+V_{i,j} = V(K_i,T_j).
+$$
+The implied volatilities are saved in the file name\_out\_sigma which 
+has three columns: $K_i$ $T_j$ $\sigma_{i,j}$ with 
+$$
+\sigma_{i,j} = {\rm Implied\_Sigma}(K_i,T_j).
+$$
+
+The input file impsig.in contains the following data:
+\begin{verbatim}
+#################### VARIABLES S_0, R, Q, OPTIONTYPE AND T_0 ###################
+S_0 : price of the underlying asset at t=t_0
+r : risk-free rate     
+q : dividends (continuously compounded) 
+optionType : type of the option (1 for call, 0 for put)  
+t_0 : time origin
+################################# FILES IN/OUT #################################
+name_in_data : name of the file containing Ki, Tj and V_ij
+name_out_sigma : name of the file containing Ki, Tj and impsigma_ij
+\end{verbatim}
+
+\section{Examples}
+
+The following files are contained in the subdirectory ./src/example.
+
+\subsection{simul.in}
+
+This is the file simul.in used to build the synthetic data with 
+$$
+\sigma_{true}(S,t) = 0.05 
++ 0.1 \exp \left( -\frac{S}{100} \right) + 0.5 t
+$$
+(see~\cite{bcv:inria:02}).
+
+\begin{verbatim}
+################################################################################
+###################### VARIABLES S_0, R, Q AND OPTIONTYPE ######################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+100
+# r : risk-free rate     
+0.05
+# q : dividends (continuously compounded) 
+0.02
+# optionType : type of the option (1 for call, 0 for put)  
+1
+################################################################################
+########################### DUPIRE OR BLACK-SCHOLES ? ##########################
+################################################################################
+# optionSimul :
+#   1 for PDE Dupire                --> t_0, T_max, y_min, y_max, N, M, gridType
+#                                   --> theta, name_ddl or sigma_func (spline.c)
+#   2 for Black-Scholes (sigma cte) --> sigmaCte
+#   3 for Black-Scholes (sigma(t))  --> intSigma (DupirePDE.c)
+1
+################################################################################
+########################### IF OPTIONSIMUL=1 (DUPIRE) ##########################
+################################################################################
+# t_0 : time origin
+0
+# T_max : maximal maturity (in year)
+1
+# y_min : --> S_min=exp(y_min)     
+-5.29831736654804
+# y_max : --> S_max=exp(y_max)
+5.29831736654804
+# N : number of space steps of the fine grid
+400
+# M : number of time steps of the fine grid
+100
+# gridType : type of the y_fineGrid (0 for regular, 1 for tanh)
+0
+# theta : type of scheme used
+.5
+# name_ddl : name of the file containing the degrees of freedom of sigma
+#   Type "_" if sigma has to be defined from the function sigma_func (spline.c)
+_
+################################################################################
+############# IF OPTIONSIMUL=2 (B-S WITH SIGMA CONSTANT) #######################
+################################################################################
+# sigmaCte : value of sigma
+.2
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_visu : name of the file containing the visualization parameters
+#   Type "_" if no visualization is required
+visuprices
+# name_out_visu : name of the out file containing the prices to be visualized
+#   used if name_in_visu is not given by "_"
+dupireprices.visu
+# name_in_data : name of the file containing Ki and Tj
+#   Type "_" if no data have to be computed
+dataprices
+# name_out_data : name of the out file containing Ki, Tj and the prices Vij
+#   used if name_in_data is not given by "_"
+dupireprices.data
+\end{verbatim}
+
+The files visuprices and dataprices are also contained in the subdirectory 
+./src/examples. The function sigma\_func defined in spline.c is:
+\begin{verbatim}
+double sigma_func(double S, double t){
+/* OUTPUT
+   - returns sigma(S,t)
+   INPUTS
+   - S
+   - t   */
+  return 0.01+0.1*exp(-S/100)+0.01*t;
+}
+\end{verbatim}
+After execution of simul, the output files are dupireprices.visu and 
+dupireprices.data. The latter file is:
+\begin{verbatim}
+90.000000 0.500000 13.149445
+92.000000 0.500000 11.726255
+94.000000 0.500000 10.392428
+96.000000 0.500000 9.149493
+98.000000 0.500000 7.997157
+100.000000 0.500000 6.956789
+102.000000 0.500000 6.018150
+104.000000 0.500000 5.166235
+106.000000 0.500000 4.395305
+108.000000 0.500000 3.737694
+110.000000 0.500000 3.154494
+90.000000 1.000000 20.477956
+92.000000 1.000000 19.401076
+94.000000 1.000000 18.367679
+96.000000 1.000000 17.376526
+98.000000 1.000000 16.426167
+100.000000 1.000000 15.521834
+102.000000 1.000000 14.659627
+104.000000 1.000000 13.834786
+106.000000 1.000000 13.045292
+108.000000 1.000000 12.301597
+110.000000 1.000000 11.592354
+\end{verbatim}
+
+\subsection{calib.in}
+
+This is the file calib.in used to estimate a local volatility from 
+real option prices (see~\cite{bcv:inria:02}).
+
+\begin{verbatim}
+################################################################################
+###################### VARIABLES S_0, R, Q AND OPTIONTYPE ######################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+590
+# r : risk-free rate     
+0.06
+# q : dividends (continuously compounded) 
+0.0262
+# optionType : type of the option (1 for call, 0 for put)  
+1
+################################################################################
+##################################### DUPIRE ###################################
+################################################################################
+# t_0 : time origin
+0
+# T_max : maximal maturity (in year)
+2
+# y_min : --> S_min=exp(y_min)     
+-7
+# y_max : --> S_max=exp(y_max)
+7
+# N : number of space steps of the fine grid
+400
+# M : number of time steps of the fine grid
+100
+# gridType : type of the y_fineGrid (0 for regular, 1 for tanh)
+0
+# theta : type of scheme used
+.5
+################################################################################
+################################## OPTIMIZATION ################################
+################################################################################
+# choice_optim : choice of the optimization method (1-->QN, 2-->QN with bounds)
+2
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_optim : name of the file containing the optimization parameters
+optim2.in
+# name_in_data : name of the file containing the data prices
+sp500prices.data
+# name_in_sigmainit_ddl : name of the file containing the degrees of freedom of
+#   the initial sigma
+sigmainit_n1m1_0_013.ddl
+# name_out_sigmaest_ddl : name of the file containing the degrees of freedom of
+#   the estimated sigma
+v2_008_1_sigmaest_n1m1_0_013.ddl
+# name_in_sigma_visu : name of the file containing the visualization parameters
+#   Type "_" if no visualization is required
+visusigma
+# name_out_sigmainit_visu : name of the out file containing the initial sigma 
+#   to be visualized (Type "_" is no visualization is required)
+sigmainit_n1m1_0_013.visu
+# name_out_sigmaest_visu : name of the out file containing the estimated sigma
+#   to be visualized (Type "_" is no visualization is required)
+v2_008_1_sigmaest_n1m1_0_013.visu
+\end{verbatim}
+
+The files optim2.in, sp500prices.data, sigmainit\_n1m1\_0\_013.ddl and 
+visusigma are contained in the subdirectory ./src/examples. Here, we 
+employ a Quasi-Newton algorithm with bounds 0.08-1 as we can see 
+in the file optim2.in:
+
+\begin{verbatim}
+# pgtol : tolerance on the infinity norm of the projected gradient
+0.00001
+# factr : tolerance on the change of the objective function
+10000000
+# iprint : level of printed information
+1
+# maxCounter : maximum number of iterations
+30
+# sigma_min : minimal bound on sigma
+0.08
+# sigma_max : maximal bound on sigma
+1.0
+# lambda : coeff of F1 in the obj function : F = G+lambda*F1
+0
+\end{verbatim}
+
+We also give an example of file optim.in which could be used 
+with a Quasi-Newton algorithm without constraints, namely 
+if ${\rm choice\_optim} = 1$:
+
+\begin{verbatim}
+# gradtol : tolerance on the relative gradient
+0.0000000001
+# steptol : tolerance on the relative change of x
+0.0000000001
+# verbosity : level of printed information (0 --> 3)
+3
+# saveSuccessiveXinFile : save succesive x0 in the file data.out (0 ou 1)
+0
+# maxCounter : maximum number of iterations
+30
+# lambda : coeff of F1 in the obj function : F = G+lambda*F1
+0
+\end{verbatim}
+
+\subsection{rafsig.in}
+
+This file rafsig.in could be used at the end of the previous calib 
+execution in order to discretize the estimated volatility from 
+a grid $1 \times 1$ to a grid $3 \times 3$ (multiscale 
+approach).
+
+\begin{verbatim}
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_sigma1_ddl : name of the file containing the ddl
+v2_008_1_sigmaest_n1m1_0_013.ddl
+# nbsplit_y : number (integer) of subdivisions in y
+3
+# nbsplit_T : number (integer) of subdivisions in T
+3
+# name_out_sigma2_ddl : name of the out file containing the new ddl
+v2_008_1_sigmainit_n3m3_0_013.ddl
+\end{verbatim}
+
+\subsection{visusig.in}
+
+This is an example of file visusig.in allowing us to visualize the 
+estimated volatility on a grid defined by visusigma.
+
+\begin{verbatim}
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_sigma_ddl : name of the file containing the ddl
+v2_008_1_sigmaest_n1m1_0_013.ddl
+# name_in_sigma_visu : name of the file containing the visualization parameters
+visusigma
+# name_out_sigma_visu : name of the out file containing sigma 
+v2_008_1_sigmaest_n1m1_0_013.visu
+
+\end{verbatim}
+
+\subsection{impsig.in}
+
+This is a file impsig.in used to compute the implied volatilities from 
+the options prices defined in sp500prices.data.
+
+\begin{verbatim}
+################################################################################
+#################### VARIABLES S_0, R, Q, OPTIONTYPE AND T_0 ###################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+590
+# r : risk-free rate     
+0.06
+# q : dividends (continuously compounded) 
+0.0262
+# optionType : type of the option (1 for call, 0 for put)  
+1
+# t_0 : time origin
+0
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_data : name of the file containing Ki, Tj and V_ij
+sp500prices.data
+# name_out_sigma : name of the file containing Ki, Tj and impsigma_ij
+#v2_008_1_sigmaest_n12m12_0_013.t0175impsigdata
+sp500impsig2.data
+\end{verbatim}
+
+\section{Bugs}
+
+Be careful of the following bug. After execution of rafsig, 
+the numbers $y_0$ and $y_n$ written in the file .ddl are 
+truncated by the fprintf function and they do not correspond 
+exactly to $y_{min}$ and $y_{max}$ given in calib.in. For 
+example, -5.298317 is written instead of -5.29831736654804. 
+This fact produces a bug if you want to execute calib. To 
+solve this problem, you have to edit the file .ddl and 
+write manually $y_0$ and $y_n$ (5.29831736654804 and 
+-5.29831736654804 in our example).
+
+Be careful to enter numbers and names of files in the 
+files simul.in, calib.in, etc. without any blank or 
+tab at the end, because our syntaxic analyzer does not 
+take into account these cases.
+
+\newpage
+\bibliography{biblio}
+\bibliographystyle{plain}
+
+\end{document}

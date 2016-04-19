@@ -1,0 +1,24 @@
+add_library (libpad OBJECT
+	asiancallfixedamer.c
+	asiancallfixedeuro.c
+	asiancallfloatingamer.c
+	asiancallfloatingeuro.c
+	asianputfixedamer.c
+	asianputfixedeuro.c
+	asianputfloatingamer.c
+	asianputfloatingeuro.c
+	lookbackcallfixedamer.c
+	lookbackcallfixedeuro.c
+	lookbackcallfloatingamer.c
+	lookbackcallfloatingeuro.c
+	lookbackputfixedamer.c
+	lookbackputfixedeuro.c
+	lookbackputfloatingamer.c
+	lookbackputfloatingeuro.c
+    movingaveragecallfixedamer.c
+    movingaveragecallfloatingamer.c
+    movingaverageputfixedamer.c
+    movingaverageputfloatingamer.c
+	pad.c
+	cliquet.c
+)

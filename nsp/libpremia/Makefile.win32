@@ -1,0 +1,26 @@
+# -*- mode: Makefile -*-
+## dans le Makelib généré par nsp linux, changer le path de nsp pour
+## /usr/local/src/nsp2-mingw32
+## make -f Makelib
+## terminer la création de la dll avec la cible ci-dessous
+
+
+# creation du dll 
+
+all:  shared-win32 
+
+ARGS=../../lib/libpremia.dll ../../lib/libpnl.dll -lstdc++  -lm
+NSPDIR=/usr/local/src/nsp2
+PNLWIN32DIR=/home/jl/devel/pnl-git/build-win32
+NSPWIN32DIR=/home/jl/.wine/drive_c/Program Files/nsp2
+OBJS=premiamod.o premia_wrap.o premia_vars.o libpremiamodel.o
+
+shared-win32:: $(OBJS) 
+	gcc -mno-cygwin -shared -o libpremiamodel.dll $(OBJS)  $(ARGS) \
+		-Wl,--export-all-symbols -Wl,--allow-multiple-definition \
+		-Wl,--enable-auto-import   \
+		 -Xlinker --out-implib -Xlinker libpremiamodel.dll.a ../../lib/libpnl.dll.a ../../lib/libpremia.dll.a "$(NSPWIN32DIR)/bin/libnsp.dll.a"
+
+
+%.o: %.c
+	i686-pc-mingw32-gcc -c $< -I$(NSPDIR)/src/include -I../../include -I$(PNLWIN32DIR)/include

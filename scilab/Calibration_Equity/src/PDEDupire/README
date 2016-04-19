@@ -1,0 +1,41 @@
+  MATHFI Project, Inria Rocquencourt.
+  Sophie Volle and Jean-Marc Cognet, November 2002.
+
+The source files of the calibration code are in the subdirectory:
+ ./src
+
+To compile the five programs simul, calib, rafsig, visusig and 
+impsig:
+ cd ./src
+ make or make all
+or you can compile each program separately:
+ make simul
+ make calib
+etc.
+
+You can execute each program from other test subdirectories 
+(e.g. by creating ./tests). Make sure that the subdirectory 
+./src containing the programs (after compilation) is in 
+your Unix environment variable PATH.
+
+To execute a program, e.g. calib, from a test subdirectory, 
+you have to edit a file ended by .in, calib.in in this case. 
+You can find examples of files simul.in, calib.in, etc. 
+in the subdirectory ./src/examples.
+
+The subdirectory ./src/matlab contains useful programs 
+to visualize the results with Matlab. For instance, 
+vprice.m (type help vprice in Matlab to have the documentation) 
+allows us the visualize option prices or volatilities 
+(files ended by .visu in the given examples).
+
+The scripts Perl decroi1 and decroi2 contained in ./src/scripts 
+are useful to extract the decrease of the cost function from 
+a file containing the output of a calib execution. Use decroi1 
+if the output is given by the Quasi-Newton algorithm without 
+constraints and decroi2 if the output is given by the Quasi-Newton 
+algorithm with bounds.
+
+The subdirectory ./doc contains the documentation of the code 
+containing more details concerning the execution of each programs. 
+See the file ./doc/documentation_code.ps. 

@@ -1,0 +1,21 @@
+################################################################################
+#################### VARIABLES S_0, R, Q, OPTIONTYPE AND T_0 ###################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+590
+# r : risk-free rate     
+0.06
+# q : dividends (continuously compounded) 
+0.0262
+# optionType : type of the option (1 for call, 0 for put)  
+1
+# t_0 : time origin
+0
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_data : name of the file containing Ki, Tj and V_ij
+sp500prices.data
+# name_out_sigma : name of the file containing Ki, Tj and impsigma_ij
+#v2_008_1_sigmaest_n12m12_0_013.t0175impsigdata
+sp500impsig2.data

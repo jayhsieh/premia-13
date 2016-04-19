@@ -1,0 +1,135 @@
+\section{Some bindings}
+
+% --------------------------------------------------------------------- %%
+% MPI
+\subsection{MPI bindings}
+\subsubsection{Overview}
+
+We provide some bindings for the MPI library to natively handle {\it PnlObjects}.
+
+The functionnalities described in this chapter are declared in \verb!pnl/pnl_mpi.h!.
+
+\subsubsection{Functions}
+
+All the following functions return an error code as an integer value. This
+returned value should be tested against \var{MPI_SUCCESS} to check that no
+error occurred.
+
+\begin{itemize}
+\item \describefun{int}{pnl_object_mpi_pack_size}{const
+    \refstruct{PnlObject} \ptr Obj, MPI_Comm comm, int \ptr size}
+  \sshortdescribe Compute in \var{size} the amount of space needed to pack \var{Obj}.
+\item \describefun{int}{pnl_object_mpi_pack}{const \refstruct{PnlObject}
+    \ptr Obj, void \ptr buf, int bufsize, int \ptr pos, MPI_Comm comm}
+  \sshortdescribe Pack \var{Obj} into \var{buf} which must be at least of
+  length \var{size}. \var{size} must be at least equal to the value returned
+  by \reffun{pnl_object_mpi_pack_size}. 
+\item \describefun{int}{pnl_object_mpi_unpack}{\refstruct{PnlObject} \ptr
+    Obj, void \ptr buf, int bufsize, int \ptr pos, MPI_Comm comm}
+  \sshortdescribe Unpack the content of \var{buf} starting at position
+  \var{pos} (unless several objects have been packed contiguously, \var{\ptr
+    pos} should be equal to \var{0}). \var{buf} is a contigous memery area
+  of length \var{bufsize} (note that the size is counted in bytes).
+  \var{pos} is incremented and is on output the first location in the input
+  buffer after the locations occupied by the message that was
+  unpacked. \var{pos} is properly set for a future call to {\it MPI_Unpack}
+  if any.
+  
+\item \describefun{int}{pnl_object_mpi_send}{const \refstruct{PnlObject}
+    \ptr Obj, int dest, int tag, MPI_Comm comm}
+  \sshortdescribe Perform a standard-mode blocking send of \var{Obj}. The
+  object is sent to the process with rank \var{dest}.
+
+\item \describefun{int}{pnl_object_mpi_ssend}{const \refstruct{PnlObject} \ptr
+    Obj, int dest, int tag, MPI_Comm comm}
+  \sshortdescribe Perform a standard-mode synchronous blocking send of
+  \var{Obj}. The object is sent to the process with rank \var{dest}.
+  
+\item \describefun{int}{pnl_object_mpi_recv}{\refstruct{PnlObject} \ptr Obj,
+    int src, int tag, MPI_Comm comm, MPI_Status \ptr status} 
+  \sshortdescribe Perform a standard-mode blocking receive of \var{Obj}. The
+  object is sent to the process with rank \var{dest}. Note that \var{Obj}
+  should be an already allocated object and that its type should match the
+  true type of the object to be received. \var{src} is the rank of the
+  process who sent the object.
+
+  
+\item \describefun{int}{pnl_object_mpi_bcast}{\refstruct{PnlObject} \ptr
+    Obj, int root, MPI_Comm comm}
+  \sshortdescribe Broadcast the object \var{Obj} from the process with rank
+  \var{root} to all other processes of the group \var{comm}.
+
+\item \describefun{int}{pnl_object_mpi_reduce}{\refstruct{PnlObject} \ptr Recvbuf, const
+  \refstruct{PnlObject} \ptr Sendbuf, MPI_Op op, int root, MPI_Comm comm}
+  \sshortdescribe Perform the reduction described by \var{op} on
+  the objects \var{Sendbuf} and stores the result into \var{Recvbuf}. Note that
+  \var{Recvbuf} and \var{Sendbuf} must be of the same type. The argument
+  \var{root} is the index of the root process and \var{comm} is a communicator.
+  Not all reductions are implemented for all types. Here is the list of
+  compatible reductions
+
+  \begin{center}
+  \begin{tabular}{l@{\hskip 1em}|@{\hskip 1em}l}
+
+    MPI_SUM            & PnlVect, PnlVectInt, PnlVectComplex, \\
+                       & PnlMat, PnlMatInt, PnlMatComplex \\
+    \hline
+    MPI_PROD, MPI_MAX, & PnlVect, PnlVectInt, PnlMat, PnlMatInt \\
+    MPI_MIN            & 
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+For more expect users, we provide the following nonblocking functions.
+\begin{itemize}
+\item \describefun{int}{pnl_object_mpi_isend}{const \refstruct{PnlObject}
+    \ptr Obj, int dest, int tag, MPI_Comm comm, MPI_Request \ptr request}
+  \sshortdescribe Start a standard-mode, nonblocking send of object
+  \var{Obj} to the process with rank \var{dest}.
+  
+  
+\item \describefun{int}{pnl_object_mpi_irecv}{void \ptr \ptr buf, int \ptr
+    size, int src, int tag, MPI_Comm comm, int \ptr flag, MPI_Request \ptr
+    request}
+  \sshortdescribe Start a standard-mode, nonblocking receive of object
+  \var{Obj} from the process with rank \var{root}. On output \var{flag} equals
+  to \var{TRUE} if the object can be received and \var{FALSE} otherwise (this
+  is the same as for {\it MPI_Iprobe}).
+\end{itemize}
+
+\subsection{The save/load interface}
+
+The interface is only accessible when the MPI bindings are compiled since it
+is based on the Packing/Unpacking facilities of MPI.
+
+The functionnalities described in this chapter are declared in \verb!pnl/pnl_mpi.h!.
+\begin{itemize}
+\item \describefun{\refstruct{PnlRng}\ptr \ptr}
+  {pnl_rng_create_from_file}{char \ptr str, int n}
+  \sshortdescribe Load \var{n} rng from the file of name \var{str} and
+  returns an array of \var{n} \refstruct{PnlRng}.
+\item \describefun{int}{pnl_rng_save_to_file}{\refstruct{PnlRng} \ptr \ptr
+    rngtab, int n, char \ptr str}
+    \sshortdescribe Save \var{n} rng stored in \var{rngtab} into the file of
+  name \var{str}.
+\item \describefun{int}{pnl_object_save}{PnlObject \ptr O, FILE *stream}
+  \sshortdescribe Save the object \var{O} into the stream \var{stream}. \var{stream}
+  is typically created by calling fopen with \var{mode="wb"}. This function can be
+  called several times to save several objects in the same stream.
+\item \describefun{PnlObject\ptr}{pnl_object_load}{FILE *stream}
+  \sshortdescribe Load an object from the stream \var{stream}. \var{stream}
+  is typically created by calling fopen with \var{mode="rb"}.  This function can be
+  called several times to load several objects from the same stream. If \var{stream}
+  was empty or it did not contain any PnlObjects, the function returns \var{NULL}.
+\item \describefun{PnlList\ptr}{pnl_object_load_into_list}{FILE *stream}
+  \sshortdescribe Load as many objects as possible from the stream \var{stream} and
+  stores them into a \refstruct{PnlList}. \var{stream} is typically created by
+  calling fopen with \var{mode="rb"}. If \var{stream} was empty or it did not contain
+  any PnlObjects, the function returns \var{NULL}.
+\end{itemize}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "pnl-manual"
+%%% End: 

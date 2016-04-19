@@ -1,0 +1,31 @@
+OBJECTS  =  main.o QuasiNewton.o BFGSupdate.o lineSearch.o cholesky.o  stopping.o testing.o 
+
+
+optim: main.o QuasiNewton.o BFGSupdate.o lineSearch.o cholesky.o  stopping.o testing.o
+	gcc -o optim main.o QuasiNewton.o lineSearch.o cholesky.o BFGSupdate.o testing.o stopping.o -lm
+
+main.o: main.c QuasiNewton.h BFGSupdate.h lineSearch.h cholesky.h stopping.h testing.h
+	gcc -c main.c
+
+QuasiNewton.o: QuasiNewton.c QuasiNewton.h BFGSupdate.h lineSearch.h cholesky.h stopping.h testing.h
+	gcc -c QuasiNewton.c
+
+BFGSupdate.o: BFGSupdate.c  BFGSupdate.h cholesky.h
+	gcc -c BFGSupdate.c
+
+lineSearch.o: lineSearch.c lineSearch.h
+	gcc -c lineSearch.c
+
+cholesky.o: cholesky.c cholesky.h
+	gcc -c cholesky.c
+
+stopping.o: stopping.c stopping.h
+	gcc -c stopping.c
+
+testing.o: testing.c testing.h
+	gcc -c testing.c	
+
+pure: $(OBJECTS) 
+	/usr/Rational/releases/purify-5.3-solaris2/purify -cache-dir=/afs/inria.fr/rocq/home/mathfi/volle/purifyVincent/cache gcc -o pure_optim $(OBJECTS) -lm
+
+

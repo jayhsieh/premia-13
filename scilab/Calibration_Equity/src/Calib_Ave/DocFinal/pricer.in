@@ -1,0 +1,17 @@
+#############################################################################
+##############Used Parameters To calibrate the Tree #########################
+########S_O= 100.000 r= 0.050 dividende q = 0.000 N=100 #####################
+#####prior sigma_0=0.215 sigma_min=0.100 sigma_min =0.460 sigmabar=0.480 ####
+############################################################
+###################### VARIABLES K, T, AND OPTIONTYPE #######################
+#############################################################################
+# K : Strik of the option to price
+100
+# T : Maturity of the option to price must be less then the
+# terminal date on the calibrated trinomial Tree =1.000
+1
+# optionType : type of the option (C for call, P for put)
+P
+#############################################################################
+
+

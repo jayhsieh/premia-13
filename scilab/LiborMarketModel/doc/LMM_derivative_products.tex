@@ -1,0 +1,105 @@
+\section{Derivative products}
+
+
+
+We note $B(t,T)$ the value of a zero coupon bond at time $t$ with maturity $T$.  
+
+We suppose the following date structure $\lbrace T_n=T_0+n\tau ; n=1..M \rbrace $ 
+
+the foward swap rate starting at date $T_s$ and ending at $T_M$ is given by 
+
+
+\ban
+S(t,T_s,T_M)=\frac{B(t,T_s)-B(t,T_M)}{\sum_{j=s+1}^{M}\tau B(t,T_j)}
+\ean
+
+the spot swap rate is $S(T_s,T_s,T_n)=S(T_s,T_M)$.
+
+We note $L(t,T_i,\tau)$ the forward rate which set at time $T_i$ the cash flow received at time $T_i+\tau$. Arbitrage leads to  
+
+\ba
+1+\tau L(t,T_i,\tau)=\frac{B(t,T_i)}{B(t,T_{i+1})} 
+\ea
+
+spot libor rate is given by 
+
+\ba
+1+\tau L(T_i,T_i,\tau)=\frac{1}{B(T_i,T_{i+1})} 
+\ea
+
+remark: it is a simple rate.
+
+
+Main products of interest for the libor Market Model
+
+{\bf Caplet and floorlet}
+suppose that  $t<T_M<T_{M+1}$
+
+\begin{itemize}
+\item we note $Cplt(t,T_M,K,\tau,N)$ the european caplet with  maturity $T_M$, strike $K$  on the spot libor rate $L(t,t,\tau)$ with  nominal value $N$ then at time $T_{M+1}=T_M+\tau$ the payoff is given by 
+\ban
+N \tau (L(T_M,T_M,\tau)-K)_+
+\ean
+
+\item we note $Flt(t,T_M,K,\tau,N)$ the european  floorlet  with maturity $T_M$, strike $K$  on the spot libor rate $L(t,t,\tau)$ with nominal value $N$ then at time $T_{M+1}=T_M+\tau$ the payoff is given by 
+
+\ban
+N \tau (K-L(T_M,T_M,\tau))_+
+\ean
+\end{itemize}
+
+the cash flow at time $T_{M+1}=T_M+\tau$ is fixed at time $T_M$
+
+
+
+{\bf Cap and floor} 
+suppose that  $t=T_0<T_1<..<T_M$
+\begin{itemize}
+\item we note $Cap(t,T_s,T_M,K,\tau , N )$ the european  cap with maturity  $T_M$, strike $K$  on the spot rate $L(t,t,\tau)$ then at times $T_{s+1},...,T_M$ the option leads the cash flows  $N \tau (L(T_{s},T_{s},\tau)-K)_+, N \tau (L(T_{s+1},T_{s+1},\tau)-K)_+,.., N\tau (L(T_{M-1},T_{M-1},\tau)-K)_+$ ie 
+
+\ban
+\textrm{at $T_i$  cash flow } N \tau (L(T_{i-1},T_{i-1},\tau)-K)_+
+\ean
+
+\item we  note $Floor(t,T_s,T_M,K,\tau , N)$ the european floor with maturity $T_M$, strike $K$  on the spot libor rate $L(t,t,\tau)$ then at times $T_{s+1},...,T_M$ the option leads the cash flows  $N \tau (K-L(T_s,T_s,\tau))_+,N \tau (K-L(T_{s+1}1,T_{s+1},\tau))_+,..,N \tau (K-L(T_{M-1},T_{M-1},\tau))_+$ 
+
+\ban
+\textrm{at  $T_i$  cash flow } N \tau (K-L(T_{i-1},T_{i-1},\tau))_+
+\ean
+
+\end{itemize}
+
+\begin{enumerate}
+\item a cap is a portfolio of  caplets 
+\ban
+Cap(t,T_s,T_M,K,\tau, N )=\sum_{i=s}^{M-1}Cplt(t,T_i,K,\tau , N )
+\ean
+\item a floor is a portfolio of floorlets
+\ban
+Floor(t,T_s,T_M,K,\tau , N )=\sum_{i=s}^{M-1} Flt(t,T_i,K,\tau , N )
+\ean
+\end{enumerate}
+
+{\bf Swaption} 
+we suppose that  $t<T_0<T_1<..<T_M$ and we note $S(t,t,T_M)$ the swap rate with maturity $T_M$
+\begin{itemize}
+\item we note $Swpt(t,T_s,T_M,K,\tau,N)$ the european payer swaption with maturity $T_s=T$,  strike $K$ and nominal $N$  on the swap rate  $S(t,t,T_M)$   then at $T_s$ the exercise leads the cash flows:
+
+
+\ban
+\textrm{at $T_i$  cash flow } N \tau (S(T_s,T_s,T_M)-K)_+ \quad \textrm{for }i=s+1..M
+\ean
+
+\item we note $Swpt(t,T_s,T_M,K,\tau,N)$ the european receiver swaption with maturity $T_s=T$,  strike $K$ and nominal $N$  on the swap rate  $S(t,t,T_M)$   then at $T_s$ the exercise leads the cash flows:
+
+
+\ban
+\textrm{at $T_i$  cash flow } N \tau (S(T_s,T_s,T_M)-K)_+ \quad \textrm{for }i=s+1..M
+\ean
+
+\end{itemize}
+
+
+
+
+

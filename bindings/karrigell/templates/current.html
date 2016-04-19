@@ -1,0 +1,339 @@
+<script type="text/html" id="current">
+<span class="error" data-bind="visible: errorResult(), text: errorResult()">
+</span>
+<table class="current">
+  <tr>
+    <td>
+      <table class="model">
+        <tr>
+          <th>Asset type:</th>
+          <th></th>
+          <th><select data-bind="options: assets, value: myAsset"></select></th>
+          <th></th>
+        </tr>
+        <tr>
+          <th>Model:</th>
+          <th></th>
+          <th>
+            <select data-bind="options: myModels, value: myModelProxy"></select>
+          </th>
+          <th>
+            <A data-bind="if: myModelHtml()(), attr: { href: '../'+myModelHtml()() }" target="_blank">
+              <IMG src="html-icon.png" border="0" height="24">
+            </A>
+          </th>
+        </tr>
+        <tbody data-bind="template: { name: 'row-template', foreach: myModelParams }">
+        </tbody>
+      </table>
+    </td>
+
+    <td>
+      <table class="option">
+        <tr>
+          <th>Family:</th>
+          <th></th>
+          <th><select data-bind="options: myFamilies()[0], value: myFamilyProxy"></select></th>
+          <th>
+            <A data-bind="if: myFamilyHtml()(), attr: { href: '../'+myFamilyHtml()() }" target="_blank">
+              <IMG src="html-icon.png" border="0" height="24">
+            </A>
+          </th>
+        </tr>
+        <tr>
+          <th>Option:</th>
+          <th></th>
+          <th><select data-bind="options: myOptions()[0], value: myOptionProxy"></select></th>
+          <th>
+            <A data-bind="if: myOptionHtml()(), attr: { href: '../'+myOptionHtml()() }" target="_blank">
+              <IMG src="html-icon.png" border="0" height="24">
+            </A>
+          </th>
+        </tr>
+        <tbody data-bind="template: { name: 'row-template', foreach: myOptionParams }">
+        </tbody>
+      </table>
+    </td>
+
+    <td>
+      <table class="pricing_method">
+        <tr>
+          <th>Pricing method:</th>
+          <th></th>
+          <th><select data-bind="options: myMethods, value: myMethod"></select></th>
+          <th>
+            <A data-bind="if: myMethodHtml()(), attr: { href: '../'+myMethodHtml()() }" target="_blank">
+              <IMG src="html-icon.png" border="0" height="24">
+            </A>
+          </th>
+        </tr>
+        <tbody data-bind="template: { name: 'row-template', foreach: myMethodParams }">
+        </tbody>
+        <tr>
+          <td></td>
+          <td></td>
+          <td><button id="Compute" data-bind="enable: paramsAreOk, text: (computing() ? 'Computing...' : 'Compute')"></button></td>
+          <td></td>
+        </tr>
+      </table>
+      <table data-bind="if: scalarResult" class="result">
+        <tr>
+          <th>Result:</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+        <!-- ko foreach: scalarResult -->
+          <!-- ko if: typeof($data[1])=="number" -->
+            <tr data-bind="css: { even: $index()%2==0 }">
+              <td colspan="2" class="keys" data-bind="text: $data[0]"></td>
+              <td colspan="2" class="values" data-bind="text: $data[1].toFixed(6)"></td>
+            </tr>
+          <!-- /ko -->
+          <!-- ko notif: typeof($data[1])=="number" -->
+            <!-- ko foreach: $data[1] -->
+              <tr data-bind="css: { even: $parentContext.$index()%2==0 }">
+                <!-- ko ifnot: $index -->
+                  <td colspan="2" class="keys" data-bind="text: $parentContext.$data[0], attr: { rowspan: $parentContext.$data[1].length }"></td>
+                <!-- /ko -->
+              <td colspan="2" class="values" data-bind="text: $data.toFixed(6)"></td>
+              </tr>
+            <!-- /ko -->
+          <!-- /ko -->
+        <!-- /ko -->
+      </table>
+      <table data-bind="if: iterationRang" class="result">
+              <tr>
+                <th colspan="4">Graph visualisation options</th>
+              </tr>
+              <tr class="even">
+                <td>Graph size X</td>
+                <td></td>
+                <td><input data-bind="value: graphSizeX"></input></td>
+                <td></td>
+              </tr>
+              <tr class="odd">
+                <td>Graph size Y</td>
+                <td></td>
+                <td><input data-bind="value: graphSizeY"></input></td>
+                <td></td>
+              </tr>
+              <tr class="even">
+                <td>Inherit last by default</td>
+                <td></td>
+                <td><input type="checkbox" data-bind="checked: inheritByDefault"></input></td>
+                <td></td>
+              </tr>
+              <tr class="odd">
+                <td>Suffix</td>
+                <td><input type="checkBox" data-bind="checked: trackSuffix"></input></td>
+                <td><input data-bind="value: suffix, valueUpdate: 'afterkeydown'"></input></td>
+                <td></td>
+              </tr>
+              <!-- ko foreach: myMethodResults -->
+                <tr data-bind="css: { even: $index()%2==0 }">
+                  <td></td>
+                  <td>
+                    <input type="checkbox" data-bind="checked: visible"></input>
+                  </td>
+                  <td>
+                    <input data-bind="value: label"></input>
+                  </td>
+                  <td></td>
+                </tr>
+              <!-- /ko -->
+      </table>
+    </td>
+  </tr>
+</table>
+<style type="text/css">
+    .graph1d {
+      margin: 8px auto;
+    }
+</style>
+<span data-bind="visible: debug, text: query"></span>
+<!-- ko if: showGraph1d  -->
+  <div data-bind="template: { foreach: iteration1dGraphsData, afterRender: renderGraph1d }">
+    <table class="graph1d">
+      <tr>
+        <td>
+          <div data-bind="attr: { id: $index }">
+          </div>
+        </td>
+        <td class="inherit">
+          <table data-bind="foreach: $data">
+            <tr data-bind="css: { even: $index()%2==0 }">
+              <td data-bind="text: label"></td>
+              <td>
+                <input type="checkbox" data-bind="checked: inherit"></input>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+<!-- /ko -->
+<!-- ko if: showGraph2d  -->
+  <div data-bind="template: { foreach: iteration2dGraphsData, afterRender: renderGraph2d }">
+    <div class="graph1d"></div>
+  </div>
+<!-- /ko -->
+</script>
+
+<script type="text/html" id="footer">
+<table border="0" cellpadding="0" cellspacing="0" width="754px" align="center" class="footer">
+
+  <tbody>
+    <tr>
+      <td align="center">
+      <div style="margin: 20px;" align="center"> <br>
+      <a href="https://www.rocq.inria.fr/mathfi/Premia/index.html"><img src="premia_logo.png" align="left" alt="" title=""></a> <br>
+      <a href="https://www.rocq.inria.fr/mathfi/Premia/index.html"><img src="premia_slogan.png" alt="" title=""></a> <br>
+ <a href="http://premia.fr" target="_blank">Premia</a> is developed by the <a href="http://www.inria.fr/equipes/mathfi" target="_blank">Math-Risk</a> 
+team which gathers research scientists from <a href="http://www.inria.fr/">INRIA</a> (the French
+national institute for research in computer science and control), <a href="http://cermics.enpc.fr/">Ecole des Ponts
+ParisTech</a> (CERMICS laboratory on applied mathematics and computing),
+and the <a href="http://www.univ-mlv.fr/"> University
+of Marne la Vall&eacute;e.</a><br>
+      </div>
+      <div align="center"> <a href="https://www.rocq.inria.fr/mathfi/"><img src="INRIA-CORPO-RVB.jpg" alt="Premia" title=""></a>&nbsp;&nbsp;&nbsp;
+      <a href="http://cermics.enpc.fr/"><img src="cermics.gif" alt="Premia" title=""></a>&nbsp;&nbsp;&nbsp;
+      <a href="http://www.univ-mlv.fr/"><img src="univ-mlv.gif" alt="Premia" title=""></a> </div>
+      Bug found? Please contact premia -at- inria.fr or anton.kolotaev -at- gmail.com.
+      </td>
+    </tr>
+    <tr>
+      <td class="bottomnav padlt10" align="right" height="15">Copyright
+&copy; 2012 Premia. All rights reserved.</td>
+    </tr>
+    <tr>
+      <td height="15"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<input type="checkbox" data-bind="checked: debug"></input>
+</script>
+
+<script type="text/html" id="history">
+<button data-bind="visible: history().length" id="ClearHistory">Clear history</button><br><br>
+<!-- ko foreach: history -->
+<table class="history">
+  <tr>
+    <td>
+      <table class="model">
+        <tr>
+          <th>Asset type:</th>
+          <th data-bind="text: myAsset"></th>
+          <th></th>
+        </tr>
+        <tr>
+          <th>Model:</th>
+          <th data-bind="text: myModel"></th>
+          <th></th>
+        </tr>
+         <tbody data-bind="template: { name: 'row-history-template', foreach: myModelParams }">
+        </tbody>
+      </table>
+    </td>
+
+    <td>
+      <table class="option">
+        <tr>
+          <th>Family:</th>
+          <th data-bind="text: myFamily"></th>
+          <th></th>
+        </tr>
+        <tr>
+          <th>Option:</th>
+          <th data-bind="text: myOption"></th>
+          <th></th>
+        </tr>
+        <tbody data-bind="template: { name: 'row-history-template', foreach: myOptionParams }">
+        </tbody>
+      </table>
+    </td>
+
+    <td>
+      <table class="pricing_method">
+        <tr>
+          <th>Pricing method:</th>
+          <th data-bind="text: myMethod"></th>
+          <th></th>
+        </tr>
+        <tbody data-bind="template: { name: 'row-history-template', foreach: myMethodParams }">
+        </tbody>
+        <!-- <tr>
+          <td colspan="3">
+            <a target="_blank" data-bind="attr: { href: 'koPremia?'+query }">Make current</a>
+          </td> 
+        </tr> -->
+      </table>
+      <table data-bind="if: iterationRang==0" class="result">
+        <tr>
+          <th>Result:</th>
+          <th></th>
+          <th></th>
+        </tr>
+        <!-- ko foreach: scalarResult -->
+          <!-- ko if: typeof($data[1])=="number" -->
+            <tr data-bind="css: { even: $index()%2==0 }">
+              <td             class="keys" data-bind="text: $data[0]"></td>
+              <td colspan="2" class="values" data-bind="text: $data[1].toFixed(6)"></td>
+            </tr>
+          <!-- /ko -->
+          <!-- ko notif: typeof($data[1])=="number" -->
+            <!-- ko foreach: $data[1] -->
+              <tr data-bind="css: { even: $parentContext.$index()%2==0 }">
+                <!-- ko ifnot: $index -->
+                  <td class="keys" data-bind="text: $parentContext.$data[0], attr: { rowspan: $parentContext.$data[1].length }"></td>
+                <!-- /ko -->
+              <td colspan="2" class="values" data-bind="text: $data.toFixed(6)"></td>
+              </tr>
+            <!-- /ko -->
+          <!-- /ko -->
+        <!-- /ko -->
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ko if: iterationRang==1  -->
+  <div data-bind="template: { foreach: iteration1dGraphsData, afterRender: renderGraph1d }">
+    <table class="graph1d">
+      <tr>
+        <td>
+          <div data-bind="attr: { id: $index }">
+          </div>
+        </td>
+        <td class="inherit">
+          <table data-bind="foreach: $data">
+            <tr data-bind="css: { even: $index()%2==0 }">
+              <td data-bind="text: label"></td>
+              <td>
+                <input type="checkbox" data-bind="checked: inherit"></input>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+<!-- /ko -->
+<!-- ko if: iterationRang==2  -->
+  <div data-bind="template: { foreach: iteration2dGraphsData, afterRender: renderGraph2d }">
+    <div class="graph1d"></div>
+  </div>
+<!-- /ko -->
+
+<!-- /ko -->
+</script>
+
+<div data-bind="template: { name: 'current' }">
+</div>
+
+<div data-bind="template: { name: 'history' }">
+</div>
+
+<div data-bind="template: { name: 'footer' }">
+</div>

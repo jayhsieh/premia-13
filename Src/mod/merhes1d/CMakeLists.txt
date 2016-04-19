@@ -1,0 +1,25 @@
+add_library (libmerhes1d OBJECT
+	merhes1d.c
+	merhes1d_lim/merhes1d_lim.c
+	merhes1d_lim/mc_alfonsi_bates_out.c
+	merhes1d_pad/merhes1d_pad.c
+	merhes1d_pad/mc_alfonsi_asian_bates.c
+	merhes1d_pad/mc_am_asian_alfonsi_longstaffschwartz_merhes.c
+	merhes1d_pad/mc_am_asian_alfonsi_andersenbroadie_merhes.c
+	merhes1d_std/merhes1d_std.c
+	merhes1d_std/cf_attari_merhes.c
+	merhes1d_std/cf_call_merhes.c
+	merhes1d_std/cf_carr_merhes.c
+	merhes1d_std/cf_put_merhes.c
+	merhes1d_std/fd_natalinibriani_merhes.c
+	merhes1d_std/mc_alfonsi_bates.c
+	merhes1d_std/mc_am_alfonsi_andersenbroadie_merhes.c
+	merhes1d_std/mc_am_alfonsi_longstaffschwartz_merhes.c
+	merhes1d_std/mc_polynomial.c
+	merhes1d_std/ap_alos_bates.c
+	merhes1d_std/svj.c
+	merhes1d_vol/merhes1d_vol.c
+	merhes1d_vol/ap_merhes_realvar.c
+	merhes1d_vol/cf_merhes_varianceswap.c
+	merhes1d_vol/ap_merhes_volatilityswap.c
+	)

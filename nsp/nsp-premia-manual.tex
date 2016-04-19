@@ -1,0 +1,513 @@
+%% -*- ispell-local-dictionary: "english"; -*-
+
+%% This manual has been written by 
+%% Jérôme Lelong 2008 INRIA
+
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4wide}
+\usepackage[dvips=true]{hyperref}
+\usepackage{verbatim,moreverb,alltt}
+\usepackage{makeidx}
+\usepackage[dvips]{color}
+\usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+\usepackage[strings]{underscore}
+
+
+
+%% --------------------------------------------
+\hbadness=10000
+\emergencystretch=\hsize
+\tolerance=9999
+\parindent=0pt
+%% --------------------------------------------
+
+%\makeatletter
+\long\def\varname#1#2{\item[#1]#2}
+\def\var#1{{\tt #1}}
+
+\newcommand{\describefun}[2]{%
+  \index{#1}\phantomsection\item \label{#1} {\bf #1~(#2)}}
+\newcommand{\describemeth}[2]{%
+  \index{#1}\phantomsection\item \label{#1} {\bf #1[\if#2\empty ~\hskip1ex\else#2\fi]}}
+
+\def\reffun#1{\hyperref[#1]{#1}}
+\def\refmeth#1{\hyperref[#1]{#1[~]}}
+\newenvironment{varlist}{\vskip1ex\noindent{\large\bfseries\color[named]{Blue} Parameters}%
+  \unskip\begin{description}}{\end{description}\unskip}
+\newenvironment{example}{\vskip1ex\noindent{\large\bfseries\color[named]{Blue} Examples}\unskip}{}
+\def\code{\unskip\verbatim} \def\endcode{\endverbatim\unskip}
+\newenvironment{describe}{\vskip1ex\noindent{\large\bfseries\color[named]{Blue} Description}%
+  \vskip1ex\noindent}{} 
+%\makeatother
+
+
+\title{Nsp/Premia Manual}
+\date{\today}
+\author{Jean-Philippe Chancelier \and J\'er\^ome Lelong}
+
+\makeindex
+\begin{document}
+\maketitle
+
+\section{How Premia is embedded into Nsp}
+
+For long, the only way to use Premia was from the command line. With the
+growing of Premia every year, the need of real graphical user interface has
+become more and more pressing. The idea of embedding the Premia library in a
+Matlab-like Scientific Software has come up quite naturally. Unlike a
+standalone graphical user interface, embedding Premia into Matlab-like
+Scientific Software provides two ways of accessing the library either through
+the scripting language or using the graphical capabilities of the
+software. The possibility of accessing the Premia functions directly at the
+interpreter level makes it possible to make Premia interact with other
+toolboxes. Since the license of Premia gives right to freely distribute the
+version of Premia two year older that the current release, it was important
+that the scientific software used can be freely obtained and has extensive
+graphical feature. Nsp fulfilled all these conditions.
+
+The inheritance system of Nsp enables to easily add new objects in the
+interpreter. This is how we introduced a new type named {\em PremiaModel},
+through which the wide range of pricing problems described in Premia and their
+corresponding pricing methods are made available from Nsp. The results
+obtained in a given problem can be used in any post-treatment routines as any
+other standard data.
+
+For practitioners, the daily valuation of a complex portfolio is a burning
+issue. Given a bunch of pricing problems to be solved, which are implemented
+in Premia, how can we make the most of Nsp and the Premia toolbox? First, we
+needed a way to describe a pricing problem in a way that is understandable by
+Nsp so that it can create the correct instance of the {\em PremiaModel}
+class. We implemented the {\em load} and {\em save} methods for such an
+instance relying on the XDR library (eXternal Data Representation). This way,
+any {\em PremiaModel} object can be saved to a file in a format which is
+independent of the computer architecture; these files can be reloaded later by
+any Nsp process. Then, a bunch of pricing problems can be represented by a
+list of files created either from the scripting language or using the
+graphical interface. Let us give an example of how to create such a file. To
+save the pricing of an American call option in the one dimensional Heston
+model using a finite difference method, one can use the following instructions
+\begin{example}
+  \begin{code}
+    P = premia_create()
+    P.set_asset[str="equity"]
+    P.set_model[str="Heston1dim"]
+    P.set_option[str="PutAmer"]
+    P.set_method[str="FD_Fem_Achdou"]
+    save('fic', P)
+  \end{code}
+\end{example}
+Creating an instance of the {\em PremiaModel} class and setting its parameters
+are very intuitive.  The object saved in the file \verb+fic+ can reloaded
+using the command \verb+load('fic')+.
+
+
+\section{A scripting approach}
+
+The {\em PremiaModel} toolbox can be loaded into {\em Nsp} by running
+\verb!exec loader.sce! in the directory \verb!nsp! of {\em Premia}.
+
+\subsection{General functions}
+
+In this section, argument written between square brackets are optional.
+
+\begin{description}
+  \describefun{premia_init}{}
+  \begin{describe}
+    It does some initialization stuff to create the {\em PremiaModel} type.
+  \end{describe}
+
+  \describefun{premia_create}{}
+  \begin{describe}
+    It creates an instance of a {\em PremiaModel} object and returns its address.
+  \end{describe}
+  
+  \describefun{premia_get_assets}{}
+  \begin{describe} It returns as a string matrix the names of the different
+    asset type handled by Premia.
+  \end{describe}
+  
+  \describefun{premia_get_models}{[asset=str]}
+  \begin{varlist}
+    \varname{str}{is a string parameter. It must be one of the values returned
+      by \var{premia_get_assets}. This argument is optional and describes the
+      type of underlying assets. When no \var{asset} argument is passed, the
+      default value is \var{asset=equity}.}
+  \end{varlist}
+  \begin{describe} This function returns the list of the models available for
+    the given asset type.
+  \end{describe}
+
+  \describefun{premia_get_families}{[n], [asset=str]}
+  \begin{varlist}
+    \varname{n}{is an integer parameter. This is the index of the family
+      considered.}
+    \varname{str}{is a string parameter. It must be one of the values
+      returned by \var{premia_get_assets}.  This argument is optional and
+      describes the type of underlying assets. When no \var{asset} argument
+      is passed, the default value is \var{asset=equity}.}
+  \end{varlist}
+  \begin{describe} This function returns the name of the \var{n}$-th$ family
+    available for the underlying asset type given by the optional and named
+    argument \var{asset=str}. When the argument \var{n} is not given, the
+    function returns the names of the different families available for the
+    given asset type.
+  \end{describe}
+
+  \describefun{premia_get_family}{family, [model], [asset=str]}
+  \begin{varlist}
+    \varname{family}{is an integer parameter. This is the index of the family
+      to be considered within the list returned by \reffun{premia_get_families}.}
+    \varname{model}{is an integer parameter. This is the index of the model to
+      be considered within the list returned by \reffun{premia_get_models}.}
+    \varname{str}{is a string parameter. It must be one of the values returned
+      by \var{premia_get_assets}.  This argument is optional and describes the
+      type of underlying assets. When no \var{asset} argument is passed, the
+      default value is \var{asset=equity}.}
+  \end{varlist}
+  \begin{describe} This function returns the list of options belonging the
+    \var{family}$-th$ family in the \var{model}$-th$ model for the asset
+    described by \var{str}. When no \var{model} argument is given, the names
+    of all the options available in \var{family}$-th$ family are returned. If
+    no option of the given family is compatble with the model choice, an empty
+    string matrix is returned.
+  \end{describe}
+  
+  \describefun{premia_get_methods}{family, option, model, [asset=str]}
+  \begin{varlist}
+    \varname{family}{is an integer describing the index of the family to be
+      considered. This index can be guessed using
+      \reffun{premia_get_families}.} 
+    \varname{option}{is an integer describing the index of the option to be
+      considered within the list of options available in the given
+      family for the model defined by \var{model}.}
+    \varname{model}{is an integer describing the index of the model to be
+      considered. This index can be guessed using
+      \reffun{premia_get_models}.} 
+    \varname{str}{is a string parameter. It must be one of the values returned
+      by \var{premia_get_assets}.  This argument is optional and describes the
+      type of underlying assets. When no \var{asset}  argument is passed, the
+      default value is \var{asset=equity}.}
+  \end{varlist}
+  \begin{describe} This function returns the names of the methods available to
+    carry out the pricing problem defined by the arguments. The return value
+    is a string matrix.
+  \end{describe}
+
+  \describemeth{load}{fic}
+  \begin{varlist}
+    \varname{fic}{is the name of a file}.
+  \end{varlist}
+  \begin{describe}
+    It loads the {\em PremiaModel} object stored in the file \var{fic}. The
+    file must have been created by the method \reffun{save}.
+  \end{describe}
+\end{description}
+
+\subsection{PremiaModel's methods}
+
+The following methods can be applied to a {\em PremiaModel} object \verb!M!
+returned by the function \reffun{premia_create} using the syntax
+\verb!M.method[]!  for instance. Note that unlike functions, parameters are
+passed to methods within square brackets and not braces.
+
+The symbol \textbar\ separates complementary parameters. This is actually a
+concise way of describing two or possibly more ways of calling a method. The
+use of curly braces to group parameters means that these parameters must
+either be all used together or all ignored. Note that the curly braces must
+not be typed into Nsp.
+
+\begin{description}
+  \describemeth{get_asset}{}
+  \begin{describe}
+    Returns the name of the underlying asset.
+  \end{describe}
+  
+  \describemeth{get_model}{}
+  \begin{describe}
+    Returns the name of the model.
+  \end{describe}
+
+  \describemeth{get_models}{}
+  \begin{describe}
+    Returns the names of the models available for the already
+    set asset type.
+  \end{describe}
+
+  
+  \describemeth{get_option}{}
+  \begin{describe}
+    Returns the name of the option.
+  \end{describe}
+
+  \describemeth{get_family}{n}
+  \begin{describe}
+    Returns the names of the options of the $n-th$ family which can priced in
+    the already set model. When no option is available in that family, an
+    empty string matrix is returned.
+  \end{describe}
+  
+
+  \describemeth{get_method}{}
+  \begin{describe}
+    Returns the name of the method.
+  \end{describe}
+
+  \describemeth{get_methods}{}
+  \begin{describe}
+    Returns the names of the methods available to solve the Premia problem
+    described by the {\it PremiaModel} object.
+  \end{describe}
+
+  \describemeth{get_model_values}{}
+  \begin{describe}
+    Returns the list of parameters of the  model. 
+  \end{describe}
+
+  \describemeth{get_option_values}{}
+  \begin{describe}
+    Returns the list of parameters of the option.
+  \end{describe}
+
+  \describemeth{get_method_values}{}
+  \begin{describe} Returns the list of parameters of the method. When the
+    method does not need any parameter, an empty list is returned.
+  \end{describe}
+
+  \describemeth{set_asset}{str=asset}
+  \begin{varlist}
+    \varname{asset}{is a string parameter. It must be one of the values returned
+      by \reffun{premia_get_assets}}
+  \end{varlist}
+  \begin{describe}
+    It sets the underlying asset of a {\it PremiaModel} object.
+  \end{describe}
+
+  \describemeth{set_model}{n \textbar\ str=model}
+  \begin{varlist}
+    \varname{n}{is an integer parameter. It is the index of the
+      model to be set in the list returned by \reffun{premia_get_models}
+      called with the asset type of the object or \refmeth{get_models}.}
+    \varname{model}{is a string parameter. It must be one of the values
+      returned by \reffun{premia_get_models} called with the asset type of the
+      object or \refmeth{get_models}.}
+  \end{varlist}
+  \begin{example}
+    \begin{code}
+      M=premia_create();
+      M.set_asset[str="credit"];
+      models=premia_get_models(asset=M.get_asset[])
+      M.set_model[models(2)];
+    \end{code}
+    Equivalently, the list of available models for the already set asset type
+    can be obtained by the method \refmeth{get_models}.
+    \begin{code}
+      M=premia_create();
+      M.set_asset[str="credit"];
+      models=M.get_models[];
+      M.set_model[models(2)];
+    \end{code}
+  \end{example}
+  \begin{describe}
+    It sets the model of a {\it PremiaModel} object using either the parameter
+    \var{n} or \var{str=model}.
+  \end{describe}
+
+  \describemeth{set_option}{$\{$n_family, n_option$\}$ \textbar\ str=option}
+  \begin{varlist}
+    \varname{n_family}{is an integer parameter. It is the index of the family
+      in which the option is picked up. The index is computed within the
+      restricted list of families compatible with the model already set.}
+    \varname{n_option}{is an integer parameter. It is the index within the
+      \var{n_family}$-th$ family of the option to be set. Note that the index
+      is taken in the restricted list of options belonging to the given family
+      which are compatible with the model}
+    \varname{option}{is a string parameter. It must be one of the values
+      returned by \reffun{premia_get_families} called with the parameters
+      corresponding to the object.}
+  \end{varlist}
+  \begin{describe} It sets the option of a {\it PremiaModel} object using
+    either the two parameters \var{n_option} and \var{n_family} or the unique
+    parameter \var{str=option}. When the two parameter form is used, the
+    option set is the \var{n_option}
+  \end{describe}
+
+  \describemeth{set_method}{n \textbar\ str=method}
+  \begin{varlist}
+    \varname{n}{is an integer parameter. This is the index of the method to be
+      chosen in the restricted list of pricing methods available for the given
+      asset, model ans option.}
+    \varname{method}{is a string parameter. It must be one of the values
+      returned by \reffun{premia_get_methods} called with the parameters
+      corresponding to the object.}
+  \end{varlist}
+  \begin{describe} It sets the method of a {\it PremiaModel} object using
+    either the parameter \var{n} or \var{str=method}. The list of availble
+    methods can be withdrawn using the method \refmeth{get_methods}.
+  \end{describe}
+  
+  \describemeth{set_model_values}{L}
+  \begin{varlist}
+    \varname{L}{is a list parameter. It must have the same structure as the one
+      returned by \refmeth{get_model_values}}.
+  \end{varlist}
+  \begin{describe} It sets the different parameters of the model. The list
+    \var{L} must define all the parameters. There is no way to specify just a
+    few of them, instead you can withdraw the list returned by
+    \refmeth{get_model_values}, modifiy a few values and set it back using
+    \refmeth{set_model_values}.
+  \end{describe}
+
+  \describemeth{set_option_values}{L}
+  \begin{varlist}
+    \varname{L}{is a list parameter. It must have the same structure as the one
+      returned by \refmeth{get_option_values}}.
+  \end{varlist}
+  \begin{describe} It sets the different parameters of the option. The list
+    \var{L} must define all the parameters. There is no way to specify just a
+    few of them, instead you can withdraw the list returned by
+    \refmeth{get_option_values}, modifiy a few values and set it back using
+    \refmeth{set_option_values}.
+  \end{describe}
+
+  \describemeth{set_method_values}{L}
+  \begin{varlist}
+    \varname{L}{is a list parameter. It must have the same structure as the one
+      returned by \refmeth{get_method_values}}.
+  \end{varlist}
+  \begin{describe} It sets the different parameters of the method. The list
+    \var{L} must define all the parameters. There is no way to specify just a
+    few of them, instead you can withdraw the list returned by
+    \refmeth{get_method_values}, modifiy a few values and set it back using
+    \refmeth{set_method_values}.
+  \end{describe}
+
+  \describemeth{compute}{}
+  \begin{describe} It computes the quantities of interest (price and delta
+    generally) for the problem describe by the {\it PremiaModel} object. This
+    is a void method. See \refmeth{get_method_results} to withdraw the results
+    of the computation.
+  \end{describe}
+
+  \describemeth{get_compute_err}{}
+  \begin{describe} If the computation run by \refmeth{compute} did not end
+    successfuly, this method resturns the error message that occurred. When
+    the computation ended sucessfully, an empty string matrix is returned.
+  \end{describe}
+
+  \describemeth{get_method_results}{}
+  \begin{describe} It returns a list containing the values computed by the
+    \refmeth{compute} method. If the \refmeth{compute} method has been called
+    yest, an empty list is returned.
+  \end{describe}
+
+   \describemeth{get_method_results_iter}{}
+   \begin{describe} It returns two arguments. The first one is a list of $2$
+     or $3$ matrices depending on whether the iteration was performed on one
+     ro two parameters. The first matrix (resp. first two matrices) contains
+     the values taken by the parameter (the two parameters) on which we
+     iterated. The last matrix contains the prices for the values of the
+     parameter(s) given by the first (resp. first two) matrices. The second
+     returned argument is a string matrix containing the names of the
+     variables over which the iteration was performed.
+   \end{describe}
+
+   \describemeth{is_with_iter}{}
+   \begin{describe}
+     Returns a boolean : \verb!%t! if we have iterated on some parameters,
+     \verb!%f! otherwise
+   \end{describe}
+   
+  \describemeth{get_help}{type}
+  \begin{varlist} \varname{type}{is a string parameter. It can be one of the
+    keywords ``model'', ``option'' or ``method''.}
+  \end{varlist}
+  \begin{describe}
+    It displays the PDF help corresponding to the object referred to by the
+    \var{type} variable.
+  \end{describe}
+
+  \describemeth{save}{}
+  \begin{describe}
+    It saves a {\em PremiaModel} object to a file in a format that can be
+    easily reloaded into Nsp (see function \reffun{load}). The format of the
+    file is independent of the architecture.
+  \end{describe}
+\end{description}
+
+
+
+\section{The graphical interface}
+
+To access the graphical interface, one must execute the file
+\verb!interface.sci! located in the directory \verb!nsp!.
+
+\subsection{Basic usage}
+
+\begin{description}
+  \describefun{premia}{}
+  \begin{describe}
+    It launches the graphical interface and returns a {\em PremiaModel} object
+    linked to the interface, which means that this object is modified eah time
+    you change a parameter in the interface.
+  \end{describe}
+  
+  \begin{example}
+    \begin{code}
+      P = premia ()
+      // .. do some changes in the interface
+      P.get_method[] //returns the name of the method
+    \end{code}
+  \end{example}
+\end{description}
+
+Once all the different parameters are properly set, the computation is
+launched with the button  {\tt ``Compute''}.
+
+
+\subsection{Advanced usage}
+
+The interface has three menus : {\tt File, Help, Tools}, the use of which is
+explained below.
+
+\paragraph{File menu}
+
+This menu provides the ability to save or reload a {\em PremiaModel} object
+from a file. This is equivalent to using \reffun{load} or \reffun{save}.
+
+\paragraph{Help menu}
+
+This menu provides a fast and easy access to Premia's scientific
+documentation. You can directly access the help concerning the model, the
+option or the pricing method. This help is displayed in an external PDF viewer
+as specified as compitation time (see the option \verb!--with-pdfviewer! of
+the configure script).
+
+\paragraph{Tools menu}
+
+The graph menu is intended to be used with parameter iteration. It is possible
+to use a vector for a parameter which is normally real valued and its means
+that the prices must be computed for the different values specified in the
+vector. The different results can be withdrawn using the method
+\refmeth{get_method_results_iter} and are storred internally so that the
+values can be plotted using the function {\tt Draw} from the {\tt Tools}
+menu. If a second set of computations is carried out iterating on an other
+parameter, the size of the two iterations must be the same because the new
+results are concatenated to the previous ones and plotted on the same
+graph. This is particularly useful to compare different methods for instance.
+
+The function {\tt Clear Data} clears the variable in which the results of the
+iterations are stored. The function {\tt Clear Graph} clears the graph which
+can be redrawn using the function {\tt Redraw} as far as the {\tt Clear Data}
+function has not been called.
+
+Finally, it is possible to add a legend to the graph using the {\tt Legend}
+function. The format of the legend is the folowing \verb!leg1@leg2@leg3...!
+where \verb!leg1!, \verb!leg2! and $\dots$ are strings. The position of the
+legend can also be specified 'ul' (upper left), 'ur' (upper right), ' dl'
+(lower left) or 'dr' (lower right).
+
+
+
+\printindex
+\end{document}

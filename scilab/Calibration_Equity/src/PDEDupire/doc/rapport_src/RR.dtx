@@ -1,0 +1,1573 @@
+% \iffalse meta-comment
+% 
+% RR.dtx Copyright (C) 1997-2002 J. Grimm INRIA/MIAOU
+% (c) Philippe Louarn - INRIA/IRISA - 1993-1997
+% Fichier PS de couverture du a G. Ouanounou - INRIA Rocq.
+%
+% Pour utilisation interne a l'INRIA seulement %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\fi
+% 
+% \CheckSum{1404}
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+% \iffalse
+% \section{Identification}
+% Test de la version de latex.
+%    \begin{macrocode}
+%<*RR|RRA4>
+\def\RRfiledate{2001/07/18}
+\def\RRfileversion{3,8a}
+%</RR|RRA4>
+%<RR|RRA4>\NeedsTeXFormat{LaTeX2e}
+%<RR>\ProvidesPackage{RR}
+%<RRA4>\ProvidesPackage{RRA4}
+%<RR|RRA4>       [\RRfiledate\space v\RRfileversion\space
+%<RR|RRA4>         Copyright INRIA/MIAOU 2002]
+%<*driver>
+\ProvidesFile{RR.drv}[\RRfiledate\space v\RRfileversion\space]
+%</driver>
+%<*driver>
+\documentclass[a4paper]{ltxdoc}
+\makeatletter
+\def\glossary@prologue{\section{Historique des changements}}
+\def\index@prologue{\section{Index}%
+  Tous les nombres correspondent à des numéros de ligne dans le code source.}
+\makeatother
+\usepackage{RR}
+
+\usepackage{hyperref}
+\usepackage[frenchb]{babel}
+%    \end{macrocode}
+%
+%    On supprime un certain nombre de mots dans l'index.
+%    \begin{macrocode}
+\DoNotIndex{\@minus,\@plus,\\,\[,\\,\],\@listi,\@setfontsize}
+\DoNotIndex{\abovedisplayshortskip,\abovedisplayskip,\addtolength,\advance}
+\DoNotIndex{\belowdisplayshortskip,\belowdisplayskip}
+\DoNotIndex{\begin,\begingroup,\bf,\bfdefaults,\bfseries,\bigskip}
+\DoNotIndex{\def,\DeclareFontFamily,\DeclareFontShape}
+\DoNotIndex{\DeclareMathAlphabet,\DeclareMathSizes,\DeclareOldFontCommand}
+\DoNotIndex{\DeclareOption,\DeclareSymbolFont}
+\DoNotIndex{\edef,\em,\end,\endgroup,\endlist}
+\DoNotIndex{\fill,\frac,\gdef,\global}
+\DoNotIndex{\ifdim,\ifcase,\or,\ifnum,\ifodd,\else,\ifx,\fi,\fi,\fi,\fi,\fi}
+\DoNotIndex{\kern,\let,\newcommand,\newdimen,\p@}
+\DoNotIndex{\relax,\renewcommand,\setlength,\z@}
+%    \end{macrocode}
+%    On veut un index, avec des nombres de lignes
+%    \begin{macrocode}    
+\let\disablecrossrefs\DisableCrossrefs
+\EnableCrossrefs
+\CodelineIndex
+
+%    \begin{macrocode}
+\usepackage{latexsym}
+\usepackage{pifont} % Before getfileinfo
+\GetFileInfo{RR.drv}
+%\DisableCrossrefs % Say \DisableCrossrefs if index is ready
+\RecordChanges     % Gather update information
+%\OnlyDescription  % uncomment for user instructions only
+
+\hfuzz 1pt
+\textheight22cm
+\footskip1cm
+\begin{document}
+ \hfuzz5pt
+ \DocInput{RR.dtx}
+ \hfuzz15pt \hbadness=7000
+\PrintIndex
+\PrintChanges
+\end{document}
+%</driver>
+%    \end{macrocode}
+% \fi
+% \selectlanguage{french}
+% \changes{v3.4}{1997/09/17}{Version initiale}
+% \RRtitle{Les styles \texttt{RR} et \texttt{RRA4}\thanks{Ce package
+%         a pour numéro de version \RRfileversion, a été
+%        modifié le \RRfiledate.}}
+% \RRetitle{The syle files \texttt{RR} and \texttt{RRA4}}
+% \RRprojet{MIAOU}
+% \RRtheme{4}
+% \URSophia
+% \RRauthor{José Grimm}
+% \RRresume{
+% Ce document décrit le fichier de style \texttt{RR.sty}
+% qui permet de saisir les
+% rapports de recherche et les rapports techniques Inria.
+% Il présente les recommandations de saisie, comment obtenir un numéro de
+% rapport ainsi que la façon de déposer la version finale (PostScript)
+% sur les serveurs ftp Inria locaux et nationaux.
+% }
+%
+% \RRmotcle{
+% rapport de recherche, rapports techniques,
+% documentation scientifique, INRIA, LaTeX}
+%
+% \RRabstract{
+% This documents describes the source of the style \texttt{RR.sty}, and how to
+% use it for typesetting INRIA research reports or technical
+% reports by using LaTeX, the way to obtain a serial number
+% and how to deposit the final version (PostScript file) on
+% local and national INRIA files servers.
+% }
+%
+% \RRkeyword{
+% research reports, technical reports, INRIA, LaTeX}
+%
+% \RRnote{Premier auteur : Philippe Louarn}
+% \RRnote{
+% Le style \LaTeX{} décrit dans ce document est distribué tel quel.
+% Il a été testé avec la version de \LaTeX\ en service
+% à Sophia le \today, mais ils peuvent nécessiter quelques adaptations
+% selon les configurations des autres sites Inria.
+% }
+% \RRdate{Imprimé le \today}
+% \makeRT
+% \addtolength\oddsidemargin{1.5cm}
+% \addtolength\evensidemargin{1.5cm}
+% \begingroup\catcode`\|=11\gdef\Vbar{|}\endgroup
+% \newenvironment{decl}%
+%    {\par\small\addvspace{4.5ex plus 1ex}%
+%     \vskip -\parskip
+%     \noindent\hspace{-\leftmargini}%
+%     \begin{tabular}{\Vbar l\Vbar}\hline\ignorespaces}%
+%    {\\\hline\end{tabular}\par\nobreak
+%     \vspace{2.3ex}\vskip -\parskip}
+% \newcommand{\m}[1]{\mbox{$\langle$\it #1\/$\rangle$}}
+% \renewcommand{\arg}[1]{{\tt\string{}\m{#1}{\tt\string}}}
+% \renewcommand{\oarg}[1]{{\tt[}\m{#1}{\tt]}}
+% \tableofcontents
+% \section*{Préface}
+% 
+% La réflexion sur la communication scientifique 
+% de l'Inria a entraîné une série d'actions, certaines spectaculaires
+% (le 25$^{\rm e}$ anniversaire, le changement de logo, la création de l'Ucis,
+% etc.), d'autres
+% moins. La politique éditoriale de l'institut
+% vis à vis du monde extérieur (communauté scientifique et monde industriel)
+% se doit d'évoluer. De plus, la mise à dispostion des services de documentation
+% d'outils modernes (ftp, wais, etc.) montre que les documents scientifiques
+% ne peuvent plus se suffire du seul support papier.
+% Il est apparu nécessaire d'harmoniser l'ensemble des
+% publications de l'institut. 
+%
+% Nous avons défini un style \LaTeX{} pour la saisie des rapports
+% de recherche Inria qui respecte un certain nombre de critères :
+% \begin{itemize}
+% \item respect de l'identité visuelle de l'institut telle que définie
+% dans la charte graphique de l'Inria (logos, couleurs), 
+% en particulier pour les versions des documents 
+% qui seront disponibles sur les serveurs
+% de fichiers ;
+% \item respect autant que possible des normes de l'édition scientifique ;
+% \item rester le plus proche possible des habitudes des auteurs ;
+% \item harmoniser les divers rapports ;
+% \item pour l'unité de recherche de Rennes, 
+% faciliter le passage d'une publication interne Irisa en rapport
+% de recherche Inria.
+% \end{itemize}
+%
+% Vous trouverez des informations techniques concernant la réalisation d'un 
+% rapport sur le serveur interne de l'Inria à l'URL suivante :\\
+% \href{http://www.inria.fr/interne/disc/publier/rrrt/index.html}{http://www.inria.fr/interne/disc/publier/rrrt/index.html}
+% \StopEventually{
+% \begin{thebibliography}{9}
+%
+% \bibitem{companion} Michel Goossens, Frank Mittelbach and Alexander 
+% Samarin, \textit{The \LaTeX{} Companion}, Addison-Wesley, Reading,
+% Massachusetts, 1994.
+%
+% \bibitem{texbook} Donald Knuth, \textit{The \TeX book}, Addison-Wesley,
+% Reading, Massachusetts, 1983, revised in 1993.
+%
+% \bibitem{latexbook} Leslie Lamport, \textit{\LaTeX: A Document
+% Preparation System}, 2nd ed., Addison-Wesley, Reading, Massachusetts,
+% 1994. 
+%
+% \bibitem{charte} UCIS, \textit{Charte graphique} et \textit{Abrégé de la
+% charte graphique}, INRIA, 1994. 
+% \end{thebibliography}
+% } 
+% \section{Description du style}
+% Comme tout style \LaTeX, celui-ci se charge au moyen de la commande
+% |\usepackage|, après le |\documentclass|. Il y a deux styles |RR| et
+% |RRA4|, ce dernier comportant une taille de page plus grande. 
+% Ce document-ci utilise la classe |ltxdoc|, le style |RR|, mais les paramètres
+% de page ont été redéfinis : la marge de gauche a été agrandie, et la taille
+% du texte est intermédiaire entre celle des styles |RR| et |RRA4|.
+% 
+% Toutes les commandes fournies par le style sont expliquées dans ce
+% document. On donne aussi le code source d'un fichier d'exemple. 
+%    \begin{macrocode}
+%<*sample>
+\documentclass{article}
+\usepackage{RR}
+%    \end{macrocode}
+% L'utilisateur peut bien entendu charger d'autres styles, ou passer des
+% options à la commande |\documentclass|. Dans notre exemple, nous allons
+% charger le package |hyperref|, mais pas le package |french| 
+% (voir dans la suite). 
+%    \begin{macrocode}
+\usepackage{hyperref}
+%%\usepackage{french} % optionnel
+%%\usepackage[frenchb]{babel} % optionnel
+%    \end{macrocode}
+% \begin{decl} |\usepackage{french}|\\
+%  |\usepackage[frenchb]{babel}| \end{decl}
+% L'utilisation de l'une de ces commandes a pour but de déclarer que la langue
+% principale du document est le français. Dans le cas contraire, il s'agit de
+% l'anglais. La page de titre est dans la langue principale. Note : la date qui
+% figure sur cette page doit toujours être en français.
+% \begin{decl} |\RRNo| \arg{num} \end{decl}
+% La commande |\RRNo| positionne le numéro du rapport. Il est déconseillé de
+% l'utiliser. C'est le SICS qui attribue le numéro du rapport, et le SICS
+% demande une version Postscript du rapport, avec un numéro par défaut (qui
+% est formé de quatre points d'interrogation consécutifs).
+% \begin{decl} |\RRnbpage| \arg{num} \end{decl}
+% Normalement, \LaTeX\ calcule correctement le nombre de pages. On n'utilisera
+% donc cette macro qu'en dernier recours.
+% \begin{decl} |\RRdate| \arg{date} \end{decl}
+% Cette commande est optionnelle, mais si vous ne l'utilisez pas, vous aurez un
+% message d'avertissement de \LaTeX. L'argument \m{date} est en principe
+% formé du nom du mois de publication et de l'année.
+% Ne mettez pas de date vide, ceci provoque une erreur incompréhensible de
+% la forme « ! LaTeX Error: There's no line here to end. »
+% 
+% Le mois indiqué dans la date du rapport doit être celui de l'envoi 
+% de la demande de numéro de rapport.
+%    \begin{macrocode}
+%%
+\RRdate{Septembre 1997} %  date de publication du rapport
+%    \end{macrocode}
+% \begin{decl} |\RRauthor| \arg{auteur} \end{decl}
+% Cette commande donne le nom de l'auteur du rapport. Bien entendu, l'argument
+% est formé du prénom et du nom (complets). On peut éventuellement mettre des
+% notes, au moyen de la commande |\thanks|. S'il y a plusieurs auteurs, on les
+% sépare par la commande |\and|.
+%    \begin{macrocode}
+%%
+\RRauthor{José Grimm\thanks{Footnote for first author}% les auteurs
+  \thanks[sfn]{Shared foot note}
+  \and % \and entre chaque auteur s'il y en a plusieurs
+Philippe Louarn
+  \thanks{Footnote for second author}\thanksref{sfn} % une note
+}
+%    \end{macrocode}
+% \begin{decl} |\thanks| \arg{note} \\
+% |\thanks| \oarg{cle}\arg{note}\\
+% |\thanksref|\arg{cle}
+% \end{decl}
+% La commande |\thanks| permet d'accrocher une note en bas de page à un auteur.
+% Si vous voulez partager la même note entre deux auteurs, utilisez pour le 
+% premier la commande |\thanks| avec un argument optionnel, et pour le second,
+% la commande |\thanksref|.
+%
+% \begin{decl} |\authorhead| \arg{auteur-court} \end{decl}
+% L'en-tête des pages paires contient la liste des auteurs. Dans le cas qui
+% nous intéresse, cette liste est courte, mais, des fois il y a tellement
+% d'auteurs que cela ne tient pas sur la page. On peut donc utiliser la macro
+% |\authorhead| pour placer \m{auteur-court} sur les pages paires.
+%    \begin{macrocode}
+%%
+\authorhead{Grimm \& Louarn} % Ceci apparait sur chaque page paire.
+%    \end{macrocode}
+% \begin{decl} |\RRtitle| \arg{titre-f} \end{decl}
+% La commande |\RRtitle| définit le titre français du rapport.
+%    \begin{macrocode}
+%%
+\RRtitle{Exemple de document\\ % titre francais long avec des \\ inutiles.
+ utilisant le style\\rapport de recherche\\Inria}
+%    \end{macrocode}
+% \begin{decl} |\RRetitle| \arg{titre-e} \end{decl}
+% Cette macro définit le titre anglais. Rappelons que le titre du document est
+% le titre dans la langue principale. Si on est en français, la page de
+% couverture, de même que la page~1 contiendra le titre français, et la page~2
+% contiendra le titre anglais. Si on est en anglais, la page de
+% couverture, de même que la page~1 contiendra le titre anglais, et la page~2
+% contiendra le titre français.
+%    \begin{macrocode}
+%%
+\RRetitle{Example of a document using the RR style file} % english title
+%    \end{macrocode}
+% \begin{decl} |\titlehead| \arg{titre-court} \end{decl}
+%  Si le document est en français, \m{titre-f} sera sur toutes
+% les pages impaires du rapport, si le document est en anglais, ce sera
+% \m{titre-e}. Dans le cas où le titre est très long, on peut utiliser
+% |\titlehead|, de sorte que ce sera la valeur de \m{titre-court} qui sera
+% utilisée. Si on veut utiliser cette commande, il faut le faire après
+% |\RRtitle|, |\RRetitle|, et bien entendu avant |\begin{document}|.
+%    \begin{macrocode}
+%%
+\titlehead{Example of RR.sty} %titre court, sur toutes les pages.
+%    \end{macrocode}
+% \begin{decl} |\RRnote| \arg{note} \end{decl}
+% Cette commande permet de mettre des notes sur la première page (page de
+% titre intérieure). Il est
+% déconseillé d'utiliser la commande |\footnote| sur la première page. 
+%    \begin{macrocode}
+%%
+\RRnote{This is a note}
+\RRnote{This is a second note}
+%    \end{macrocode}
+% \begin{decl} |\RRresume| \arg{resume-f} \\
+% |\RRabstract| \arg{resume-e} \end{decl}
+% Ces deux commandes définissent le résumé français et anglais. Le résumé de
+% la langue principale est sur la page~1, l'autre sur la page~2. On peut aussi
+% utiliser les commandes |\resume| et |\abstract|, qui sont de simples alias.
+%
+% Les règles Afnor fixent la taille maximum d'un résumé à 250 mots, en un seul
+% paragraphe. Il faut aussi éviter les environnement itemize, etc,
+% les références bibliographiques, et les formules mathématiques.
+% Il ne faut pas oublier que le résumé est diffusé \emph{tel quel}, sur le
+% serveur WEB, et le bulletin d'annonces des rapports papier. S'il est parfois
+% impossible d'éviter des phrases telles que « on montre que la fonction
+% définie par Dupond et Dupont est dans |$|H|^|2|$| », il est
+% inadmissible de voir « on montre ici que la relation 
+% |\|label|{|eq-joli|}| proposée par |\|cite|{|DdDt98|}| est également vraie si
+% ...»  
+%    \begin{macrocode}
+%%
+\RRresume{Ce document montre comment utiliser le style RR.sty.
+Pour en savoir plus, consulter le fichier RR.dvi}
+\RRabstract{This document is a sample of all commands made available by the
+RR.sty style file. More is explained in the documentation of the package
+}
+%    \end{macrocode}
+% \begin{decl} |\RRmotcle| \arg{mot-cle-f} \\
+%  |\RRkeyword| \arg{mot-cle-e} \end{decl}
+% Ces deux commandes permettent de définir les mots clés dans les deux
+% langues. Pour les paresseux : le préfixe |RR| est optionnel.
+%    \begin{macrocode}
+%%
+\RRmotcle{calcul formel, base de formules,  %mots-clés sans rapport
+protocole, différentiation automatique, % les uns avec les autres
+génération de code,  modélisation, lien symbolique/numérique,
+matrice structurée, résolution de systèmes polynomiaux, géométrie effective}
+\RRkeyword{task placement, environment, % keywords (taken from some
+ message passing,  network management,   % random research report)
+ performances} 
+%    \end{macrocode}
+% \begin{decl} |\RRprojet| \arg{projet} \\
+% |\RRprojets| \arg{projets} \end{decl}
+% La commande |\RRprojet| permet de définir le projet de l'auteur. Dans le cas
+% où il y a plusieurs auteurs, de plusieurs projets différents, on utilisera
+% la seconde commande |\RRprojets|. 
+%    \begin{macrocode}
+%% \RRprojet{Miaou} % cas d'un seul projet
+%%
+\RRprojets{Miaou et Opéra} % cas de 2 projets.
+%    \end{macrocode}
+% \begin{decl} |\RRtheme| \arg{theme} \end{decl}
+% L'argument est le numéro du thème du ou des auteurs. Dans le cas où il y a
+% plusieurs thèmes, on met les uns à la suite des autres. Pour l'instant, le
+% cas de plus de deux thèmes n'est pas prévu. Contacter la maintenance dans ce
+% cas. Notez que « 3B » n'est pas un numéro de thème.
+%    \begin{macrocode}
+%%
+%% \RRtheme{4} % cas d'un seul theme
+\RRtheme{43} % cas de 2 themes
+%    \end{macrocode}
+% \begin{decl} |\URLorraine| \\
+%  |\URRennes| \\
+%  |\URRhoneAlpes| \\
+%  |\URRocq| \\
+%  |\URFuturs| \\
+%  |\URSophia| \end{decl}
+% Utilisez une et une seule des commandes précédentes. Si vous êtes plusieurs
+% auteurs dans des UR différentes, prenez-en une aléatoirement. Cette commande
+% précise quel logo mettre sur la page~1, elle donne l'adresse et le numéro de
+% téléphone de l'UR, et conditionne la 4\ieme{} page  de couverture.
+%    \begin{macrocode}
+%%
+%% \URLorraine % pour ceux qui sont à l'est
+%% \URRennes  % pour ceux qui sont à l'ouest
+%% \URRhoneAlpes % pour ceux qui sont dans les montagnes
+%% \URRocq % pour ceux qui sont au centre de la France
+%% \URFuturs % pour ceux qui sont dans le virtuel
+\URSophia % pour ceux qui sont au Sud.
+%    \end{macrocode}
+% Comme tout est dit, on peut commencer à travailler.
+%    \begin{macrocode}
+%%
+\begin{document}
+%    \end{macrocode}
+% Zut, j'allais oublier le plus important
+% \begin{decl} |\makeRR| \\ |\makeRT| \end{decl}
+% La commande |\makeRR| doit être utilisée juste après le |\begin{document}|
+% dans le cas d'un rapport de recherche. S'il s'agit d'un rapport technique,
+% on utilisera |\makeRT|.
+%    \begin{macrocode}
+%%
+\makeRR   % cas d'un rapport de recherche
+%% \makeRT % cas d'un rapport technique.
+%% a partir d'ici, chacun fait comme il le souhaite
+\section{First section}
+Here is some text for the first section, and a label\label{sec1}. 
+Uses version \RRfileversion\ of the package.\newpage
+\section{Second section}
+Text for the second section. This is closely related to the text in
+section \ref{sec1} on page \pageref{sec1}. \newpage
+\tableofcontents
+%    \end{macrocode}
+
+% On termine le document comme d'habitude, via |\end{document}|.
+%    \begin{macrocode}
+\end{document}
+%</sample>
+%    \end{macrocode}
+% \section{Description du code du package RR}
+% \subsection{Introduction}
+% \changes{v3.7i}{2001/07/18}{T1/OT1 switch was wrong}
+%    \begin{macrocode}
+%<*RR|RRA4>
+% \typeout{Style de documents Rapport de recherche INRIA : \styleoption,
+% \fileversion\space du <\filedate>}
+\newif\if@RRfrench \@RRfrenchfalse
+\newif\if@tone@encoding
+\newif\if@no@inputenc \@no@inputencfalse
+\DeclareOption{T1}{\@tone@encodingtrue}
+\DeclareOption{OT1}{\@tone@encodingfalse}
+\DeclareOption{noinputenc}{\@no@inputenctrue}
+\ExecuteOptions{T1}
+\@ifundefined{pdfoutput}{}{\@tone@encodingfalse}
+\ProcessOptions\relax
+
+\if@tone@encoding
+\def\psenc{T1}
+\def\degre{{\char '6}}
+\else
+\def\psenc{OT1}
+\def\degre{{\char '027{}}}
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Ne pas modifier a partir d'ici.
+%    \end{macrocode}
+% On a besoin des packages graphics. On demande aussi iso-latin1 et
+% l'encodage de fonte T1.
+% \changes{v3.7g}{2000/12/13}{Test a pdfoutput changed}
+% \changes{v3.7h}{2001/07/11}{added dvips option to graphicx (garavel)}
+%    \begin{macrocode}
+\if@no@inputenc
+\else
+  \RequirePackage[latin1]{inputenc}
+  \if@tone@encoding
+     \RequirePackage[T1]{fontenc}
+   \else
+     \RequirePackage[OT1]{fontenc}
+  \fi
+\fi
+\@ifundefined{pdfoutput}{
+\RequirePackage[dvips]{graphicx}
+\RequirePackage{textcomp}
+\def\@logoext{epsi}}%
+{\RequirePackage[pdftex]{graphicx}
+\def\textdegree{o}
+\def\@logoext{pdf}}
+%    \end{macrocode}
+% \begin{macro}{twoside}
+% Pour une raison que j'ignore, il y a ce code. Notons que l'option |twoside|
+% de la classe book fait aussi |\@mparswitchtrue|.
+%    \begin{macrocode}
+\@twosidetrue
+%    \end{macrocode}
+% \end{macro}
+% Les fontes Postscript :
+% \begin{macro}{\twentytb}
+% \begin{macro}{\fifteentb}
+% \begin{macro}{\twelvetr}
+% \begin{macro}{\tentm}
+% \begin{macro}{\eighttm}
+% \begin{macro}{\tenhv}
+% Ces macros avaient des noms un peu court. 
+% |twenty| = 20, |fifteen|=15, |twelve| = 12,
+% |ten| = 10, |eight| = 8, et pour les suffixes, |tb| est times bold, |tr| est
+% times roman, |hv| est helvetica.
+% \changes{v3.7b}{1998/02/11}{macro twentytb changed from 20pt to 20.74}
+% \changes{v3.7b}{1998/02/11}{Changement des noms de fonte postscript}
+%    \begin{macrocode}
+\newcommand\twentytb{\fontencoding\psenc\fontfamily{ptm}\fontseries{b}%
+   \fontshape{it}\fontsize{\@xxpt}{25pt}\selectfont}
+\newcommand\fifteentb{\fontencoding\psenc\fontfamily{ptm}\fontseries{b}%
+   \fontshape{n}\fontsize{15pt}{20pt}\selectfont}
+\newcommand\twelvetr{\fontencoding\psenc\fontfamily{ptm}\fontseries{m}%
+   \fontshape{n}\fontsize{12pt}{14pt}\selectfont}
+\newcommand\tentm{\fontencoding\psenc\fontfamily{ptm}\fontseries{m}%
+   \fontshape{n}\fontsize{10pt}{12pt}\selectfont}
+\newcommand\eighttm{\fontencoding\psenc\fontfamily{ptm}\fontseries{m}%
+   \fontshape{n}\fontsize{8pt}{10pt}\selectfont}     
+\newcommand\tenhv{\fontencoding\psenc\fontfamily{phv}\fontseries{m}%
+   \fontshape{n}\fontsize{10pt}{12pt}\selectfont}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \subsection{Commandes de base}
+% \begin{macro}{\titlehead}
+% \begin{macro}{\@titlehead}
+% \begin{macro}{\authorhead}
+% \begin{macro}{\@authorhead}
+% Les en-têtes de pages utilisent les valeurs de |\@titlehead| et
+% |\@authorhead|. Ces valeurs sont positionnées par les macros |\RRauthor| et
+% |\RRtitle|. 
+% L'utilisateur peut les modifier via |\titlehead| et
+% |\authorhead| (cas où le titre est trop long, cas où il y a trop d'auteurs).
+% \changes{v3.7h}{2001/06/06}{titlehead undef'ed, Lasgouttes }
+%    \begin{macrocode}
+\let\titlehead=\undefined
+\newcommand\titlehead[1]{\gdef\@titlehead{#1}}
+\newcommand\authorhead[1]{\gdef\@authorhead{#1}}
+\titlehead{}
+\authorhead{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \subsection{atxy}
+% Comme atxy est buggé, on change le code. On met des |my| partout devant.
+%    \begin{macrocode}
+\newbox\@myatxybox%
+\newif\if@myatxy\@myatxyfalse
+%    \end{macrocode}
+% syntaxe : |atxy(HPOS,VPOS){TEXT}|
+% Positionne le texte en absolu là où on le demande. On commence par mettre
+% dans une boite tous les bouts de texte.
+%
+%    \begin{macrocode}
+\long\def\myatxy(#1,#2)#3{\global\setbox\@myatxybox=\hbox
+ {\unhbox\@myatxybox
+  \vtop to 0pt{\kern #2\hbox to 0pt{\kern #1\relax #3\hss}\vss}}%
+ \global\@myatxytrue}
+%    \end{macrocode}
+% C'est maintenant que les choses se gatent. Il faut positionner la boite. 
+%    \begin{macrocode}
+\def\@usemyatxy{\if@myatxy{%
+  \if@twoside
+    \ifodd\count\z@
+         \let\@themargin\oddsidemargin
+    \else \let\@themargin\evensidemargin
+    \fi
+  \fi
+  \vtop to 0pt{\kern-\headsep \kern-\topmargin \kern-\headheight 
+               \kern-1in \kern-\voffset
+    \hbox to 0pt{\kern-\@themargin \kern-1in \kern-\hoffset
+\unhbox\@myatxybox \hss}\vss}}%
+            \fi\global\@myatxyfalse}% --bg
+%    \end{macrocode}
+%
+% The following is a copy of the latex.tex |\output| routine except for
+% line 1: this prepends the shifted absolute material to the current
+% page. A little unsafe to copy code like this, but I couldn't work
+% out where else to insert the box.
+%
+%    \begin{macrocode}
+\toks0={\setbox255=\vbox{\@usemyatxy \unvbox255}}
+\output=\expandafter{\the\toks0\the\output}
+\def\foo{
+\let\par\@@par%
+  \ifnum\outputpenalty <-\@M\@specialoutput\else%
+  \@makecol\@opcol\@floatplacement\@startcolumn%
+  \@whilesw\if@fcolmade \fi{\@opcol\@startcolumn}\fi%
+  \global\vsize\ifnum\outputpenalty >-\@Miv \@colroom%
+                  \else \maxdimen\fi}%
+%    \end{macrocode}
+%
+% \begin{macro}{\RRNo}
+% \begin{macro}{\@RRNo}
+% La macro |\RRNo| est utilisée pour positionner le numéro du rapport.
+% Il ne faut en aucun cas utiliser cette macro pour la version transmise au
+% SICS. Il faut que la valeur de |\@RRNo| contienne 4 points
+% d'interrogations successifs.
+% \changes{v3.7b}{1998/03/12}{RRno correct, meme si vide}
+%    \begin{macrocode}
+\newcommand\RRNo[1]{%
+    \gdef\@RRNo{#1}%
+    \count1=0#10
+    \count0=0#1
+    \divide\count1 by 10
+    \advance\count1 by -\count0
+    \ifnum \count0=0 
+     \gdef\@RRNo{????}\@latex@error{Ne pas mettre de numéro bidon: #1}\@eha\fi
+    \ifnum \count1=0 \else 
+    \gdef\@RRNo{????}\@latex@error{Ne pas mettre de numéro bidon: #1}\@eha\fi
+    \gdef\@RRdigits{#1}%
+}
+\newcommand\@RRNo{????}
+\newcommand\@RRdigits{0123456789}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRdate}
+% \begin{macro}{\@RRdate}
+% La macro |\@RRdate| contient la date à mettre sur le rapport. Par défaut, on
+% met la date courante. L'utilisateur peut positionner une date via
+% |\RRdate|. Note : la date doit être en français.
+% \changes{v3.4}{1997/09/22}{Manquait novembre dans la liste des mois}
+% \changes{v3.5}{1997/11/24}{Message imprime une seule fois}
+%    \begin{macrocode}
+\newcommand\RRdate[1]{\gdef\@RRdate{#1}}
+\newcommand\@RRdate{%
+ \xdef\@RRdate{
+ \ifcase\the\month
+ \or Janvier\or Février\or Mars\or Avril\or Mai\or Juin%
+ \or Juillet\or Août\or Septembre\or Octobre\or Novembre\or Décembre\fi\space
+ \number\the\year}%
+ \@RRdate%
+ \@warning{*** Pas de \string\RRdate \space :
+         \@RRdate\space par défaut. ***}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRauthor}
+% \begin{macro}{\@RRauthor}
+% \begin{macro}{\and}
+% La macro |\RRauthor| est utilisée pour les noms des auteurs du rapport. On
+% sépare plusieurs auteurs par |\and|. Cette macro sauve le résultat dans
+% |\@RRauthor|. Elle positionne aussi |\@authorhead|, pour les en-têtes de
+% page. 
+% \changes{v3.4}{1997/09/17}{Def de la macro and sortie de author}
+%    \begin{macrocode}
+\newcommand\RRauthor[1]{\gdef\@RRauthor{#1}\gdef\@authorhead{#1}}
+\newcommand\@RRauthor{??\@warning{***Il manque le nom d'auteur,^^J
+   utilisez \string\RRauthor{Prenom1 NOM1\string\and \space Prenom2 NOM
+   \string\and \space... ***}}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRtitle}
+% \begin{macro}{\@RRtitle}
+% \begin{macro}{\RRetitle}
+% \begin{macro}{\@RRetitle}
+% Les deux macros |\RRtitle| et |\RRetitle| prennent en argument le titre en
+% français et en anglais, respectivement. Elles mettent cet argument dans une
+% macro interne de même nom.
+%    \begin{macrocode}
+\newcommand\RRtitle[1]{\gdef\@RRtitle{#1}}
+\newcommand\RRetitle[1]{\gdef\@RRetitle{#1}}
+%    \end{macrocode}
+% Le code qui suit essaie de trouver dans quelle langue est le document.
+% On essaie de savoir si la langue française est définie pour babel,
+% ou alors si le package |french| est chargé. Une fois fait ceci, on regarde
+% si |\titlehead| a été utilisé ; si non, on utilise le titre dans la langue
+% principale.
+%    \begin{macrocode}
+\def\set@titlehead{{\def\tempa{french}\def\tempb{frenchb}%
+   \ifx\bbl@main@language\tempa\global\@RRfrenchtrue\fi
+   \ifx\bbl@main@language\tempb\global\@RRfrenchtrue\fi
+   \@ifundefined{ifFrench}{}{\global\@RRfrenchtrue}%
+   \def\tempa{}%
+   \ifx\@titlehead\tempa \if@RRfrench \gdef\@titlehead{\@RRtitle} \else
+     \gdef\@titlehead{\@RRetitle}\fi\fi}}
+%    \end{macrocode}
+% Le code plus haut est exécuté au début du document. Comme cela la chargement
+% du fichier |babel| ou |french| peut être fait n'importe quand. On met un
+% titre par défaut.
+%    \begin{macrocode}
+\AtBeginDocument{\set@titlehead}
+\newcommand\@RRtitle{??\@warning{*** Pas de titre français, 
+     utilisez \string\RRtitle. ***}}
+\newcommand\@RRetitle{??\@warning{*** Pas de titre anglais, 
+      utilisez \string\RRetitle. ***}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRnote}
+% \begin{macro}{\@RRnote}
+% La macro |\RRnote| permet de faire des notes sur la page 1. On collectionne
+% dans |\@RRnote| l'ensemble de ces textes, en disant que c'est des notes de
+% bas de page.
+% \changes{v3.4}{1997/09/17}{Utilisation de unexpandableprotect}
+%    \begin{macrocode}
+\newcommand\RRnote[1]{\begingroup
+  \let\protect\@unexpandable@protect
+  \xdef\@RRnote{\@RRnote \protect\footnotetext[0]{#1\par}}%
+  \endgroup}
+\newcommand\@RRnote{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRprogramme}
+% Cette macro ne sert plus, il n'y a plus de programme.
+% \changes{v3.4}{1997/09/25}{Suppression de RRprogramme}
+% \end{macro}
+
+% \begin{macro}{\n@mth@m}
+% Macro qui convertit un numéro de programme en texte.
+% Il y avait une macro |\n@mth@mC| qui faisait la même chose, mais elle a été supprimée.
+% \changes{v3.4}{1997/09/17}{Suppression de n@mth@mC}
+%    \begin{macrocode}
+\newcommand\n@mth@m[1]{\ifcase#1 ~
+  \or Réseaux~et~systèmes
+  \or Génie~logiciel\\et~calcul~symbolique
+  \or Interaction~homme-machine,\\images,~données,~connaissances
+  \or Simulation~et~optimisation\\de~systèmes~complexes
+  \else ~\@warning{*** Numéro de thème incorrect. ***}
+  \fi}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\@compteur@theme}
+% \begin{macro}{\@compteur@theme@un}
+% \begin{macro}{\@compteur@theme@deux}
+% \changes{v3.4}{1997/09/24}{Suppression de if@monothem}
+% On peut préciser un ou deux thèmes. 
+%  Pour faire nos petits calculs, on utilise le compteur
+% |\@compteur@theme|. Dans le cas où il y a deux thèmes, on met les numéros dans
+% |\@compteur@theme@un| et |\@compteur@theme@deux|.
+%    \begin{macrocode}
+\newcount\@compteur@theme
+\@compteur@theme=0
+\newcount\@compteur@theme@un\newcount\@compteur@theme@deux
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@RRthmnum}
+% \begin{macro}{\@RRthmname}
+% \begin{macro}{\@RRTHMTYPE}
+% \begin{macro}{\@RRthmtype}
+% On met dans |\@RRthmnum| le numéro du thème, dans |\@RRthmname| le nom du
+% thème. On utilise deux macros qui contiennent le mot « thème ».
+%    \begin{macrocode}
+\newcommand\@RRthmnum{?\@warning{*** Il manque un numéro de thème INRIA ; 
+  utilisez \string\RRtheme ***}}
+\newcommand\@RRthmname{(hors thème INRIA)}
+\newcommand\@RRTHMTYPE{THÈME}
+\newcommand\@RRthmtype{Thème}  
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRtheme}
+% La macro |\RRtheme| prend en argument le numéro du thème.
+%    \begin{macrocode}
+\newcommand\RRtheme[1]{%
+%    \end{macrocode}
+% Il y a des gens qui pensent que le thème est 2A. Pour éviter cela, on compare
+% l'argument à 0. Si l'argument ne commence pas par un chiffre, le test est
+% faux, et |\foo| contient $y$. Si l'argument commence par des chiffres, on 
+% aura dans |\foo| les caractères qui ne sont pas des chiffres. S'il y a 
+% autre chose que des chiffres, le résultat ne sera pas $x$.
+% \changes{v3.7d}{1998/07/23}{Correction de l'algo de test de RRtheme}
+%    \begin{macrocode}
+    \bgroup
+      \edef\foo{\ifnum 0<0#1x\else y\fi}\def\bar{x}%
+      \ifx\foo\bar
+        \global\@compteur@theme=#1
+      \else \global\@compteur@theme=0 \@latex@error{Pas un thème #1}\@eha\fi
+    \egroup
+%    \end{macrocode}
+% Dans le cas où il n'y a qu'un thème, c'est facile, on positionne le numéro
+% du thème, et son nom. En cas d'erreur plus haut, on utilise 1, pas 
+% l'argument. 
+%    \begin{macrocode}
+  \ifnum\@compteur@theme=0
+     \gdef\@RRthmnum{1}
+     \gdef\@RRthmname{\n@mth@m{1}}
+   \else
+  \ifnum\@compteur@theme<10
+     \gdef\@RRthmnum{#1}
+     \gdef\@RRthmname{\n@mth@m{#1}}
+   \else
+%    \end{macrocode}
+% Il faut au plus deux thèmes.
+%    \begin{macrocode}
+   \ifnum\@compteur@theme>99
+        \@warning{*** Pas plus de 2 thèmes INRIA ***}
+   \else
+%    \end{macrocode}
+% On a donc deux thèmes. On change les macros qui contiennent « thème », en
+% mettant ça au pluriel. On calcule les deux numéros, le numéro du thème sera
+% « 3 et 4 », et le nom « nom de 3 --- nom de 4 ».
+%    \begin{macrocode}
+        \gdef\@RRTHMTYPE{THÈMES}
+        \def\@RRthmtype{Thèmes}
+        \@compteur@theme@un=\@compteur@theme \divide\@compteur@theme@un by 10
+        \@compteur@theme@deux=\@compteur@theme@un 
+        \multiply\@compteur@theme@deux by 10
+        \advance\@compteur@theme@deux by -\@compteur@theme
+        \@compteur@theme@deux=-\@compteur@theme@deux
+        \gdef\@RRthmnum{\the\@compteur@theme@un\space et \the\@compteur@theme@deux}
+        \gdef\@RRthmname{\n@mth@m{\@compteur@theme@un} ---
+          \n@mth@m{\@compteur@theme@deux}}
+\fi\fi\fi}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\RRprojet}
+% \begin{macro}{\RRprojets}
+% \begin{macro}{\@RRprojet}
+% \begin{macro}{\@RRprjtype}
+% La macro |\RRprojet| permet de positionner le nom du projet dans
+% |\@RRprojet|. S'il y a deux projets, il faut utiliser |\RRprojets|.
+% On met le mot « projet », ou « projets » dans |\@RRprjtype|.
+%    \begin{macrocode}
+\newcommand\@RRprjtype{Projet}
+\newcommand\RRprojet[1]{\gdef\@RRprojet{#1}}
+\newcommand\RRprojets[1]{\gdef\@RRprjtype{Projets}\gdef\@RRprojet{#1}}
+\newcommand\@RRprojet{??\@warning{*** Pas de nom de projet ; 
+       utilisez \string\RRprojet ***}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\RRnbpage}
+% \begin{macro}{\@RRnbpage}
+% \changes{v3.4}{1997/09/17}{Utilisation de pageref}
+% Normalement, \LaTeX\ compte bien le nombre de pages, mais pour le cas où, 
+% on autorise l'utilisateur à mettre le nombre de pages dans |\RRnbpage|. Le
+% nombre de pages est la valeur de la dernière page du rapport.
+%    \begin{macrocode}
+\newcommand\RRnbpage[1]{\gdef\@RRnbpage{#1}}
+\newcommand\@RRnbpage{\@ifundefined{r@RRlastpageofreport}{??}
+  {\pageref{RRlastpageofreport}}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@RRURnum}
+% \begin{macro}{\@title@logo@name}
+% \begin{macro}{\@RRURaddress}
+% \changes{v3.4}{1997/09/24}{Supression de @RRURname}
+% On met le numéro de l'UR dans |\@RRURnum|, le nom
+% du fichier ps qui contient le logo dans |\@title@logo@name|, et l'adresse dans
+% |\@RRURaddress|. 
+%    \begin{macrocode}
+\newcommand\@RRURnum{0}
+%    \end{macrocode}
+% \end{macro}\end{macro}\end{macro}
+% On commence par la Lorraine (ordre alphabétique).
+% \begin{macro}{\URLorraine}
+% \changes{v3.7c}{1998/04/28}{Remplacement de telecopie par fax}
+% \changes{v3.7c}{1998/04/28}{Tel lorraine sur 1 ligne}
+% \changes{v3.7f}{1999/09/17}{deux numéros de téléphone}
+% \changes{v3.7f}{1999/09/17}{Suppression de l'antenne de Metz}
+%    \begin{macrocode}
+\newcommand\URLorraine{\gdef\@RRURnum{2}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Lorraine\\
+         LORIA, Technopôle de Nancy-Brabois, Campus scientifique,\\
+         615, rue du Jardin Botanique, BP 101,
+         54602 Villers-L\`es-Nancy (France)\\ 
+    \eighttm 
+         T\'el\'ephone :  +33 3  83 59 30 00 ---
+         Télécopie : +33 3  83 27 83 19}
+    \gdef\@title@logo@name{Logo-INRIA-Lorraine-couleur}}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\URRennes}
+% Le suivant est Rennes. Pour des raisons historiques, c'est le défaut.
+% \changes{v3.7f}{1999/09/17}{deux numéros de téléphone}
+%    \begin{macrocode}
+\newcommand\URRennes{\gdef\@RRURnum{3}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Rennes\\
+      IRISA, Campus universitaire de Beaulieu, 
+            35042 Rennes Cedex (France)\\
+ \eighttm 
+      T\'el\'ephone :  +33 2 99 84 71 00 ---
+      Télécopie : +33 2 99 84 71 71}
+    \gdef\@title@logo@name{Logo-INRIA-Rennes-couleur}}
+% \URRennes
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\URRhoneAlpes}
+% Puis Grenoble
+%    \begin{macrocode}
+\newcommand\URRhoneAlpes{\gdef\@RRURnum{4}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Rh\^one-Alpes\\
+      655, avenue de l'Europe, 38330 Montbonnot-St-Martin (France)\\
+ \eighttm 
+      T\'el\'ephone : +33 4 76 61 52 00 ---
+      Télécopie  +33 4 76 61 52 52}
+    \gdef\@title@logo@name{Logo-INRIA-Rhone-Alpes-couleur}}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\URRocq}
+% Ne pas oublier Rocquencourt.
+% \changes{v3.7f}{1999/09/17}{deux numéros de téléphone}
+%    \begin{macrocode}
+\newcommand\URRocq{\gdef\@RRURnum{5}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Rocquencourt\\
+         Domaine de Voluceau, Rocquencourt, BP 105, 
+         78153 Le Chesnay Cedex (France)\\ 
+        \eighttm  T\'el\'ephone : +33 1 39 63 55 11 ---
+         Télécopie :  +33 1 39 63 53 30}
+    \gdef\@title@logo@name{Logo-INRIA-Rocq-couleur}
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\URFuturs}
+% Ni Futurs.
+% \changes{v3.8a}{2002/11/07}{Ajout de futurs}
+%    \begin{macrocode}
+\newcommand\URFuturs{\gdef\@RRURnum{1}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Futurs\\
+         Domaine de Voluceau, Rocquencourt, BP 105, 
+         78153 Le Chesnay Cedex (France)\\ 
+        \eighttm  T\'el\'ephone : +33 1 39 63 55 11 ---
+         Télécopie :  +33 1 39 63 53 30}
+    \gdef\@title@logo@name{Logo-INRIA-Futurs-couleur}
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\URSophia}
+% On termine par Sophia Antipolis.
+% \changes{v3.6}{1997/12/17}{date de changement de numero}
+% \changes{v3.7}{1998/01/19}{Suppression de l'ancien numero}
+% \changes{v3.7f}{1999/09/17}{Suppression des points dans BP}
+% \changes{v3.7f}{1999/09/17}{deux numéros de téléphone}
+%    \begin{macrocode}
+\newcommand\URSophia{\gdef\@RRURnum{6}
+    \gdef\@RRURaddress{Unit\'e de recherche INRIA Sophia Antipolis\\
+         2004, route des Lucioles, BP 93, 
+            06902 Sophia Antipolis Cedex (France)\\
+       \eighttm
+         T\'el\'ephone : +33 4 92 38 77 77 ---
+         Télécopie : +33 4 92 38 77 65\\
+    }
+    \gdef\@title@logo@name{Logo-INRIA-Sophia-couleur}}
+%    \end{macrocode}
+% \end{macro}
+% \subsection{Dernière page}
+% \begin{macro}{\if@mustprint}
+% \begin{macro}{\@comspace}
+% La dernière page contient les adresses de toutes les UR. On met en premier
+% l'UR de l'auteur, puis les autres, par ordre alphabétique. À chaque UR est
+% associé un numéro, on imprime dans l'ordre des numéros croissants. On
+% utilise le booléen |\if@mustprint| s'il faut imprimer l'UR. Autre subtilité
+% : quand on imprime la première UR, un met un changement de ligne après le
+% nom, dans le cas contraire on met un deux-points. Le changement de ligne est
+% |\\|, et la macro |\@comspace| imprime le deux-points.
+%    \begin{macrocode}
+\newcommand\@comspace{ : }
+\newif\if@mustprint
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@printUR}
+% La macro |\@printUR| prend deux arguments $n$ et $i$. Elle est appellée 12
+% fois, d'abord avec $i=1$, puis avec $i=0$. La valeur de $n$ est 1, 2, 3, 4,
+% 5, et 6. Dans le cas $i=1$, on veut imprimer l'UR courante. 
+% Dans le cas $i=0$,
+% on veut imprimer les autres UR. Le premier argument est le numéro de l'UR.
+%    \begin{macrocode}
+\newcommand\@printUR[2]{%
+ \@mustprintfalse
+ \ifx#21
+   \if #1\@RRURnum \@mustprinttrue\fi
+ \else\if #1\@RRURnum \else\@mustprinttrue\fi\fi
+ \if@mustprint
+%    \end{macrocode}
+% Il faut faire quelque chose.
+% Dans le cas $i=1$, on utilise un corps 10 points, et sinon un corps 8
+% points. La charte graphique demande un interligne de 9.5 points. On utilise
+% un interligne de 10 (pour éviter de créer une fonte). On positionne la
+% macro |\@RRoptret|. Dans le cas $i=1$, c'est un changement de ligne, dans le
+% cas contraire, c'est un deux-points.
+%    \begin{macrocode}
+ \ifx#21\tentm\let\@RRoptret\\
+   \else\eighttm\let\@RRoptret\@comspace\fi
+%    \end{macrocode}
+% On y va. 
+% \changes{v3.7f}{1999/09/17}{mise à jour des adresses}
+%    \begin{macrocode}
+ \ifcase #1
+ \or 
+   Unité de recherche INRIA Futurs\@RRoptret 
+   Domaine de Voluceau - Rocquencourt - BP 105 - 
+   78153~Le~Chesnay~Cedex (France)
+ \or
+   Unité de recherche INRIA Lorraine\@RRoptret 
+   LORIA, Technopôle de Nancy-Brabois - Campus scientifique\\
+   615, rue du Jardin Botanique - BP~101 - 
+   54602~Villers-lès-Nancy Cedex (France)
+ \or
+   Unité de recherche INRIA Rennes\@RRoptret
+   IRISA, Campus universitaire de Beaulieu - 35042~Rennes~Cedex (France)
+ \or
+   Unité de recherche INRIA Rhône-Alpes\@RRoptret 
+   655, avenue de l'Europe -  38330  Montbonnot-St-Martin (France)
+ \or 
+   Unité de recherche INRIA Rocquencourt\@RRoptret 
+   Domaine de Voluceau - Rocquencourt - BP 105 - 
+   78153~Le~Chesnay~Cedex (France)
+  \or
+   Unité de recherche INRIA Sophia Antipolis\@RRoptret 
+   2004, route des Lucioles -
+   BP~93 - 06902~Sophia Antipolis Cedex (France)
+  \fi
+%    \end{macrocode}
+% De plus, on met un peut plus d'espace vertical après la première UR. 
+%    \begin{macrocode}
+   \ifx#21\\[2mm]\else \\\fi
+\fi}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\lastRRpage}
+% Cette macro génère la dernière page. On commence par dire qu'il n'y a rien
+% d'intéressant, on met un label, pour pouvoir compter le nombre de pages,
+% puis on place du code à une position bien choisie. On change
+% la largeur de la ligne à 18cm. Rappel : on a déjà changé de page. Je veux la
+% page de couverture sur une page paire. On décrémente le compteur de 1, et si
+% la page est paire, on envoie une page de plus (note : c'est une idée idiote,
+% on ne fait donc rien).
+% \changes{v3.7h}{2001/06/14}{clearpage, gouzé}
+%    \begin{macrocode}
+\newcommand\lastRRpage{%
+  \clearpage\thispagestyle{empty}%
+  \label{RRlastpageofreport}
+  \addtocounter{page}{-1}
+  \null\vfill
+  \myatxy(1.5cm,163mm){\vbox{\hsize=18cm
+%    \end{macrocode}
+% On met d'abord le logo Inria, puis un peu d'espace.
+%    \begin{macrocode}
+    \centerline{\includegraphics[height=1.4cm]{Logo-INRIA-picto.\@logoext}}
+    \vskip1cm
+%    \end{macrocode}
+% Dans une boite de hauteur de 6 cm, on met un trait, les 6 UR (voir plus
+% haut), puis un trait.
+%    \begin{macrocode}
+    \vbox to 6cm{%
+       \hrule\vfill
+       \begin{tiny}
+        \begin{center}
+          \@printUR 11\@printUR21\@printUR31\@printUR41\@printUR51\@printUR61
+          \@printUR 10\@printUR20\@printUR30\@printUR40\@printUR50\@printUR60
+         \end{center}
+       \end{tiny}%
+       \vfill\hrule}
+%    \end{macrocode}
+% Ensuite, on met l'éditeur, l'URL, et l'ISSN.
+% \changes{v3.4}{22/09/1997}{ISSN correct}
+%    \begin{macrocode}
+   \vskip5mm
+   \begin{center}\eighttm \'Editeur\\
+     INRIA - Domaine de Voluceau - Rocquencourt, BP~105 -
+     78153~Le~Chesnay~Cedex (France)\\
+     \tentm \textsf{http://www.inria.fr}\\[.5mm]
+     ISSN 0249-\ifcase\cpt@type\or 6399\or 0803\fi
+   \end{center}}}
+   \clearpage
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\endRRdocument}
+% On utilise |\AtEndDocument| pour insérer la dernière page.
+% \changes{v3.4}{1997/10/19}{Utilisation de AtEndDocument}
+%    \begin{macrocode}
+\AtEndDocument{\lastRRpage}
+%    \end{macrocode}
+% \end{macro}
+% \subsection{Page de titre}
+% \begin{macro}{\@resume}
+% \begin{macro}{\@abstract}
+% \begin{macro}{\RRresume}
+% \begin{macro}{\RRabstract}
+% Le résumé en français et en anglais se font via les commandes |\RRresume| et
+% |\RRabstract|, qui mettent dans une variable cachée le texte. L'appel à
+% |\ehyph| et |\fhyph| est curieux. On donne une valeur par défaut à ces
+% choses. 
+% \changes{v3.7b}{1998/02/11}{Real name is RRabstract, not abstract}
+%    \begin{macrocode}
+\newcommand\RRresume[1]{%
+    \long\def\@resume{\noindent{\bf Résumé : }\french #1\par}}
+\newcommand\RRabstract[1]{%
+    \long\def\@abstract{\noindent{\bf Abstract: }\english #1\par\french}}
+\RRresume{Pas de résumé}
+\RRabstract{No abstract}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@motcle}
+% \begin{macro}{\@keyword}
+% \begin{macro}{\motcle}
+% \begin{macro}{\keyword}
+% Même technique pour les mots clés.
+% \changes{v3.4}{1997/09/25}{fhyph mal place dans keyword}
+% \changes{v3.5}{1997/10/05}{s a mots-cles}
+%    \begin{macrocode}
+\newcommand\motcle[1]{%
+   \def\@motcle{\noindent{\bf Mots-clés : } \french #1\par}}
+\newcommand\keyword[1]{%
+   \def\@keyword{\noindent{\bf Key-words: } \english #1\par\french}}
+\motcle{Pas de motclef}
+\keyword{No keywords}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% Il y a une tendance à vouloir mettre « RR » devant toutes les commandes.
+%    \begin{macrocode}
+
+\let\resume=\RRresume \let\abstract=\RRabstract
+\let\RRmotcle=\motcle \let\RRkeyword=\keyword
+%    \end{macrocode}
+% \begin{macro}{\@nothanks}
+% On redéfinit la macro |\thanks| avec un argument optionnel. Ceci permet 
+% d'inhiber cette macro. Note : |\thanks| est redéfini plus loin à cause de
+% |french|.
+% \changes{v3.7e}{1999/05/07}{Modif de thanks}
+% \changes{v3.7h}{2001/07/11}{Code of thanks changed}
+%    \begin{macrocode}
+\def\@nothanks{\@ifnextchar[{\@xnothanks}{\@gobble}}
+\def\@xnothanks[#1]#2{\relax}
+%\let\orig@thanks\thanks
+%\def\thanks{\@ifnextchar[ {\@xthanks}{\orig@thanks}}
+\def\@xthanks[#1]#2{\orig@thanks{#2}%
+  \expandafter\edef\csname @footnote@#1\endcsname{\the\c@footnote}}
+\def\thanksref#1{\footnotemark[\csname @footnote@#1\endcsname]}
+%    \end{macrocode}
+% \end{macro}
+
+% \begin{macro}{\ps@titrr}
+% La commande |\ps@titrr| est utilisée quand on fait |\pagestyle{titrr}|. Elle
+% définit les haut et bas de page.
+%    \begin{macrocode}
+\newcommand\ps@titrr{%
+%    \end{macrocode}
+% Le haut de page contient le Logo Inria de l'UR rédactrice.
+% \changes{v3.7b}{1998/02/11}{modif logo page 1}
+%    \begin{macrocode}
+  \def\@oddhead{\hbox to\textwidth{%
+      \hfill
+      \vbox to \headheight{%
+\hbox{\includegraphics[width=5.7cm]{\@title@logo@name.\@logoext}}\vss}%
+      \hfill
+   }}
+%    \end{macrocode}
+% Le bas de page contient l'adresse de l'UR.
+%    \begin{macrocode}
+  \def\@oddfoot{\relax}
+%    \end{macrocode}
+% Ce machin est sur la page 1, et ce qui suit ne sert pas en principe.
+%    \begin{macrocode}
+   \let\@evenfoot\@oddfoot
+   \let\@evenhead\@oddhead
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\@out@UR}
+% La macro suivante positionne l'adresse de l'UR sur la page 1. C'est un peu
+% compliqué. On commence par mettre cette adresse dans une boîte. La largeur
+% de la boîte est la taille de ligne, la hauteur est indéfinie.
+% On calcule $y$ qui est 28cm moins cette hauteur : c'est là qu'on va placer
+% la boîte : 
+% elle sera donc à 2 cm du bord inférieur de la page. Comme on utilise un
+% placement absolu, il faut aussi calculer la position horizontale.
+% \changes{v3.4}{1995/09/25}{Ajout de @outUR}
+%    \begin{macrocode}
+\newcommand\@out@UR{%
+  \setbox0\hbox to\textwidth{\vbox{%\hrule%
+      \begin{center}\tentm\@RRURaddress\end{center}%
+   }}%
+  \dimen0=29cm
+  \advance\dimen0 -\ht0
+  \dimen1=1in
+  \advance\dimen1\oddsidemargin
+  \myatxy(\dimen1,\dimen0){\box0}%
+%    \end{macrocode}
+% Il y a maintenant un petit problème : on ne veut pas que les notes touchent
+% l'adresse. Pour cela, on calcule la position absolue $y'$ de la fin du
+% texte. Si $y'$ est plus grand que $y$, on diminue de $y'-y$ la hauteur de la
+% page courante.
+%    \begin{macrocode}
+  \dimen1=1in
+  \advance\dimen1\topmargin
+  \advance\dimen1\headheight
+  \advance\dimen1\headsep
+  \advance\dimen1\textheight
+  \advance\dimen1\footskip
+  \ifdim \dimen1>\dimen0 
+     \advance\dimen1 -\dimen0 \enlargethispage{-\dimen1}\fi}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\makeRR}
+% \begin{macro}{\makeRT}
+% \begin{macro}{\cpt@type}
+% Les commandes |\makeRR| et |\makeRT| créent la page de titre. On appelle une
+% macro commune, en mettant un indicateur dans |\cpt@type|.
+% \changes{v3.5}{1997/11/25}{Added new level of brace. This keeps defs local}
+% \changes{v3.6}{1997/12/01}{changed brace position}
+%    \begin{macrocode}
+\newcommand\makeRR{\cpt@type=1{\@makeRRorRT}}
+\newcommand\makeRT{\cpt@type=2{\@makeRRorRT}}
+\newcount\cpt@type
+\cpt@type=1
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@makeRRorRT}
+% \changes{v3.7c}{1998/07/07}{Test de URmachin}
+% Le code de cette macro est un peu long. On commence par la page de
+% couverture. D'abord, on se débrouille que les macros |\fhyph| et |\ehyph|
+% existent. Note : pas sur que ça marche ... On définit |\thanks| ici.
+% On définit |\and| comme étant un tiret (c'est le séparateur entre
+% les noms des auteurs). On passe en 1 colonne, si le mode est 2 colonnes.
+% \changes{v3.7h}{2001/07/11}{language switch algo changed (durand)}
+%    \begin{macrocode}
+\newcommand\@makeRRorRT{%
+   \let\orig@thanks\thanks
+   \def\thanks{\@ifnextchar[ {\@xthanks}{\orig@thanks}}%
+   \@ifundefined{english}{%
+     \def\french{\language=1 }\def\english{\language=0 }
+   }{}
+   \ifnum 0= \@RRURnum \@latex@error{Pas d'unité de recherche!}\@eha\fi
+   \def\and{ --- }
+   \@restonecolfalse
+   \if@twocolumn\@restonecoltrue\onecolumn\fi
+   \thispagestyle{empty}
+%    \end{macrocode}
+% Redéfinition (pourquoi ?) de la commande pour les notes en bas de page.
+%    \begin{macrocode}
+  \def\@makefnmark{\rlap{\@textsuperscript{\@thefnmark}}}
+%    \end{macrocode}
+% Insertion du Postscript qui contient « Rapport de recherche » ou « Rapport
+% technique ».
+%    \begin{macrocode}
+  \ifcase\cpt@type
+   \or \myatxy(1.05cm,1.625cm){\includegraphics{rap-rech.\@logoext}}
+   \or \myatxy(1.05cm,1.625cm){\includegraphics{rap-tech.\@logoext}}
+   \else\@warning{*** Problème avec le type de rapport. 
+       Prévenez la maintenance ***}
+   \fi
+%    \end{macrocode}
+% Insertion du Logo Inria.
+% \changes{v3.7b}{1998/02/11}{Repositionnement logo page de titre}
+%    \begin{macrocode}
+   \myatxy(77mm,2cm)
+       {\includegraphics[width=5.7cm]{Logo-INRIA-couleur.\@logoext}}
+%    \end{macrocode}
+% Insertion du nom de l'INRIA. Le placement vertical de ce machin est un peu
+% délicat. On calcule la position courante où est mis le texte. On insère un
+% |\vskip| pour que cela soit placé comme il faut. Par ailleurs, on se
+% débrouille pour que le texte soit centré horizontalement. On fait
+% l'hypothèse que la ligne tient sur 14cm. On met le nom de l'institut dans
+% une boite, et on place la boite là où il faut.
+% \changes{v3.6}{1997/12/17}{Page de couverture change}
+%    \begin{macrocode}
+   {%
+   \parskip=0pt
+   \@tempdima=5cm
+   \advance \@tempdima -1in
+   \advance\@tempdima -\topmargin
+   \advance\@tempdima -\headheight
+   \advance\@tempdima -\headsep
+   \advance\@tempdima -\topskip
+   \null \vskip\@tempdima
+   \setbox0\hbox to 14cm{%
+     \noindent\hfill
+     {\tentm INSTITUT NATIONAL DE RECHERCHE
+            EN INFORMATIQUE ET EN AUTOMATIQUE}%
+      \hfill}
+   \@tempdima=1in\advance\@tempdima\evensidemargin
+   \advance\@tempdima-3.5cm
+   \noindent\kern-\@tempdima\hbox to0pt{\box0\hss}
+   }%
+%    \end{macrocode}
+% Insertion du titre du rapport. On met tout dans une boite verticale de
+% hauteur 10cm. Il y a 1,5 cm entre le nom de l'institut et cette boite. La
+% boite fait 16cm de large (redéfinition de |hsize|).
+%    \begin{macrocode}
+   \vskip1.5cm
+   \setbox0\vbox to 10cm{%
+   \hsize=16cm
+%    \end{macrocode}
+% On inhibe |\thanks| et |\footnotemark| (pas de notes sur la page de
+% couverture). On met le titre dans la bonne langue.
+% \changes{v3.6}{1997/12/17}{changed def of footnotemark}
+%    \begin{macrocode}
+   \begin{center}
+     \def\footnote##1{\relax}%
+     \let\thanks\@nothanks
+     \def\footnotemark{%
+         \@ifnextchar[\my@xfootnotemark\relax}
+     \def\my@xfootnotemark[##1]{\relax}%
+      \baselineskip20pt
+      \twentytb \if@RRfrench {\@RRtitle}\else {\@RRetitle}\fi
+      \\[1cm]
+%    \end{macrocode}
+% Et maintenant l'auteur, le numéro du rapport, et la date.
+% \changes{v3.7c}{1998/04/28}{Utilisation de textdegree pour numero}
+%    \begin{macrocode}
+      {\twelvetr \@RRauthor}%
+      \vfill
+      {\fifteentb N\textdegree\ \@RRNo}\\
+      {\twelvetr \@RRdate}\\
+   \end{center}}%
+%    \end{macrocode}
+% On positionne proprement la boite dans la page.
+%    \begin{macrocode}
+   \@tempdima=1in\advance\@tempdima\evensidemargin
+   \advance\@tempdima-2.5cm
+   \noindent\kern-\@tempdima\hbox to0pt{\box0\hss}
+%    \end{macrocode}
+% Finalement, on met « Thème 2 », ou « Thèmes 1 et 4 », avec un filet à gauche
+% et à droite.
+%    \begin{macrocode}
+   \myatxy(70mm,175mm) {\hbox to 72mm{%
+      \hrulefill\tenhv ~\@RRTHMTYPE~\@RRthmnum~ \hrulefill}}
+%    \end{macrocode}
+% On dit que tout ça, c'est la page zéro. C'est tout pour cette page.
+% On construit une autre page, numérotée zéro, qui sera vide.
+%    \begin{macrocode}
+      \vfill
+      \c@page\z@
+      \newpage
+      \thispagestyle{empty}
+      \c@page\z@
+      \null
+      \vfill      
+      \newpage
+%    \end{macrocode}
+% Allons-y pour la page 1. On commence par redéfinir les macros qui impriment
+% les notes en bas de page, et les appels de note. On redéfinit aussi la macro
+% |\and|, pour mettre une virgule entre les auteurs.
+% \changes{v3.4}{1997/09/19}{Supression de fndot}
+% \changes{v3.6}{1997/12/17}{reset footnotecounter}
+%    \begin{macrocode}
+%%\def\@fnsymbol##1{\ifcase##1 \or * \or {**} \or {***} \or {****}
+%% \or {*****} \else\@ctrerr \fi\relax}  
+   \gdef\and{, }
+   \def\thefootnote{\fnsymbol{footnote}}
+   \setcounter{footnote}{0}
+   \def\@makefnmark{\hbox{\@textsuperscript{\@thefnmark}}}
+   \long\def\@makefntext##1{\parindent 1em\noindent
+            \hb@xt@1.8em{%
+                \hss\@textsuperscript{\normalfont\@thefnmark}} ##1}%
+   \let\footnoterule\relax 
+%    \end{macrocode}
+% La première chose à faire est de positionner l'adresse de l'UR, ce qui va
+% calculer la taille de la page. On envoie ensuite le titre (langue
+% principale)  et l'auteur.
+%    \begin{macrocode}
+   \null  \vskip 30pt
+   \thispagestyle{titrr}
+   \@out@UR
+   \begin{center}
+      {\Large\bf \if@RRfrench \@RRtitle\else\@RRetitle\fi \par} 
+      \vskip 2em
+      {\large \lineskip .75em \@RRauthor \par}
+      \vskip 1em
+%    \end{macrocode}
+% On met maintenant le programme, et pas uniquement le numéro, suivi du nom du
+% projet. 
+%    \begin{macrocode}
+      {\normalsize \@RRthmtype~\@RRthmnum{}  --- \@RRthmname\par}
+      {\normalsize \@RRprjtype~\@RRprojet \par}\vskip 1em
+%    \end{macrocode}
+% On balance un truc du genre « Rapport de recherche numéro 123 --- premier
+% janvier 2000 --- 37 pages »
+%    \begin{macrocode}
+      {\normalsize 
+        \ifcase\cpt@type\or Rapport de recherche \or Rapport technique\fi
+        \space n\textdegree{} \@RRNo{} --- \@RRdate{} ---
+       \@RRnbpage{} pages\par}
+   \end{center}
+%    \end{macrocode}
+% On envoie les notes, 
+%    \begin{macrocode}
+   \@RRnote
+   \@thanks 
+   \vfil
+%    \end{macrocode}
+%  On met le résumé et les mots clés dans la langue principale.
+% \changes{v3.4}{1997/09/19}{le moins de choses possible dans les test}
+%    \begin{macrocode}
+   \if@RRfrench
+      \@resume \par\vskip2mm \@motcle \else
+      \@abstract\par\vskip2mm \@keyword\fi
+   \vfil
+%    \end{macrocode}
+%  On met en bas de page une indication qui dit que le résumé dans l'autre
+%  langue est sur la page suivante. Ce code est obsolète.
+% \changes{v2.5}{1997/10/27}{pagestyle-empty en trop}
+% \changes{v2.5}{1997/10/27}{Suppression du tsvp, pto}
+%    \begin{macrocode}
+%   \pagebreak[0]
+%   {\footnotesize\em
+%    \begin{flushright}
+%       \if@RRfrench (Abstract: pto) \else (Résumé : tsvp)\fi
+%    \end{flushright}}
+%    \end{macrocode}
+%  On change de page. 
+%    \begin{macrocode}
+%%   \pagebreak[4]
+     \newpage
+     \thispagestyle{empty}
+%    \end{macrocode}
+%  On met le titre dans l'autre langue.
+%    \begin{macrocode}
+   {\Large\bf \begin{center}
+       \if@RRfrench \@RRetitle\else \@RRtitle \fi
+        \end{center}}
+%    \end{macrocode}
+%  Puis le résumé et les mots clés dans l'autre langue.
+%    \begin{macrocode}
+    \pagebreak[0]
+    \if@RRfrench \@abstract\par\vskip2mm \@keyword \french\else
+        \@resume \par\vskip2mm \@motcle \english\fi      
+    \vfil
+    \null
+%%    \thispagestyle{empty}
+   \newpage
+   \if@restonecol\twocolumn\fi
+%    \end{macrocode}
+%  Pour finir, on remet le compteur de notes à 0, on tue |\thanks|, et on
+%  désactive |\maketitle| ???.
+% \changes{v3.5}{1997/11/25}{Global added}
+%    \begin{macrocode}
+  \setcounter{footnote}{0} 
+  \global\def\thanks##1{\relax}
+  \let\maketitle\relax
+}
+%    \end{macrocode}
+% \end{macro}
+% \subsection{Les autre pages}
+% \begin{macro}{\@inibe}
+% Macro utilisée pour mettre le titre sur toutes les pages. On vire les |\\|,
+% les  |\thanks| et les |\footnotemark|.
+%    \begin{macrocode}
+\newcommand\@inibe{%
+      \let\\\space
+      \let\thanks\@nothanks%
+      \def\footnotemark[##1]{\relax}}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ps@pi}
+% Style de page |pi|, i.e. pages intérieures. À droite, il y a le titre et le
+% numéro de pages. À gauche il y a la même chose, dans l'autre sens.
+% En bas, il y a à gauche le mot INRIA, et à droite, il y a « RR numéro 128 »,
+% ou peut être aussi « RT ». Le numéro du rapport est remplacé par une chaîne
+% magique. 
+% \changes{v3.6}{1997/12/01}{Let ps@plain  ps@pi}
+%    \begin{macrocode}
+\newcommand\ps@pi{\let\@mkboth\@gobbletwo%
+     \def\@oddhead{\vbox{\hbox to \textwidth{%
+         \normalsize\it{\@inibe\@titlehead}\hfil\rm\thepage}%
+          \hbox{\rule[-1ex]{\textwidth}{.03cm}}}}
+     \def\@oddfoot{{\footnotesize \ifcase\cpt@type\or RR \or RT\fi
+          \space n\textdegree{} \@RRdigits{}}\hfill}
+     \def\@evenhead{\vbox{\hbox to \textwidth{%
+            \rm\thepage\normalsize\it\hfil{\@inibe\@authorhead}}
+            \hbox{\rule[-1ex]{\textwidth}{.03cm}}}}%
+     \def\@evenfoot{\hfill{\footnotesize INRIA}}}
+\let\ps@plain\ps@pi
+%    \end{macrocode}
+% \end{macro}
+% \subsection{Liens hypertextes}
+% Un des problèmes avec le package hyperref est qu'il dit toujours que
+% les labels ont changé, alors que c'est faux. Le code qui suit corrige ce
+% problème. L'expansion d'un |\cite| est de la forme
+% |\hyper@link [Cite]{}{\hyper@hash cite.charte}{4}|. 
+% Nouvelle version de hyperref : c'est maintenant :
+% |\hyper@@link[cite]{}{cite.charte}{4}|
+% On commence par faire une macro qui récupère le numéro de la page.
+% \begin{macro}{testdef}
+%    \begin{macrocode}
+\def\@myhyperlink[#1]#2#3#4{#4}
+%    \end{macrocode}
+% La macro |\RR@testdef| compare d'abord |#3| et |#1@#2|. Si ces deux
+% quantités sont les mêmes, c'est OK. 
+%    \begin{macrocode}
+\def\RR@testdef #1#2#3{%
+  \def\reserved@a{#3}%
+  \expandafter \ifx \csname #1@#2\endcsname \reserved@a
+  \else 
+%    \end{macrocode}
+% Si on est ici, c'est qu'il y a un problème. On ne traite que le cas où
+% |#1| est b, i.e. une référence bibliographique.
+% On re-évalue le troisième argument, en utilisant |\@myhyperlink|, et on
+% teste ça. Au cas où ça rate, on met dans le fichier de log la valeur de la
+% référence qui a changé. Au moins, ça permet de voir ce qui se passe.
+%    \begin{macrocode}
+    \ifx #1b%
+      {\let\hyper@@link\@myhyperlink
+       \edef\XX@{#3}\edef\XX@@{\csname #1@#2\endcsname}%
+       \ifx\XX@\XX@@  \else \wlog{Reference #1-#2 changed}\@tempswatrue\fi}%
+    \else \wlog{Reference #1-#2 changed}\@tempswatrue\fi
+ \fi}
+%    \end{macrocode}
+% On définit |\RRtestdef| qui utilise cette macro à la place de l'ancienne. Ce
+% document utilise cette macro.
+%    \begin{macrocode}
+\newcommand\RRtestdef{\global\let\@testdef\RR@testdef}
+%    \end{macrocode}
+% \end{macro}\RRtestdef
+% \subsection{Le reste}
+% Fraction et compteurs pour les flottants
+%    \begin{macrocode}
+\setcounter{topnumber}{5}
+\def\topfraction{1}
+\setcounter{bottomnumber}{4}
+\def\bottomfraction{1}
+\setcounter{totalnumber}{10}
+\def\textfraction{0}
+\def\floatpagefraction{.5}
+%    \end{macrocode}
+% Autre paramètres.
+%    \begin{macrocode}
+\clubpenalty=10000
+\widowpenalty=10000
+\hfuzz=1pt
+\vfuzz=5pt
+\headheight1cm
+\headsep1cm
+\pagestyle{pi}
+%    \end{macrocode}
+% Autre paramètres.
+%    \begin{macrocode}
+\@ifundefined{chapter}{\relax}
+   {\def\chapter{\cleardoublepage \thispagestyle{pi}
+   \global\@topnum\z@ \@afterindentfalse \secdef\@chapter\@schapter}}
+%</RR|RRA4>
+%    \end{macrocode}
+% Paramètres de taille standard
+%    \begin{macrocode}
+%<*RR>
+\textwidth14cm
+\textheight18cm
+\evensidemargin0.96cm
+\oddsidemargin0.96cm
+\footskip2cm
+%</RR>
+%    \end{macrocode}
+% Paramètres de taille en mode RRA4
+% \changes{v3.7}{1998/01/19}{bigger footskip for RRA4}
+%    \begin{macrocode}
+%<*RRA4>
+\textwidth17cm
+\textheight24cm
+\evensidemargin-0.46cm
+\oddsidemargin-0.46cm
+\topmargin-1.46cm
+\footskip1cm
+%</RRA4>
+%    \end{macrocode}
+%
+% \Finale  
+\endinput

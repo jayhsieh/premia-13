@@ -1,0 +1,6 @@
+LIBRARY    libmanu.dll
+EXPORTS
+	implied
+	LoiNormale
+	implied_volatility
+	libmanu_

@@ -1,0 +1,282 @@
+\section{Probl\`eme inverse~: description de l'algorithme de 
+calibration}
+\label{SEC:PB_INVERSE}
+
+\subsection{Formulation du probl\`eme}
+
+Nous avons d\'ecrit \`a la section~\ref{SEC:PB_DIRECT} la 
+r\'esolution num\'erique de l'EDP de Dupire~: 
+\begin{eqnarray*}
+\frac{\partial U}{\partial T}(y,T) + 
+(r-q+\frac{1}{2}\hat{\sigma}^2(y,T))
+\frac{\partial U}{\partial y}(y,T) - 
+\frac{1}{2}\hat{\sigma}^2(y,T)
+\frac{\partial^2 U}{\partial y^2}(y,T) &=& -qU(y,T),
+\end{eqnarray*}
+avec les conditions aux limites suivantes~: 
+$$
+\left \{
+\begin{array}{ll}
+U(y,t_0) = \max(S_0-e^y,0)& \text{pour tout r\'eel $y$},\\
+\lim_{y \rightarrow -\infty}U(y,T) = S_0e^{-q(T-t_0)} & 
+\text{pour}~ t_0\leq T,\\
+\lim_{y \rightarrow +\infty} U(y,T) = 0 & 
+\text{pour}~ t_0\leq T.
+\end{array}
+\right .
+$$
+Nous pouvons ainsi calculer, pour une volatilit\'e donn\'ee, le 
+prix de l'option $V(K,T) = U(e^y,T)$ pour tout prix d'exercice 
+$K$ et toute maturit\'e $T$. 
+
+A l'instant $t=t_0$, les donn\'ees du march\'e correspondent \`a 
+des prix d'options de maturit\'es $T_1,...,T_n$ et, pour chacune 
+de ces maturit\'es $T_i$, de prix d'exercice 
+$K_{i1},...,K_{im_i}$. On note $\tilde{V}$ le vecteur form\'e de 
+tous les prix d'options $\tilde{V}_{ij}$ de maturit\'e $T_i$ et 
+de prix d'exercice $K_{ij}$.
+
+Pour une volatilit\'e $\sigma$ donn\'ee, on note $V(\sigma)$ le 
+vecteur form\'e de tous les prix d'options $V_{ij}(\sigma)$ de 
+maturit\'e $T_i$ et de prix d'exercice $K_{ij}$, calcul\'es en 
+r\'esolvant l'EDP de Dupire. Notre objectif est de d\'eterminer 
+la volatilit\'e $\sigma$ telle que les prix calcul\'es soient 
+aussi proches que possible des donn\'ees. De plus, nous 
+souhaitons \`a priori (mais ce point reste \`a discuter) obtenir 
+une nappe de volatilit\'e aussi lisse que possible. Nous 
+formulons le probl\`eme de calibration de la fa\c con suivante~: 
+\begin{equation}
+\label{FORM:MIN}
+\dsp\min_{\sigma} F(\sigma) := \dsp\frac{1}{2} 
+\| V(\sigma) - \tilde{V} \|^2 + 
+\lambda \; \| \, \nabla \sigma \, \|^2
+\end{equation}
+o\`u $\|.\|$ correspond \`a la norme Euclidienne dans l'espace 
+discret des donn\'ees et $\lambda \in \cR$ est un coefficient 
+de r\'egularisation \`a d\'eterminer. Le premier terme de la 
+fonction co\^ut $F$, not\'e 
+$$
+G(\sigma) = \dsp\frac{1}{2} \| V(\sigma) - \tilde{V} \|^2, 
+$$
+impose que les prix calcul\'es collent aux donn\'ees, alors que 
+le second terme, not\'e 
+$$
+F_1(\sigma) = \| \, \nabla \sigma \, \|^2
+$$
+impose que la volatilit\'e ne soit pas trop irr\'eguli\`ere, ce 
+qui permet de r\'egulariser le probl\`eme inverse. Le choix 
+de $\lambda$ est un compromis entre pr\'ecision et stabilit\'e 
+et il est en g\'en\'eral difficile \`a d\'eterminer en pratique. 
+Nous verrons \`a la section~\ref{SEC:RESULTATS} qu'il est possible 
+de choisir $\lambda = 0$ et de r\'egulariser d'une autre fa\c con 
+(voir l'approche multi\'echelle d\'ecrite au 
+paragraphe~\ref{SSEC:MULTIECHELLE}).
+
+\subsection{Param\'etrage de la volatilit\'e par des splines 
+bicubiques}
+
+Avant de r\'esoudre le probl\`eme d'optimisation~(\ref{FORM:MIN}), 
+il faut param\'etrer la volatilit\'e $\sigma$, fonction de deux 
+variables $S$ et $t$, dans un espace de dimension finie 
+ad\'equat. Si l'on garde la m\^eme grille de discr\'etisation 
+que pour l'EDP, on aura trop de param\`etres pour la variable 
+d'optimisation. Mais rien ne nous oblige \`a prendre la m\^eme 
+discr\'etisation pour $U$ et pour $\sigma$. Nous choisissons 
+de discr\'etiser $\sigma$ sur une grille beaucoup plus 
+grossi\`ere que la grille de diff\'erences finies \`a l'aide 
+des splines bicubiques. Les deux principaux avantages sont les 
+suivants~:
+\begin{itemize}
+\item le nombre d'inconnues du probl\`eme d'optimisation, 
+correspondant au nombre de degr\'es de libert\'e des splines 
+bicubiques, est beaucoup plus petit~;
+\item la solution du probl\`eme d'optimisation sera plus 
+r\'eguli\`ere par construction car les splines bicubiques 
+poss\`edent une r\'egularit\'e $\mathcal{C}^2$.
+\end{itemize}
+La grille grossi\`ere sur laquelle nous d\'efinissons les 
+splines bicubiques correspond \`a une discr\'etisation du 
+domaine $[y_{min};y_{max}] \times [t_0;T_{max}]$ en 
+$n$ mailles suivant $y$ et $m$ mailles suivants $T$. Une 
+grille $n \times m$ \'etant donn\'ee, les splines bicubiques 
+sont des polyn\^omes de degr\'e $3$ par morceaux qui se 
+raccordent de fa\c con $\mathcal{C}^2$ entre chaque maille 
+(voir De Boor~\cite{deb:jmp:62}). Dans l'espace des splines 
+bicubiques, les degr\'es de libert\'e correspondent aux~:
+\begin{itemize}
+\item valeurs de la fonction $\sigma$ en tous les n{\oe}uds de 
+la grille~;
+\item valeurs des d\'eriv\'ees par rapport \`a $y$ aux 
+n{\oe}uds tels que $y = y_{min}$ et $y = y_{max}$~;
+\item valeurs des d\'eriv\'ees par rapport \`a $T$ aux 
+n{\oe}uds tels que $T = t_0$ et $T = T_{max}$~;
+\item valeurs des d\'eriv\'ees crois\'ees aux quatre coins de la 
+grille.
+\end{itemize}
+La figure~\ref{FIG:DDL} permet de visualiser les degr\'es de 
+libert\'e sur une grille $3 \times 3$. Le nombre de degr\'es de 
+libert\'e est \'egal \`a~: 
+$$
+(n+1)(m+1) + 2(m+1) + 2(n+1) + 4 = (n+3)(m+3).
+$$
+L'algorithme d'interpolation permettant de d\'eterminer la 
+valeur de la volatilit\'e en n'importe quel point du domaine 
+\`a partir des degr\'es de libert\'e est d\'etaill\'e dans 
+l'annexe~\ref{ANN:SPLINES}.
+
+Nous d\'ecrirons \`a la section~\ref{SEC:RESULTATS} comment 
+choisir $n$ et $m$, ce qui d\'etermine le nombre d'inconnues du 
+probl\`eme d'optimisation et la r\'egularit\'e plus ou moins 
+importante donn\'ee par construction \`a la volatilit\'e. 
+
+% FIG:DDL
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/ddl}
+}
+\end{minipage}
+\end{center}
+
+\caption{Degr\'es de libert\'e d'une spline bicubique sur une 
+grille $3 \times 3$.}
+\label{FIG:DDL}
+\end{figure}
+
+\subsection{Choix de l'algorithme d'optimisation de Quasi-Newton}
+
+Pour r\'esoudre le probl\`eme d'optimisation~\ref{FORM:MIN}, nous 
+choisissons d'utiliser l'algorithme de Quasi-Newton (voir par 
+exemple~\cite{bgls:optnum:97}) qui permet d'\'eviter de calculer 
+le hessien de la fonction co\^ut $F$. Cet algorithme, qui 
+n\'ecessite le calcul de la fonction et de son gradient $g(\sigma)$ 
+en chaque it\'er\'e, peut se sch\'ematiser ainsi (la matrice $W$ 
+est une approximation du hessien)~:
+\begin{description}
+\item[Etape 0] tol\'erance $= \epsilon$, $\sigma = \sigma_{init}$, 
+$W = W_{init}$ definie positive.
+\item[Etape 1] Si $\arrowvert g(\sigma) \arrowvert \leq \epsilon$, 
+STOP.
+\item[Etape 2] calcul d'une direction de descente $d$ en 
+r\'esolvant le syst\`eme lin\'eaire~: $W d = -g(\sigma)$.
+\item[Etape 3] calcul du pas $t$ le long de cette direction de 
+descente, par recherche lin\'eaire Wolfe.
+\item[Etape 4] mise \`a jour de l'it\'er\'e courant~: 
+$\sigma:=\sigma+td$.
+\item[Etape 4] mise \`a jour de $W$ par BFGS et retour \`a 
+l'\'etape 1.
+\end{description}
+L'algorithme de Quasi-Newton utilis\'e dans la suite pour 
+r\'esoudre le probl\`eme~(\ref{FORM:MIN}) sans contraintes a \'et\'e 
+impl\'ement\'e par~\cite{bar:optim:02}. Nous verrons \`a la 
+section~\ref{SSEC:CALIB3} qu'il peut \^etre utile d'ajouter 
+des contraintes de bornes sur la volatilit\'e. Dans ce cas, nous 
+utiliserons un algorithme de Quasi-Newton avec bornes 
+d\'evelopp\'e par~\cite{noce:siam:95,noce:acm:97}.
+
+Dans chaque cas, il est n\'ecessaire de savoir \'evaluer le gradient 
+de la fonction co\^ut 
+$$
+F(\sigma) = G(\sigma) + \lambda F_1(\sigma).
+$$
+Il est pr\'ef\'erable de calculer \`a chaque \'etape ce gradient de 
+mani\`ere analytique plut\^ot que par diff\'erences finies : le gain 
+de temps est consid\'erable, surtout lorsque le nombre de variables 
+augmente. Nous montrons dans les annexes~\ref{ANN:GRADG} 
+et~\ref{ANN:GRADF1} comment calculer analytiquement les gradients, 
+respectivement de $G$ et de $F_1$.
+
+\subsection{R\'esum\'e de l'algorithme de calibration}
+
+Nous choisissons donc d'utiliser la m\'ethode de Quasi-Newton 
+coupl\'ee avec une interpolation par spline bicubique pour r\'esoudre 
+notre probl\`eme. La fonction de volatilit\'e $\sigma$ sera donc 
+repr\'esent\'ee par les degr\'es de libert\'e d'une spline bicubique 
+sur une grille grossi\`ere de taille $n \times m$. Le sch\'ema 
+suivant r\'esume les diff\'erentes \'etapes de l'algorithme de 
+calibration~: 
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{picture}(180,185)(0,0)
+\put(97,190){\fbox{$\sigma_{\text{init}}$}}
+\put(110,180){\vector(0,-1){20}}
+\put(95,149){\fbox{$\sigma_{\text{ddl}}$}}
+\put(110,140){\vector(0,-1){20}}
+\put(88,109){\fbox{$\sigma_{N\times M}$}}
+\put(110,100){\vector(0,-1){20}}
+\put(88,65){\fbox{$V_{N\times M}$}}
+\put(110,57){\vector(0,-1){25}}
+\put(65,20){\fbox{\scriptsize{crit\`ere d'arr\^et satisfait?}}}
+\put(175,25){\vector(1,0){25}}
+\put(185,30){\makebox(0,0)[b]{\scriptsize{oui}}}
+\put(205,23){\fbox{$\sigma_{\text{est}}$}}
+\put(60,25){\line(-1,0){50}}
+\put(40,30){\makebox(0,0)[b]{\scriptsize{non}}}
+\put(10,25){\vector(0,1){80}}
+\put(-20,111){\fbox{\scriptsize{Quasi-Newton}}}
+\put(10,125){\line(0,1){25}}
+\put(10,150){\vector(1,0){80}}
+\put(140,85){\makebox(0,0)[b]{\scriptsize{EDP Dupire}}}
+\put(150,125){\makebox(0,0)[b]{\scriptsize{spline bicubique}}}
+\put(145,40){\makebox(0,0)[b]
+{\scriptsize{$F(\sigma),\nabla F(\sigma)$}}}
+\end{picture}
+\end{center}
+
+\subsection{Comparaison avec d'autres m\'ethodes de calibration}
+
+Notre algorithme de calibration pr\'esente plusieurs diff\'erences 
+avec les m\'ethodes de calibration similaires (avec une approche 
+de type probl\`eme inverse) d\'ej\`a d\'evelopp\'ees par 
+Lagnado-Osher~\cite{lag:jcf:97}, 
+Jackson {\em et~al.}~\cite{jac:jcf:98} et 
+Coleman {\em et~al.}~\cite{col:jcf:99}.
+
+Pour la r\'esolution du probl\`eme direct, nous avons choisi 
+d'utiliser l'EDP de Dupire et non celle de Black-Scholes 
+g\'en\'eralis\'ee. Dans l'EDP de Black-Scholes, les param\`etres 
+du probl\`eme sont le strike $K$ et la maturit\'e $T$ de l'option 
+consid\'er\'ee, et les variables sont $t$ et $S_0$. Dans l'EDP de 
+Dupire, le point de vue est diff\'erent~: on se place en un point 
+$(S_0,t_0)$ (param\`etres de probl\`eme) et les variables sont $K$ 
+et $T$. Par cons\'equent, lorsque l'on r\'esout l'EDP de Dupire, on 
+obtient une nappe de prix d'options sur $K$ et $T$ pour $(S_0,t_0)$ 
+fix\'es. Une seule r\'esolution de cette EDP suffit donc \`a 
+\'evaluer la fonction co\^ut $F(\sigma$), alors qu'il faudrait 
+autant de r\'esolutions de l'EDP de Black-Scholes qu'il y a 
+de donn\'ees du march\'e. Le gain de temps para\^{\i}t non 
+n\'egligeable.
+
+Concernant le terme de r\'egularisation, nous utilisons le m\^eme 
+terme que \cite{lag:jcf:97}, \`a savoir 
+$\lambda \; \| \, \nabla \sigma \, \|^2$, alors que 
+\cite{jac:jcf:98} n'utilise aucun terme et \cite{col:jcf:99} 
+r\'egularise le probl\`eme en ajoutant \`a la fonction co\^ut un 
+terme $r(\sigma)$ qui correspond \`a la valeur moyenne du gradient. 
+
+Nous avons choisi de repr\'esenter $\sigma$ par les degr\'es de 
+libert\'e d'une spline bicubique~: de cette mani\`ere, beaucoup de 
+fonctions lisses peuvent \^etre repr\'esent\'ees. Par comparaison, 
+les repr\'esentations par splines propos\'ees par~\cite{jac:jcf:98} 
+et~\cite{col:jcf:99} permettent d'obtenir un moins grand nombre de 
+fonctions. En effet, dans~\cite{col:jcf:99}, il s'agit de splines 
+bicubiques avec moins de degr\'es de libert\'e car on impose que 
+la d\'eriv\'ee seconde est nulle sur les bords du domaine 
+(``natural splines'')~; dans~\cite{jac:jcf:98}, il s'agit de 
+splines cubiques par rapport \`a $S$ et de fonctions lin\'eaires 
+par morceaux par rapport \`a $t$. La repr\'esentation choisie 
+par~\cite{lag:jcf:97} (valeurs de $\sigma$ aux points de la grille 
+de discr\'etisation de l'EDP) implique un probl\`eme de grande 
+taille surd\'etermin\'e.
+
+Enfin, nous utilisons un algorithme d'optimisation de Quasi-Newton 
+avec ou sans bornes. De m\^eme, \cite{jac:jcf:98} utilise un 
+algorithme de Quasi-Newton avec bornes, alors que \cite{lag:jcf:97} 
+utilise une m\'ethode de gradient sans bornes et \cite{col:jcf:99} 
+a choisi une m\'ethode de points int\'erieurs avec r\'egion de 
+confiance pour r\'esoudre le probl\`eme avec bornes.

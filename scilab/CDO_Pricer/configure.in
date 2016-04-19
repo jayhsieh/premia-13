@@ -1,0 +1,140 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_INIT(CDO_For_Premia, 1.0, vincent.lemaire@univ-mlv.fr)
+AC_CONFIG_AUX_DIR(config)
+##AC_CONFIG_SRCDIR(src/cdo.c)
+AC_CONFIG_HEADER(src/config.h)
+AM_INIT_AUTOMAKE
+AC_CANONICAL_HOST
+
+AC_ARG_ENABLE(debug,
+                 [  --enable-debug          compile with "-g" option, default
+                  behavious is to optimize])
+AC_ARG_ENABLE(optimize,
+                 [  --disable-optimize      disable "-0" option off gcc],
+                 [enable_optimize="no"], [])
+
+
+ac_default_prefix=/usr/local
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+
+
+# removing -ansi from CFLAGS
+CC_OPTIONS="`echo $CFLAGS | sed -e 's/-ansi//g'`"
+
+
+if test "x$GCC" = xyes ; then
+  if test "x$enable_debug" = xyes || test "x$enable_optimize" = xno ; then
+    CC_OPTIONS=`echo $CC_OPTIONS | sed -e 's/-O[[0-9]]*//g'`
+    CC_OPTIONS=`echo $CC_OPTIONS | sed -e 's/-g[[0-9]]*$//g'`
+    CC_OPTIONS=`echo $CC_OPTIONS | sed -e 's/-g[[0-9]]*//g'`
+    CC_OPTIONS="${CC_OPTIONS} -Wall -g"
+  else
+    CC_OPTIONS="${CC_OPTIONS} -Wall"
+  fi
+fi
+CFLAGS=${CC_OPTIONS}
+
+
+builtin(include, config/libtool.m4)
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+
+AM_C_PROTOTYPES
+AM_WITH_DMALLOC
+
+# Checks for libraries.
+dnl AC_CHECK_LIB(m, main, fftw3)
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+
+AC_PATH_PROG(PKG_CONFIG,pkg-config)
+if test "x$PKG_CONFIG" = x; then
+    # @*%&$ Ximian programmers renamed this application
+    AC_PATH_PROG(PKG_CONFIG,pkgconfig,yes,no)
+    if test "x$PKG_CONFIG" = x; then
+    	AC_MSG_ERROR([Could not find the pkg-config (or pkgconfig) program.],)
+    fi  
+fi  
+
+# fftw3
+FFTW3_CFLAGS=""
+FFTW3_LIBS=""
+## search for fftw3#
+if test "x$PKG_CONFIG" != x; then # try first to use pkg-config	
+   ## If fftw3.pc is found, set FFTW3_CFLAGS and FFTW3_LIBS
+   PKG_CHECK_MODULES(FFTW3, fftw3 >= 3.0, HAVE_FFTW3="yes", HAVE_FFTW3="no")
+   if test "$HAVE_FFTW3" = "yes"; then
+      FFTW3_CFLAGS="`pkg-config fftw3 --cflags`"
+      FFTW3_LIBS="`pkg-config fftw3 --libs`"
+  fi 
+fi
+if test "$HAVE_FFTW3" = "no"; then # try to find fftw3 at usual places
+   AC_CHECK_HEADERS(
+      [fftw3.h],
+      AC_CHECK_LIB(
+        [fftw3],
+        [fftw_plan_dft_1d],
+        FFTW3_CFLAGS=
+        FFTW3_LIBS="-lfftw3 -lm"
+        [HAVE_FFTW3="yes"],
+        [HAVE_FFTW3="no"]),
+      [HAVE_FFTW3="no"])
+fi
+
+# Check for "extern inline", using a modified version
+# of the test for AC_C_INLINE from acspecific.mt
+AC_CACHE_CHECK([for extern inline], ac_cv_c_extern_inline,
+	       [ac_cv_c_extern_inline=no
+		AC_TRY_COMPILE([extern $ac_cv_c_inline double foo(double x);
+				extern $ac_cv_c_inline double foo(double x) { return x+1.0; };
+				double foo (double x) { return x + 1.0; };], 
+				[  foo(1.0)  ],
+				[ac_cv_c_extern_inline="yes"])
+		])
+if test "$ac_cv_c_extern_inline" != no ; then
+    AC_DEFINE(HAVE_INLINE,1,[extern inline pour la GSL])
+    AC_SUBST(HAVE_INLINE)
+fi
+
+#AC_ARG_ENABLE(inline, [--disable-inline  no !!!], CFLAGS="$CFLAGS -UHAVE_INLINE")
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([pow sqrt])
+
+#,,
+#    AC_MSG_ERROR([Unable to find ATLAS library; see http://math-atlas.sourceforge.net/]))
+#AC_CHECK_LIB(ptcblas, main)
+#AC_CHECK_LIB(ptcblas, main, 
+#    AC_CHECK_LIB(cblas, main)
+#    )
+
+AC_SUBST(INCLUDES)
+CFLAGS="$XTRA_CFLAGS $WARN_CFLAGS $CFLAGS $FFTW3_CFLAGS"
+LDFLAGS="$LIBS $FFTW3_LIBS"
+AC_SUBST(CFLAGS)
+AC_SUBST(LDFLAGS)
+
+
+AC_CONFIG_FILES([Makefile src/Makefile demo/Makefile test/Makefile])
+AC_MSG_RESULT([
+Libsde is now configured for $canonical_host_type
+
+  Source directory:     $srcdir
+  Installation prefix:  $prefix
+  C compiler:           $CC $CFLAGS
+  LIBS:                 $LDFLAGS
+])
+
+AC_OUTPUT

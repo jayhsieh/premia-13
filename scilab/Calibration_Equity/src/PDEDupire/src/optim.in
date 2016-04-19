@@ -1,0 +1,12 @@
+# gradtol : tolerance on the relative gradient 
+0.0000000001
+# steptol : tolerance on the relative change of x
+0.0000000001
+# verbosity : level of printed information (0 --> 3)
+3
+# saveSuccessiveXinFile : save successive x0 in the file data.out (0 or 1)
+0
+# maxCounter : maximum number of iterations
+30
+# lambda : coeff of F1 in the obj function : F = G+lambda*F1
+0

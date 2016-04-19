@@ -1,0 +1,64 @@
+/////////////////////////////////////////////////////////////////////////
+//
+//    PREMIA - Pricing of equity and derivatives library
+//    Interest rates modelling	
+//          Libor Market Model (LMM)
+//		
+//	FEB 2007
+//
+// 
+//
+////////////////////////////////////////////////////////////////////////
+
+Compilation
+===========
+
+In this directory to build the library just type 
+
+    make
+
+It is independent of the other files of Premia; we extracted the complex.h complex.c 
+files from src/common/mathtools/ in this directory
+
+It will compile the following model
+
+	1) bermudan swaption pricer by least square method
+	2) A stochastic volatility extension of the LMM
+	3) Arbitrage free discretization of the LMM
+
+WARNING
+=======
+
+1) To build the Non exploding Bushy tree you should go in the subdirectory lmm_bushy/
+and read the README file  
+
+2) For Andersen bermudan swaption pricer you should go in the subdirectory lmm_andersen_bermudianswaption and read the README file
+
+3) For LMM with Jump you should go in the subdirectory lmm_jump_glassermanmerenenr/
+and read the README file  
+
+4) For LMM-CEV you should go in the subdirectory lmm_cev and read the README file
+
+5) For LMM-EBERLEIN-OZBAN article go in the subdirectory LMM-EBERLEIN-OZBAN-CAPSFLOOR.dir and read the README file
+
+6) For LMM-MODEL-STOCHASTIC-VOLATILITY-ANDERSEN article go in the subdirectory  LIBOR-MARKET-MODEL-STOCHASTIC-VOLATILITY-ANDERSEN.di and read the README file
+
+7) For HJM-LEVY-EBERLEIN-KLUGE article go in the subdirectory HJM-LEVY-EBERLEIN-KLUGE-CAPS-SWAPTIONS.di and read the README file
+
+8)  For Kolodko-Schoenmarkers bermudan swaption pricer you should go in the subdirectory lmm_kolodko_schoenmarkers_bermudianswaption and read the README file
+
+Version
+=======
+
+the compilation works under Red Hat 9 with:
+
+	gcc (GCC) 3.2.2 20030222 (Red Hat Linux 3.2.2-5)
+	glibc-2.3.2-11.9
+
+
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

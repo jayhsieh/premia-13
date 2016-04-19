@@ -1,0 +1,16 @@
+add_library (libhullwhite1d OBJECT
+	hullwhite1d.c
+	hullwhite1d_stdi/hullwhite1d_stdi.c
+	hullwhite1d_stdi/cf_hullwhite1d_cap.c
+	hullwhite1d_stdi/cf_hullwhite1d_floor.c
+	hullwhite1d_stdi/cf_hullwhite1d_payerswaption.c
+	hullwhite1d_stdi/cf_hullwhite1d_receiverswaption.c
+	hullwhite1d_stdi/cf_hullwhite1d_zbputeuro.c
+	hullwhite1d_stdi/cf_hullwhite1d_zbcalleuro.c
+	hullwhite1d_stdi/cf_hullwhite1d_zcbond.c
+	hullwhite1d_stdi/tr_hullwhite1d_zbo.c
+	hullwhite1d_stdi/tr_hullwhite1d_zcbond.c
+	hullwhite1d_stdi/tr_hullwhite1d_swaption.c
+	hullwhite1d_stdi/tr_hullwhite1d_capfloor.c
+	hullwhite1d_stdi/tr_hullwhite1d_bermudianswaption.c
+	)

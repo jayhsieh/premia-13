@@ -1,0 +1,10 @@
+add_library (libbharchiarella1d OBJECT
+	bharchiarella1d_stdi/bharchiarella1d_stdi.c
+	bharchiarella1d_stdi/cf_bharchiarella1d_zcbond.c
+	bharchiarella1d_stdi/fd_adi_bharchiarella1d_zbo.c
+	bharchiarella1d_stdi/fd_adi_bharchiarella1d_zcbond.c
+	bharchiarella1d_stdi/fd_implicit_bharchiarella1d_zbo.c
+	bharchiarella1d_stdi/fd_implicit_bharchiarella1d_zcbond.c
+	bharchiarella1d_stdi/mc_bc_teichmannbayer.c
+	bharchiarella1d.c
+	)

@@ -1,0 +1,457 @@
+\documentclass[a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{french}
+\usepackage{amssymb,amsmath}
+\usepackage{theorem}
+\newtheorem{theorem}{Théorème}[section]
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}{Claim}[section]
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{remark}{remarque}[section]
+\newtheorem{hypo}{hypothèse}[section]
+\newtheorem{solution}[theorem]{Solution}
+\newtheorem{summary}[theorem]{Summary}
+\newenvironment{proof}[1][Proof]{\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+\numberwithin{equation}{section}
+\newcommand{\bs}{\symbol{95}}
+
+
+\begin{document}
+\title{Algorithme et remarques}
+\author{Jacques Printems et Marouen Messaoud}
+\date{Septembre 2003}
+\maketitle
+
+\section {Problème}
+L'un des problème majeur dans le marché boursier et spécialement
+dans le marché des produits dérivés consiste à trouver le prix
+d'une option. Black et Scholes en 1973 ont établi une modélisation
+stochastique de l'évolution du sousjacent de
+l'option.$$\frac{dS_t}{S_t} =  \sigma dW_t + \mu dt $$ Où t est le
+temps, $\mu$ et $\sigma$ sont des constanteset $W_t$ est un
+mouvement Brownien standard. $\mu$ est appelé le drift et $\sigma$
+la volatilité. Ainsi, ils ont montré via des outils de calculs
+stochastiques que le prix d'une option $C$ résout une équation aux
+dérivées partielles. Dans le cas d'un Call Européen (une option de
+vente) cette EDP s'écrit
+$$C_t+rSCs+\frac{1}{2}\sigma^2S^2C_{ss}-rC=0 \ sur
+(0,+\infty)\times(0,T)$$ $$ C(S,T)=(S-K)_+$$ Dans le modèle de
+Black et Scholes la volatilité est constante. Il s'avère que ce
+n'est pas vrai en pratique. En fait on peut inverser le processus
+de pricing. À partir des prix d'options du marché et en se palcant
+dans le modèle BS, on peut retrouver la volatilité(on l'appelle
+volatilité implicite) : Elle n'est pas constante (voir
+Rubinstein,M. Implied binomial trees 1994). Cette non constance
+peut être expliquée par la différence de risk que donnent les
+différents acteurs du marché aux différentes options. Le risk ne
+peut pas être le même pour des options de courtes et de longues
+maturités. Le même raisonnement reste valable pour des petits et
+des grands strike. Il faut donc trouver un autre modèle où la
+volatilité peut varier. Hull et White proposairent en 1978 un
+modèle à volatilité stochastique. Dans ce cadre la volatilité
+résout une équation différentielle stochastique. L'inconvénient de
+ce modèle cést qu'il introduit de nouvelles sources d'incertitude
+et donc de nouvelle source de risque. Il faut donc pouvoir se
+couvrir contre ses risques non échangeables(tradable). Dupire
+proposa en 1994 un modèle à volatilité locale. Il remplace $sigma$
+par $sigma(S,t)$. Il donna en plus une relation entre cette
+volatilité locale et différentes dérivées du prix par rapport au
+strike.(vol et prix interpollation dependent blablabla ). Quelque
+soit le modèle utilisé pour pouvoir pricer il faut avoir
+concrètement la volatilité. Dans le cadre de volatilité
+stochastique il faut trouver les paramètres du modèle. Dans le
+modèle à volatilité locale il faut trouver la nappe de volatilité.
+La question qui se pose est comment on peut faire cela. On peut
+prendre les données historique du sousjacent et faire un
+paramétrage du modèle choisi, mais dans ce cas la diffusion ne va
+capter qu'une information antérieure. Une autre alternative
+consiste à utiliser les prix des options dans un problème inverse
+pour retrouver les caractéristique de la volatilité. De cette
+facon le modèle incorporera les anticipations des acteurs du
+marché et donnera une image de la volatilité future. En examinant
+ce problème de paramétrage qu'on appelle aussi problème de
+calibration on s'apercoit qu'il y a plusieurs diffusions ou bien
+plusieurs volatilités qui donnent le même prix. On parle de
+problème mal posé. Il suffit de regarder le prix black-scholes où
+la volatilité est constante et le prix de black ou la volatilité
+dépend du temps. Il est facile de trouver une volatilité qui
+vérifie $ \int_{0}^{T}\sigma_{t}^2dt=\sigma^2T$. Ces deux
+volatilités permettent de retrouver un même prix. Pour résoudre ce
+problème CREPEY et BERSTEKY utilisent une méthode de
+régularisation proposée par Tikhonov en 1963.(plus de details).
+
+On s'intéresse à la calibration de la nappe de volatilité locale d'un sousjacent. Retrouver la volatilité locale permet le calcul du prix de n'importe quel contrat financier basé sur l'évolution de ce sousjacent. Calibrer consiste à trouver à partir de quelques données (réalisations) les paramètres caractérisants une fonction. On parle ici de problème inverse. Dans notre cas on possède des prix d'options basés sur le même sousjacent qui sera appelé $S$. On connait aussi à la date initiale $t_{0}=0$ la valeur de $S_{t_0}=S_0$ et le prix du forward (le taux sans risque $r$). On suppose aussi que le taux de dividende $q$ est connu à l'avance, bienque dans la pratique cela ne se passe pas de la sorte. En effet les dividendes sont distribués à des dates discrètes et généralement fixées à l'avance. Sauf que on ne connait pas leur valeur à la date $t_0$. Donc ils peuvent devenir sujet d'un problème de calibration. Ici on va supposer qu'on dispose du taux $q$.\\ Il y a plusieurs approche pour calibrer le surface de volatilité locale. On s'intéresse à celle présentée par Marco Avellaneda, Craig Fridman, Richard Holmes et Dominick Samperi dans leur article Calibrating Volatility Surfaces Via Relative-Entropy Minimization \cite{Ave}.\\
+
+
+On fait un choix de diffusion :\\
+\begin{eqnarray} \frac{dS_t}{S_t} & = & \sigma_t dZ_t + \mu dt \end{eqnarray}
+qui représente l'evolution du sousjacent. On veut trouver au sein de cette famille de processus indexée par ($\sigma_t$) celui qui donne au mieux les prix de marché. Cette dernière contrainte se traduit par l'équation suivante : \\
+\begin{eqnarray} E^\sigma[e^{-rT_i}G_i(S_{T_i})]&=&C_i \end{eqnarray}
+( $G_i(.)$ et $C_i$ sont le payoff et le prix des l'options).\\
+
+Outre le fait de répliquer les prix de marché il faut un critère pour comparer les diffusions. En fait différentes diffusions peuvent engendrer le même prix. Il suffit de regarder le prix black-scholes où la volatilité est constante et le prix de black ou la volatilité dépend du temps. Il est facile de trouver une volatilité qui vérifie $ \int_{0}^{T}\sigma_{t}^2dt=\sigma^2T$. Le critère choisi par les auteurs est basée sur la distance Kullback-Leibler. L'idée est de prendre une diffusion prior et de la modifiée pour assurer la contrainte mais en contrôlant l'éloignement (dans le sens de la distance choisie) par rapport au prior. ( $\mu=r-q$ et  $\sigma_t$ est adaptée à la filtaration brownienne).\\
+En fait le problème de minimisation est mal posé, les auteurs introduisent alors  une fonction régularisante. Ils font le choix d'utiliser une fonction inspirée de l'entropie entre deux diffusions dont les deux volatilités sont différents. Or on sait que l'entropie entre deux diffusions qui n'ont pas la même volatilité est infinie. En faisant tendre le pas de temps vers zero l'entropie globale va explosée. Les auteurs choisissent une fonction régularisante inspirée par l'approximation de l'entropie par pas de temps sur un schema discretisé de l'espace.
+Soit $Q,P$ deux probabilités. L'entropie est définie de la manière suivante :
+\begin{eqnarray*}
+\varepsilon(Q,P) & = & \int_\Omega{ln\biggl(\frac{dQ}{dP}\biggr)dQ}\\
+& = & E^\sigma[\int_0^T{\eta(\sigma_s^2)ds}]
+\end{eqnarray*}
+
+avec $\eta(\sigma_s^2)$ strictement convexe telque $\eta(\sigma_0^2)=0$ ($\sigma_0$ est la volatilité apriori). Le problème est alors de trouver $\sigma$ solution de :\\
+\begin{eqnarray}
+\ \min_{\sigma} E^\sigma[\int_0^T{\eta(\sigma_s^2)ds}]\label{min}\\
+\ t.q  E^\sigma[e^{-rT_i}G_i(S_{T_i})]=C_i \ i=1..M;\label{constrain}
+\end{eqnarray}
+Le lagrangien de ce problème s'écrit :
+\begin{equation}
+\min_{\lambda_1\cdots \lambda_M} E^\sigma[\int_0^T{\eta(\sigma_s^2)ds}-\sum_{i=1}^M{\lambda_ie^{-rT_i}G_i(S_{T_i})}] + \sum_{i=1}^M{\lambda_iC_i}
+\end{equation}
+Le problème dual s'écrit
+\begin{eqnarray}
+\min_{\lambda_1\cdots \lambda_M} \sup_{\sigma} E^\sigma[-\int_0^T{\eta(\sigma_s^2)ds}+\sum_{i=1}^M{\lambda_ie^{-rT_i}G_i(S_{T_i})}] - \sum_{i=1}^M{\lambda_iC_i}\\
+=\min_{\lambda_1\cdots \lambda_M} V(S_0,0,\lambda_1,\cdots,\lambda_M)\label{dual}
+\end{eqnarray}
+L'équation HJB associée à $V$ s'écrit de la manière suivante :
+
+\begin{equation}
+\ V_t + e^{rt}\Phi\biggl(\frac{e^{-rt}}{2}S^2V_{SS}\biggr) + \mu SV_S - rV = -\sum_{t<T_i}^{M}\lambda_i\biggl(G_i(S_{T_i})-e^{rT_i}C_i\biggr)\delta(t-T_i)\label{V}
+\end{equation}
+avec $\phi$ est la transformée de Legendre de $\eta$ :
+\begin{equation}
+\Phi(x)=\sup_{\sigma_{min}\leq\sigma\leq\sigma_{max}}(\sigma^2x-\eta(\sigma))
+\end{equation}
+On peut ainsi calucler $V(S_0,0,\lambda_1,\cdots,\lambda_M)$ pour tout $(\lambda_1,\cdots,\lambda_M)$. Le schéma de discrétisation que les auteurs proposent, se base sur un arbre trinomial fixe dans l'espace du sousjacent mais dont les probabilités de transition sont variables. De ce fait c'est les probabilités qui vont être calculées dans chaque étapes d'optimisation. L'arbre est construit à partir d'un apriori. Le calcul de $V(S_0,0,\cdots)$ s'effectue d'une manière rétrograde en partant des termes sources de la date terminale et en ajoutant les termes sources aux dates où on dispose de prix d'option.\\
+La volatilité locale qui réalise l'optimalité est donnée par :\\
+\begin{eqnarray*}
+\sigma(S,t) & = & \sqrt{\Phi'\biggl(\frac{e^{-rt}S^2V_{SS}(S,t,\hat{\lambda}_1,\cdots,\hat{\lambda}_M)}{2}\biggr)}
+\end{eqnarray*}
+avec $\hat{\lambda}_1,\cdots,\hat{\lambda}_M$ sont les parmètres de Lagrange qui réalisent le minimum de $V(S_0,0,\lambda_1,\cdots,\lambda_M)$. La recherche du min s'effectue avec l'algorithme de quasiNewton BFGS. Pour cela on a besoin du gradient par rapport à $\lambda$ de $V$. On note $V_i=\frac{\partial V}{\partial \lambda_i}$. Le calcul de ce gradient découle de l'équation d'HJB. En effet une simple dérivation par rapport à $\lambda$ donne : \\
+\begin{equation}\label{Vi}
+\ V_{i,t} + \frac{1}{2}\Phi'\biggl(\frac{e^{-rt}}{2}S^2V_{SS}\biggr)S^2V_{i,SS} + \mu SV_{i,S} - rV_{i} = -\biggl(G_i(S_{T_i})-e^{rT_i}C_i\biggr)\delta(t-T_i)
+\end{equation}
+Le calcul de ce gradient s'effectue aussi de manière rétrograde sur l'arbre trinomial.
+
+Les auteurs utilisent la fonction $\eta(\sigma)=\frac{1}{2}(\sigma^2-\sigma_0^2)^2$\\
+Nous avons essaye  $\eta(\sigma)=\alpha(\sigma^2-\sigma_0^2)^2$
+Faire varier le $\alpha$ revient à élargir la fenêtre (la bande
+passante) pour les valeurs de $\Gamma$
+$(\frac{e^{-rt}}{2}S^2V_{SS})$ voir figure(\ref{fig:fig3}). Cela
+permet de regulariser la surface de volatililité locale. Le cas
+extrêm est de prendre $\alpha=0$ dans ce cas on retrouve la
+situation d'UVM ou la volatilité ne peut prendre que les deux
+valeurs $ \sigma_{min} $ ou bien $\sigma_{max}$. En effet
+$$\alpha=0\ \Longrightarrow
+\Phi(\Gamma)=\sup_{\sigma_{min}\leq\sigma\leq\sigma_{max}}(\sigma^2\Gamma)$$
+donc
+$$\left\{%
+\begin{array}{ll}
+    si\ \Gamma > 0 , & \hbox{$\sigma = \sigma_{max}$;} \\
+    si\ \Gamma < 0 , & \hbox{$\sigma = \sigma_{min}$.} \\
+\end{array}%
+\right.
+$$
+si $\alpha=\frac{1}{2}$ on retrouve le cas traité dans le papier
+\cite{Ave}.
+
+Comme les tests numériques l'ont montré, la valeur de $\alpha$ conditionne la rapidité de la convergence. En effet, on a représenté sur la figure \ref{fig:1}, la norme du gradient de $V$ en fonction des itérations du Quasi-Newton pour deux valeurs de $\alpha$ et de $\sigma_0$ ($\alpha \in \{1 , 100\}$ et $\sigma_0 \in \{0.09, 0.19\}$, pour une moyenne des volatilités implicites de 15\%). On observe que la convergence est plus rapide pour $\alpha=100$ indépendament de la valeur de $\sigma_0$. Par contre le choix de $\alpha$ semble dépendre du jeu de données initial (cf. figure \ref{fig:2}).
+
+
+
+
+\section{Nunerical documentaion}
+\subsection{programme calib\_Avellaneda}
+ Le programme calib\_Avellaneda calcule la volatilité locale
+$\sigma(S,t)$ sur un arbre trinomial à partir des prix d'options,
+$S_0, r, q,$ des aprioris $\sigma_0, \sigma_{min}, \sigma_{max}\
+et\ \bar{\sigma}$. Cette calibration revient à minimiser
+(\ref{min}) sous la contrainte (\ref{constrain}). Pour cela il
+faut trouver le minimum en $\lambda$ de
+$V(S_0,0,\lambda_1,\cdots,\lambda_M)$ comme dans (\ref{dual}). Le
+programme utilise une méthode de QuasiNewton \cite{bar:optim:02}  pour trouver ce
+minimum. Cette dernière routine nécessite le calcul de la fonction
+objective à minimiser dans ce cas
+$V(S_0,0,\lambda_1,\cdots,\lambda_M)$ et de son gradient
+$V_i=\frac{\partial V}{\partial \lambda_i},\ i=1..M$.\\ Les
+équations (\ref{V}) et (\ref{Vi})  de ces deux dernières fonctions
+peuvent être résolues d'une manière retrograde sur l'arbre
+trinomial en choisissant la bonne volatilité en chaque n\oe{}ud.
+Dans l'équation (\ref{V}) il faut choisir $$ \sigma(s,t) =
+\frac{\Phi(\frac{e^{-rt}}{2}s^2V_{ss})}{e^{-rt}s^2V_{ss}(s,t)} $$
+Dans l'équation (\ref{Vi}) il faut prendre $$  \sigma(s,t) =
+\Phi'(\frac{e^{-rt}}{2}s^2V_{ss}(s,t)) $$ Dans les deux cas $
+V_{ss}$ est donné sur chaque n\oe{}ud de l'arbre par l'approximation
+suivante :
+$$\frac{1}{2}s^2V_{ss}(s,t)=\frac{1}{\bar{\sigma}^2dt}[(1-\frac{\bar{\sigma}\sqrt{dt}}{2})V(s_u,t+dt)+(1+\frac{\bar{\sigma}\sqrt{dt}}{2})V(s_d,t+dt)-2V(s,t+dt)]$$
+avec $s_u>s>s_d$ sont les trois valeurs possibles que prend la
+diffusion sur l'arbre à partir du n\oe{}ud $(s,t)$ à la date
+$t+dt$. Le programme se déroule de la manière suivante :
+\begin{enumerate}
+    \item chargement des prix des options et des différents paramètres ;
+    \item creation de l'arbre trinomial ;
+    \item $\lambda^k=\lambda^0$ ;
+    \item calcul de $V(S_0,0,\lambda_{1}^k,\cdots,\lambda_{M}^k)$ ;
+    \item calcul de $V_i(S_0,0,\lambda_{1}^k,\cdots,\lambda_{M}^k)$ ;
+    \item calcul de $\lambda^{k+1}$ dans la routine QuasiNewton ;
+    \item test d'arrêt ;
+    \item sinon : $k = k+1$  et retour à (4).
+\end{enumerate}
+
+Le fichier d'entrée pour ce programme s'appelle
+"calib\_Avellaneda.in". Il a la forme suivante :
+\begin{verbatim}
+################################################################################
+###################### VARIABLES S_0, r, q, N, sigma_0, sigma_min ,#############
+###################### sigma_max AND sigma_bar #################################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+100
+# r : risk-free rate
+0.05
+# q : dividend (continuously compounded)
+0
+# N : number of space steps of the grid
+100
+# sigma_0 : --> prior
+0.21
+#sigma_min : --> least prior bound
+0.10
+# sigma_max : --> greatestprior bound
+0.46
+# sigma_bar : --> a default value must be greaterthen sigma_max
+0.48
+#################################################################################
+##################### OPTIMIZATION VARIABLES gradtol, steptol, verbosity, #######
+##################### saveSuccessiveXinFile,maxCounter and lambda ###############
+###################### ##########################################################
+# gradtol : tolerance on the relative gradient
+0.00001
+# steptol : tolerance on the relative change of x
+0.00001
+# verbosity : level of printed information (0 --> 3)
+1
+# saveSuccessiveXinFile : save successive x0 in the file data.out (0 or 1)
+0
+# maxCounter : maximum number of iterations
+100
+# lambda : Initial default value of lagrange parametre
+0
+# alpha : Tune this parametre when the program do not converge
+1
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_data : name of the file containing the data prices
+VolStoPut.data
+# name_out_Vol_Locale:name of the output file containing the Local Volatility
+VolStoLoc.out
+################################################################################
+
+\end{verbatim}
+N représente le nombre d'intervalle sur [0..T] : $T = N*dt$.\\
+gradtol, stepTol , verbosity, saveSuccessiveXinFile, maxCounter et
+lambda sont les paramètres d'optimisation.\\ name\_in\_data est le
+nom du fichier contenant les prix des options. Ce fichier doit
+avoir la forme suivante :
+\begin{verbatim}
+80  0.5 0.3585  P
+85  0.5 0.73546 P
+90  0.5 1.4163  P
+95  0.5 2.56686 P
+100 0.5 4.37005 P
+105 0.5 6.93777 P
+110 0.5 10.2185 P
+115 0.5 14.0489 P
+120 0.5 18.2539 P
+125 0.5 22.7012 P
+80  1   1.24677 P
+85  1   1.94357 P
+90  1   2.93407 P
+95  1   4.297   P
+100 1   6.11092 P
+105 1   8.42559 P
+110 1   11.2437 P
+115 1   14.5023 P
+120 1   18.1192 P
+125 1   22.0116 P
+\end{verbatim}
+La première colonne = strike. La deuxième colonne = maturité. La
+troisième colonne = prix. Quatrième colonne = type de l'option (P
+pour Put, C pour Call). On peut inclure des 'puts' et des 'calls' dans n'importe quel ordre de maturité.\\ En sortie le programme ecrit sur le
+terminal pour chaque option le strike, la maturité, le prix
+d'entrée, le prix calculé sur l'arbre calibrée, l'erreur relative
+en prix et la volatilité implicite correspondant au prix de la
+calibration.
+\begin{verbatim}
+K   T  Prix  PrixAvella  ErrRelPrix  VolImpAvella
+80.000000 0.500000 0.358500 0.358572 0.000200 0.225057
+85.000000 0.500000 0.735460 0.735271 0.000257 0.215992
+90.000000 0.500000 1.416300 1.417292 0.000701 0.208040
+95.000000 0.500000 2.566860 2.566917 0.000022 0.201694
+100.000000 0.500000 4.370050 4.370505 0.000104 0.198201
+105.000000 0.500000 6.937770 6.937133 0.000092 0.198145
+110.000000 0.500000 10.218500 10.217814 0.000067 0.201057
+115.000000 0.500000 14.048900 14.048730 0.000012 0.205845
+120.000000 0.500000 18.253900 18.251965 0.000106 0.211337
+125.000000 0.500000 22.701200 22.700776 0.000019 0.217218
+80.000000 1.000000 1.246770 1.245136 0.001311 0.235509
+85.000000 1.000000 1.943570 1.943707 0.000070 0.228471
+90.000000 1.000000 2.934070 2.932568 0.000512 0.222245
+95.000000 1.000000 4.297000 4.298210 0.000282 0.217450
+100.000000 1.000000 6.110920 6.111125 0.000034 0.214302
+105.000000 1.000000 8.425590 8.428096 0.000297 0.213305
+110.000000 1.000000 11.243700 11.239824 0.000345 0.214245
+115.000000 1.000000 14.502300 14.503043 0.000051 0.217056
+120.000000 1.000000 18.119200 18.120107 0.000050 0.220855
+125.000000 1.000000 22.011600 22.014958 0.000153 0.225366
+\end{verbatim}
+
+Il crée aussi le fichier "name\_out\_Vol\_Locale" (VolStoLoc.out
+dans note cas) où il stocke la volatilité locale sur l'arbre
+resultant de la calibration dans l'ordre "$s,t,\sigma(s,t)$". Ce denier fichier est utile pour visualiser la volatilité locale. Il stocke aussi dans un fichier "arbre\_Avellaneda.out" les probabilités de transitions sur l'arbre. Il ne faut jamais modifier ou effacer ce fichier sinon le programme de 'pricing' risque ne pas fonctionner correctement.\\
+Le dernier fichier crée s'intitule "pricer\_Avellaneda.in". Il est généré automatiquement pour sauvegarder les parmètres utilisés dans la calibration et nécessaires au 'pricing'. Ce fichier sera l'entrée pour le programme "pricer\_Avellaneda".\\
+FICHIER : pricer\_Avellaneda.in
+\begin{verbatim}
+#############################################################################
+##############Used Parameters To calibrate the Tree #########################
+########S_O= 100.000 r= 0.050 dividende q = 0.000 N=100 #####################
+#####prior sigma_0=0.215 sigma_min=0.100 sigma_min =0.460 sigmabar=0.480 ####
+#############################################################################
+###################### VARIABLES K, T, AND OPTIONTYPE #######################
+#############################################################################
+# K : Strike of the option to price
+125
+# T : Maturity of the option to price must be less then the
+# terminal date on the calibrated trinomial Tree =1.000
+1
+# optionType : type of the option (C for call, P for put)
+P
+#############################################################################
+############file containing the option to price##############################
+##############the data must be stored in this order #########################
+#################### K T flag(P as put,Cas Call) ############################
+VolStoP.data
+############output file containing the price of these options################
+VolStoP.out
+#############################################################################
+
+\end{verbatim}
+\subsection{programme price\_Avellaneda}
+ Ce programme permet de 'pricer' à partir du dernier arbre
+trinomial calibré soit une seule option dont les paramètres sont
+édités dans le  fichier\\"pricer\_Avellaneda.in", soit une grille
+d'option dont les  paramètres  sont  stockés dans un fichier (dans
+notre example c'est  le  fichier VolStoP.data) et le résultat sera
+écrit dans un autre  fichier dont le nom a été précisé par
+l'utilisateur dans le fichier  "pricer\_Avellaneda.in".  Des
+paramètres par défaut sont écrits  dans  le  fichier  d'entrée.
+C'est  à  l'utilisateur de les modifier ou de les effacer. Le nom
+du fichier contenant la grille des    options    est    vide, même
+chose    pour   le   nom
+du fichier de sortie contenant les résultats. S'il y a les paramètres d'une option le résultat est affiché sur le terminal.\\
+Format   du   fichier   VolStoP.data   " Strike   Maturité Type
+d'option(P,C) ".
+\begin{verbatim}
+80  0.5 P
+85  0.5 P
+90  0.5 P
+95  0.5 P
+100 0.5 P
+105 0.5 P
+110 0.5 P
+115 0.5 P
+120 0.5 P
+125 0.5 P
+80  1   P
+85  1   P
+90  1   P
+95  1   P
+100 1   P
+105 1   P
+110 1   P
+115 1   P
+120 1   P
+125 1   P
+\end{verbatim}
+
+
+Format du fichier de sortie VolStoP.out.
+\begin{verbatim}
+Prices Computed with the last output of calib_Avellaneda
+(file arbre_Avellaneda.out) from the data file VolStoPut.data
+K T Price OptionType
+80.000000 0.500000 0.358572 P
+85.000000 0.500000 0.735271 P
+90.000000 0.500000 1.417293 P
+95.000000 0.500000 2.566917 P
+100.000000 0.500000 4.370506 P
+105.000000 0.500000 6.937134 P
+110.000000 0.500000 10.217814 P
+115.000000 0.500000 14.048730 P
+120.000000 0.500000 18.251965 P
+125.000000 0.500000 22.700776 P
+80.000000 1.000000 1.245136 P
+85.000000 1.000000 1.943707 P
+90.000000 1.000000 2.932568 P
+95.000000 1.000000 4.298211 P
+100.000000 1.000000 6.111126 P
+105.000000 1.000000 8.428097 P
+110.000000 1.000000 11.239824 P
+115.000000 1.000000 14.503044 P
+120.000000 1.000000 18.120108 P
+125.000000 1.000000 22.014958 P
+\end{verbatim}
+
+
+\begin{figure}[b]
+\centering
+\scalebox{0.5}{\rotatebox{-90}{\includegraphics{phi.eps}}}
+\caption{$\Phi^\prime(\Gamma)$ pour $\alpha=100$ et $\alpha=10$ .}
+\label{fig:fig3}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=10cm,angle=-90]{figure1.ps} 
+\caption{Gradient de $V$ en fonction des itérations du Quasi-Newton pour différentes valeurs de $\alpha$ et $\sigma_0$. Feuille de prix dans \cite{lag:jcf:97}.} \label{fig:1}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=10cm,angle=-90]{figure2.ps}
+\caption{Gradient de $V$ en fonction des itérations du Quasi-Newton pour différentes valeurs de $\alpha$ et $\sigma_0$. Feuille de prix dans \cite{Ave}.} \label{fig:2}
+\end{figure}
+
+\begin{figure}[!H]
+\centering
+\scalebox{0.5}{\rotatebox{-90}{\includegraphics{VolImpRes.eps}}}
+\caption{Volatilté implicite réelle et volatilité implicite de
+l'alghorithme.} \label{fig:fig1}
+\end{figure}
+
+\begin{figure}[!Ht]
+\centering
+\scalebox{0.5}{\rotatebox{-90}{\includegraphics{PrixReelModel.eps}}}
+\caption{prix Réel et prix de l'alghorithme par maturité.}
+\label{fig:fig2}
+\end{figure}
+
+\nocite{*}
+\bibliographystyle{unsrt}
+\bibliography{biblio_marouen}
+
+\end{document}

@@ -1,0 +1,433 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[a4paper, left=2.2cm, right=2.2cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{amsfonts, amssymb, amsmath}
+\usepackage{listings}
+\usepackage[dvipdfm]{hyperref}
+\hypersetup{
+    hyperindex=true, %ajoute des liens dans les index.
+    colorlinks=true, %colorise les liens
+    urlcolor= blue,  %couleur des hyperliens
+    linkcolor= blue, %couleur des liens internes
+    pdftitle={CDO pricing module for Premia},
+    pdfauthor={Vincent Lemaire}, %dans les informations du document
+}
+\newcommand{\code}[1]{{\upshape \lstinline[language=c]{#1}}}
+\newcommand{\C}{\texttt{C}}
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\NIG}{\mathcal{NIG}}
+\newtheorem{rmk}{Remark}
+
+\begin{document}
+\title{Pricing synthetic CDO - Premia 9}
+\author{Vincent Lemaire}
+\date{}
+\maketitle
+\lstset{language=C, 
+    basicstyle=\ttfamily,
+    keywordstyle=\bfseries,
+    commentstyle=\slshape,
+    showspaces=false,
+    showstringspaces=false}
+
+Collateralized Debt Obligations (CDO) are credit derivatives \emph{i.e.} financial contracts allowing the transfer of credit risk from one market participant to another. This feature improves the efficient allocation of credit risk among market participants.
+
+\section{CDS and CDO}
+A Credit Default Swap is a contract in which party $A$ pays $B$ a regular cash flow till maturity in exchange for a compensation payment from party $B$ in an event of default of the underlying corporate bond. The cash flow as a percentage of the notional, aka \emph{credit spread}, is determined in such a way that the contract is worth $0$ at initiation of the contract. The cash flow reflects the probability of the event of default that two parties agreed upon.
+
+A synthetic CDO is a pool of CDS, of which the cumulative loss on the pool is divided into different \emph{tranches}. A tranche holder receives regular cash flow as a percentage of the remaining balance of that tranche and pays out as loss occurs for which that tranche is responsible till maturity. For example, the holder of the $3\%-7\%$ tranche gets quarterly cashflow as a percentage of the balance. When the total loss of the pool exceeds $3\%$, the balance of $3\%-7\%$ starts to reduce. When the total loss reaches $7\%$, the balance of that tranche is gone. In this pricing module, the percentage is absolute and not relative to the total loss. 
+
+The cash flows of all the tranches are determined as the same way as CDS and they reflect the joint distribution of the default events of all the underlying CDS contracts.
+
+\section{Modelling and factor approach}
+We will thereafter consider a synthetic CDO with some given maturity $T$. This is based upon $n$ CDS with nominals $N_j, j = 1,\dots,n$ and maturity also equal to $T$. We denote by $\delta_j$ the \emph{recovery rate} for credit $j$ and by $M_j = (1 - \delta_j) N_j$ the corresponding \emph{loss given default}. 
+
+For the $n$ names in the collateral pool, we consider the associated default times $\tau_1,\dots, \tau_n$ defined on a common probability space $(\Omega, \mathcal{G}, \P)$. In the following, we will consider only reduced-form models of default times defined by  
+\begin{equation} \label{hyp_tau} \tag{$H_\tau$}
+    \tau_i = \inf \Bigl\{ u \in \mathbb{R}^+, \int_0^u h_i(v) d v \ge - \log(U_i) \Bigr\},
+\end{equation}
+where the $h_i$ are deterministic and continuous positive functions, the $U_i$ are some uniform random variables.
+
+In order to compute (by a semi-analytic approach) the price of one CDO tranche, all we need is the portfolio loss distribution \emph{i.e.} the portfolio aggregate loss on the credit portfolio at time $t$: 
+\begin{equation*}
+    L(t) = \sum_{j=1}^n M_j \mathbf{1}_{\{\tau_j \le t\}}
+\end{equation*}
+which is a pure jump process. This distribution depend on the joint distribution of the default times $\tau_1, \dots, \tau_n$ that we modelling using a classical factor approach and Copula functions.
+
+We denote by $F$ and $S$ respectively the \emph{joint distribution} and survival functions such that for all $(t_1,\dots t_n) \in [0,T]^n$, $F(t_1,\dots, t_n) = \P(\tau_1 \le t_1, \dots, \tau_n \le t_n)$ and $S(t_1,\dots,t_n) = \P(\tau_1 > t_1, \dots, \tau_n > t_n)$. $F_1,\dots,F_n$ represent the \emph{marginal} distribution functions and $S_1,\dots, S_n$ the corresponding survival functions. By the assumption \eqref{hyp_tau}, we have 
+\begin{equation*}
+    S_i(t) = \P(\tau_i > t) = \exp\bigl( -\int_0^t h_i(v) d v \bigr).
+\end{equation*}
+
+We will consider now a latent factor $V$ such that conditionally on $V$, the default times are independent. We will denote by $p^{i|V}_t = \P(\tau_i \le t | V)$ and $q^{i|V}_t = 1-p^{i|V}(t)$ the conditional default and survival
+probabilities. It is easy to check that 
+\begin{align*}
+    S(t_1,\dots,t_n) &= \int \prod_{i=1}^n q^{i|v}_t f(v) d v,\\
+    F(t_1,\dots,t_n) &= \int \prod_{i=1}^n p^{i|v}_t f(v) d v.
+\end{align*}
+So, if we can easily compute the conditional default probabilities and integrate along the density of the factor $V$, we are able to compute the joint distribution of the default times. 
+
+\subsection{Gaussian Copula}
+We consider a standard Gaussian random variable $V$, and we define the Gaussian vector $(X_1, \dots, X_n)$ 
+by 
+\begin{equation*}
+    X_i = \rho V + \sqrt{1 - \rho^2} \bar{V}_i
+\end{equation*}
+where $\bar{V}_i$ are \emph{independent} ($\forall i, j, V_i \perp V_j$ and $\forall i, V_i \perp V$) standard Gaussian random variables. We define the uniform random variable $U_i = 1 - \Phi(X_i)$ where $\Phi$ is the cumulative distribution function of a standard Gaussian variable. We then get 
+\begin{equation*}
+    p^{i|V}_t = \Phi \Bigl( \frac{\Phi^{-1}(F_i(t)) - \rho V}{\sqrt{1-\rho^2}} \Bigr).
+\end{equation*}
+with $F_i(t) = 1 - \exp \bigl( - \int_0^t h_i(v) d v \bigr)$.
+
+With the CDO pricing library for Premia, we initialize a one-factor Gaussian copula with parameter $\rho = 0.4$ on the following way 
+\begin{lstlisting}
+    copula      *cop;
+    double      rho = 0.4;
+    cop = init_gaussian_copula(rho);
+\end{lstlisting}
+
+\subsection{Clayton Copula}
+We consider a positive random variable $V$ following a standard Gamma distribution with shape parameter $1/\theta$ where $\theta > 0$. Its probability density is given by $f(x) = \frac{1}{\Gamma(1)} \exp(-x) x^{(1-\theta)*\theta}$ for $x > 0$. We define the uniform random variable 
+\begin{equation*}
+    U_i = \Psi \Bigl( - \frac{\log(\bar{U}_i)}{V} \Bigr),
+\end{equation*}
+where $\bar{U}_1,\dots,\bar{U}_n$ are independent uniform random variables also independent from $V$, and $\Psi$ is the Laplace transform of $f$. The joint distribution of $(U_1,\dots,U_n)$ is known as the Clayton copula. 
+
+The conditional default probabilities can be expressed as 
+\begin{equation*}
+    p^{i|V}_t = \exp\Bigl( V \bigl(1 - F_i(t)\bigr)^{- \theta} \Bigr), 
+\end{equation*}
+with $F_i(t) = 1 - \exp \bigl( - \int_0^t h_i(v) d v \bigr)$.
+
+In Premia, we initialize a one-factor Clayton copula with parameter $\rho = 0.4$ like this: 
+\begin{lstlisting}
+    copula      *cop;
+    cop = init_clayton_copula(0.40);
+\end{lstlisting}
+
+\subsection{NIG Copula}
+The normal inverse Gaussian distribution (NIG) is a mixture of normal and inverse Gaussian distributions. 
+The density of a random variable $X \sim \NIG(\alpha, \beta, \mu, \delta)$ is given by:
+\begin{equation*}
+    f_{\NIG}(x; \alpha, \beta, \mu, \delta) = \frac{\delta \alpha \exp(\delta \gamma + \beta(x-\mu))}{\pi \sqrt{\delta^2+(x-\mu)^2}} K_1\bigl(\alpha \sqrt{\delta^2+(x-\mu)^2}\bigr),
+\end{equation*}
+where $K_1(w) = \frac{1}{2} \int_0^{\infty} \exp\bigl( \frac{-1}{2} w(t+t^{-1}) \bigr) d t$ is the modified Bessel function of the third kind.
+
+We consider a random variable $V$ following a NIG distribution with parameters 
+\begin{equation*}
+    V \sim \NIG \bigl(\alpha, \beta, -\frac{\beta \gamma^2}{\alpha^2}, \frac{\gamma^3}{\alpha^2} \bigr)
+\end{equation*}
+where $\gamma = \sqrt{\alpha^2 - \beta^2}$, and we define 
+\begin{equation*}
+    X_i = \rho V + \sqrt{1-\rho^2} \bar{V}_i,
+\end{equation*}
+where $\bar{V}_i$ are independent (and independent from $V$) NIG random variables with parameters 
+\begin{equation*}
+    \bar{V}_i \sim \NIG \bigl(\frac{\sqrt{1-\rho^2}}{\rho} \alpha, \frac{\sqrt{1-\rho^2}}{\rho} \beta, -\frac{\sqrt{1-\rho^2}}{\rho} \frac{\beta \gamma^2}{\alpha^2}, \frac{\sqrt{1-\rho^2}}{\rho} \frac{\gamma^3}{\alpha^2} \bigr).
+\end{equation*}
+To simplify notations we denote $F_{\NIG(s)}(x)$ the cumulative distribution of a NIG random variable with parameters $\NIG\bigl(s \alpha, s \beta, - s \frac{\beta \gamma^2}{\alpha^2}, s \frac{\gamma^3}{\alpha^2} \bigr)$. Using the scaling property and stability under convolution of NIG distribution we get $X_i \sim \NIG(1/\rho)$. We define the uniform random variable $U_i = 1 - F_{\NIG(1/a)}(X_i)$ and we get 
+\begin{equation*}
+    p_t^{i|V} = F_{\NIG(\sqrt{1-\rho^2}/\rho)} \Bigl( \frac{F_{\NIG(1/\rho)}^{-1}(F_i(t)) - \rho V}{\sqrt{1-\rho^2}} \Bigr).
+\end{equation*}
+
+The initialization of the NIG copula is done by the following lines of code:
+\begin{lstlisting}
+    copula      *cop;
+    double      rho = 0.4, alpha = 1.2, beta =  -0.2;
+    cop = init_nig_copula(rho, alpha, beta);
+\end{lstlisting}
+
+\section{Number of defaults}
+We thereafter denote by 
+\begin{equation*}
+    N(t) = \sum_{i=1}^n \mathbf{1}_{\{\tau_i \le t\}},
+\end{equation*}
+the counting process associated with the number of defaults. In case where the CDO is homogeneous (\emph{i.e.} $\forall i \in \{1,\dots,n\}, N_i = N$, $\delta$ deterministic and $\delta_i = \delta$), the portfolio aggregate loss on the credit portfolio at time $t$ is given by
+\begin{equation*}
+    L(t) = N (1 - \delta) N(t). 
+\end{equation*}
+
+\subsection{Hull and White recursion}
+The counting process $(N(t))_{t \in [0,T]}$ is a discrete random process with values in $\{0, \dots, n\}$. For a fixed time $t$, we denote by $\pi^{|V}_k = \P(N(t) = k | V)$ and calculate $\pi^{|V}_k$ iteratively.
+First, the conditional probability of no-default is 
+\begin{equation*}
+    \pi^{|V}_0 = \P \Bigl( \sum_{i=1}^n \mathbf{1}_{\tau_i \le t} = 0 | V \Bigr) = \prod_{i=1}^n \P (\tau_i > t | V) = \prod_{i=1}^n q_t^{i|V}.
+\end{equation*}
+The probability of one default at time $t$ is 
+\begin{align*}
+    \pi^{|V}_1 &= \P \Bigl( \bigcup_{j=1}^n \Bigl\{ \{\tau_j \le t\} \cap \bigl( \bigcap_{i=1,i \neq j}^n \{\tau_i > t\} \bigr) \Bigr\} \Bigr), \\
+    &= \sum_{i=1}^n \Bigl( (1-q_t^{j|V}) \prod_{i=1}^n \frac{q_t^{i|V}}{q_t^{j|V}} \Bigr).
+\end{align*}
+Iteratively, we prove that the conditional probability of exactly $k$ defaults by time $t$ is 
+\begin{equation*}
+    \pi^{|V}_k = \pi^{|V}_0 \sum w_{z(1)} \dots w_{z(k)}
+\end{equation*}
+where $w_i = \frac{p_t^{i|V}}{q_t^{i|V}}$ and $\{z(1),\dots,z(k)\}$ is a set of $k$ different numbers chosen from $\{1,\dots,N\}$. A relatively fast way to computing this summation (taken over $C_k^n$ different ways) is to use the following recurrence relation between $U_k = \sum w_{z(1)} \dots w_{z(k)}$ and $V_k = \sum_{j=1}^n w_{j}^k$: 
+\begin{align*}
+    U_1 &= V_1, \\
+    2 U_2 &= V_1 U_1 - V_2, \\
+    3 U_3 &= V_1 U_2 - V_2 U_1 + V_3, \\
+    & \;\; \vdots \\
+    k U_k &= V_1 U_{k-1} + V_2 U_{k-2} - \dots + (-1)^k V_{k-1} U_1 + (-1)^{k+1} V_k.
+\end{align*}
+
+This recursion is implemented in the function \code{hw_numdef} in file \code{hull_white.c}. In the following example, we initialize a time grid \code{t}, compute the conditional probabilities $p_t^{i|V}$ in \code{cp} and compute the number of defaults distribution by the recursive algorithm. 
+\begin{lstlisting}
+    t = init_fine_grid(cdo->dates, 10);
+    cp = init_cond_prob(cdo, cop, t);
+    numdef = hw_numdef(cdo, cop, t, cp);
+\end{lstlisting}
+
+\subsection{Laurent and Gregory approach} \label{lg}
+In this approach, we compute the probability generating function of $N(t)$ 
+\begin{equation*}
+    \psi_{N(t)}(u) = \E(u^{N(t)}) = \sum_{k=0}^n \P(N(t)=k) u^k. 
+\end{equation*}
+By the conditional Independence of the default time we get 
+\begin{equation*}
+    \psi_{N(t)}(u) = \int \underbrace{\prod_{i=1}^n \Bigl( q_t^{i|v} + p_t^{i|v} u \Bigr)}_{u^n \phi_n(v) + \cdots + \phi_0(v)} f(v) d v.
+\end{equation*}
+The formal expansion of $\prod_{i=1}^n \Bigl( q_t^{i|v} + p_t^{i|v} u \Bigr)$ is very effective for $n < 200$. We can then obtain the probability of $k$ names being in default at time $t$ as 
+\begin{equation*}
+    \P(N(t) = k) = \int \phi_k(v) f(v) d v.
+\end{equation*}
+
+The computation is done by the function \code{lg_numdef} in file \code{laurent_gregory.c}
+\begin{lstlisting}
+    t = init_fine_grid(cdo->dates, 10);
+    cp = init_cond_prob(cdo, cop, t);
+    numdef = lg_numdef(cdo, cop, t, cp);
+\end{lstlisting}
+
+\section{Loss distribution and cumulative loss}
+We recall that the loss distribution at time $t$ is defined by 
+\begin{equation*}
+    L(t) = \sum_{j=1}^n M_j \mathbf{1}_{\{\tau_j \le t\}} = 
+    \sum_{j=1}^n N_j (1-\delta_j) \mathbf{1}_{\{\tau_j \le t\}}
+\end{equation*}
+where $N_j$ is deterministic and $\delta_j$ is the recovery rate (possibly random) taking value in $[0,1]$.
+
+Denote therefore by $M_{A,B}(t)$ the cumulative loss on a given tranche $[A, B]$ at time $t$: 
+\begin{equation*}
+    M_{A,B}(t) = \begin{cases}
+        0, & \text{if $L(t) \le A$}, \\
+        L(t) - A, & \text{if $L(t) \in [A, B]$}, \\
+        B - A, & \text{if $L(t) \ge B$}.
+    \end{cases}
+\end{equation*}
+The expected cumulative loss on a given tranche at time $t$ can be obtained from the loss distribution on the portfolio of reference credits
+\begin{align*}
+    \E(M_{A,B}(t)) &= (B-A) \P_{L(t)}(]B, +\infty[) + \int_A^B (x-A) \P_{L(t)}(dx), \\
+    &= \E \bigl((L(t) - A)_+ - (L(t) - B)_+\bigr),
+\end{align*}
+where $\P_{L(t)}$ is the distribution of $L(t)$. 
+
+\begin{rmk}[Homogenous CDO]
+For an homogeneous CDO we deduce immediately the loss distribution $L(t)$ from the number of defaults distribution $N(t)$. Moreover, an approximation of $\E(M_{A,B}(t))$ is  
+\begin{equation*}
+    \E(M_{A,B}(t)) \simeq \sum_{k=0}^n \Bigl( \bigl( N(1-\delta) k - A \bigr)_+ - \bigl( N(1-\delta) k - B \bigr)_+ \Bigr) \P(N(t) = k),
+\end{equation*}
+This approximation is done in function \code{mean_losses_from_numdef} in file \code{cdo.c}. 
+{\upshape \begin{lstlisting}
+    meanloss = mean_losses_from_numdef(cdo, t, numdef);
+\end{lstlisting}}
+\end{rmk}
+
+\subsection{Recursive algorithm}
+\subsubsection*{Recursive approach for the Homogeneous case}
+If the CDO is homogeneous, the loss $(L(t))_{t \in [0,T]}$ is a discrete random process with values in $\{0, \frac{1}{N}, \dots, 1\}$. For a fixed time $t$, we denote by $\pi^{(n)|V}_k = \P \bigl(L(t) = k/(N(1-\delta)) | V\bigr)$ and calculate $\pi^{(n)|V}_k$ iteratively by first assuming that there are no debt instruments ($\pi^{(0)|V}_k$), then assuming that there is only one debt instrument($\pi^{(1)|V}_k$), then assuming that there are only two debt instruments and so on. 
+
+When there are no debt instruments we are certain there will be no loss. Hence 
+\begin{equation*}
+    \pi^{(0)|V}_0 = 1 \quad \text{and} \quad \pi^{(0)|V}_k = 0, \forall k \ge 1.
+\end{equation*}
+
+Suppose that we have calculated $\pi^{(j)|V}_k$ when the first $j$ debt instruments are considered. Then for every $k \in \{0, \dots, n\}$  
+\begin{align*}
+    \pi^{(j+1)|V}_k &= \P\Bigl(L^{(j+1)}(t) = \frac{k}{N(1-\delta)} | V\Bigr), \\
+    &= \P\Bigl(L^{(j)}(t) = \frac{k-1}{N(1-\delta)} | V\Bigr) \P(\tau_{j+1} \le t | V) + 
+    \P\Bigl(L^{(j)}(t) = \frac{k}{N(1-\delta)} | V\Bigr) \P(\tau_{j+1} > t | V) \\
+    &= \pi^{(j)|V}_{k-1} p_t^{j+1|V} + \pi^{(j)|V}_k q_t^{j+1|V}.
+\end{align*}
+
+When all $n$ debt instruments have been considered we obtain the conditional loss distribution at time $t$. The loss distribution is then given by 
+\begin{equation*}
+    \P(L(t) = k) = \int \pi^{(n)|v}_k f(v) d v.
+\end{equation*}
+
+This algorithm is implemented in the function \code{hw_losses_h} in the file \code{hull_white.c}. We can call this function by the following way: 
+\begin{lstlisting}
+    t = init_fine_grid(cdo->dates, 4);
+    x = init_hom_grid(MINDOUBLE, 1-delta, 1/100.);    // if n = 100
+    cp = init_cond_prob(cdo, cop, t);
+    losses = hw_losses_h(cdo, cop, t, x, cp);
+\end{lstlisting}
+
+\subsubsection*{Recursive approach for the general case}
+We assume that the recovery rate is deterministic and the same $\delta$ for each debt instrument. It is not necessary for the nominal to be equal. The loss process is a pure jump process taking value in a discrete subset of $[0,1]$. The key idea is to discretize $[0,1]$ choosing $K$ buckets $[x_k, x_{k+1}[$ such that $x_0 = 0$ and $x_K = +\infty$. 
+
+For a fixed time $t$, we denote by $\pi^{(n)|V}_k = \P(L(t) \in [x_k, x_{k+1}[ | V)$ and $A^{(n)|V}_k = \E(L(t) | L(t) \in [x_k, x_{k+1}[, V)$. As above, we compute $\pi^{(n)|V}_k$ and $A^{(n)|V}_k$ iteratively. 
+Suppose that we have calculated $\pi^{(j)|V}_k$ when the first $j$ debt instruments are considered. Then for every $k \in \{0, \dots, K\}$, we define $u(k)$ as the bucket containing $A^{(j)|V}_k + N_{j+1} (1-\delta_{j+1})$. 
+\begin{itemize}
+\item if $u(k) > k$ then 
+\begin{align*}
+    \pi^{(j+1)|V}_k &= \pi^{(j)|V}_k - \pi^{(j)|V}_k p^{j+1|V}_t, \\  
+    \pi^{(j+1)|V}_{u(k)} &= \pi^{(j)|V}_{u(k)} + \pi^{(j)|V}_k p^{j+1|V}_t, \\
+    A^{(j+1)|V}_k &= A^{(j)|V}_k, \\ 
+    A^{(j+1)|V}_{u(k)} &= A^{(j)|V}_{u(k)} + \frac{\pi^{(j)|V}_k p^{j+1|V}_t}{\pi^{(j)|V}_{u(k)} + \pi^{(j)|V}_k p^{j+1|V}_t} \bigl(A^{(j)|V}_k + N_{j+1} (1-\delta_{j+1}) - A^{(j+1)|V}_{u(k)} \bigr), 
+\end{align*}
+\item if $u(k) = k$ then 
+\begin{align*}
+    \pi^{(j+1)|V}_k &= \pi^{(j)|V}_k, \\  
+    A^{(j+1)|V}_k &= A^{(j)|V}_k + p^{j+1|V}_t N_{j+1} (1-\delta_{j+1}). \\ 
+    \hphantom{A^{(j+1)|V}_{u(k)} }&\hphantom{= A^{(j)|V}_{u(k)} + \frac{\pi^{(j)|V}_k p^{j+1|V}_t}{\pi^{(j)|V}_{u(k)} + \pi^{(j)|V}_k p^{j+1|V}_t} \bigl(A^{(j)|V}_k + N_{j+1} (1-\delta_{j+1}) - A^{(j+1)|V}_{u(k)} \bigr),}
+\end{align*}
+\end{itemize}
+
+This algorithm is implemented in the function \code{hw_losses_nh} in the file \code{hull_white.c}. 
+\begin{lstlisting}
+    t = init_fine_grid(cdo->dates, 4);
+    x = init_hom_grid(MINDOUBLE, 1, 1/1000.);    // the buckets 
+    cp = init_cond_prob(cdo, cop, t);
+    losses = hw_losses_nh(cdo, cop, t, x, cp);
+\end{lstlisting}
+
+
+\subsection{FFT approach}
+In this section, we assume that the $\sigma$-algebras $\sigma(\delta_1), \dots, \sigma(\delta_n), \sigma(V, \tau_1, \dots, \tau_n)$ are independent. We compute the characteristic function of the cumulative losses for different time horizons,
+\begin{equation*}
+    \phi_{L(t)}(u) = \E \Bigl( \exp \Bigl(i u \sum_{j=1}^n N_j (1 - \tau_j) \mathbf{1}_{\{\tau_j \le t\}} \Bigr) \Bigr).
+\end{equation*}
+From the independence of $\tau_j$ conditionally on $V$ and the independence assumption over the recovery rates $\delta_j$, we get
+\begin{equation*}
+    \phi_{L(t)}(u) = \int \prod_{j=1}^n \Bigl( q^{j|V}_t + p^{j|V}_t \E \bigl( \exp(i u N_j (1-\delta_j))\bigr)\Bigr) f(v) d v.
+\end{equation*}
+We get the distribution of $L(t)$ by the inverse fast Fourier transform (provided by the library \code{FFTW}\footnote{\url{http://www.fftw.org/}}). This is done by the function \code{lg_losses} in the file \code{laurent_gregory.c} who is call, for example, by 
+\begin{lstlisting}
+    t = init_fine_grid(cdo->dates, 4);
+    x = init_hom_grid(MINDOUBLE, 1, 1/1000.);    // 1000 points for the FFT
+    cp = init_cond_prob(cdo, cop, t);
+    losses = lg_losses(cdo, cop, t, x, cp);
+\end{lstlisting}
+
+\section{Price of a CDO tranche}
+Let 
+\begin{equation*}
+    0 = t_0 < t_1 < \dots < t_m = T
+\end{equation*}
+denote the payment dates and $D(t)$ the discount factor for maturity $t$. We assume that $D(t) = \exp(- \int_0^t r(s) ds)$ where $r$ is a step function or a continuous linear by step function. In the code, \code{rates} denotes the \code{step_fun} (see file \code{structs.h}) function $t \mapsto \int_0^t r(s) d s$. 
+
+\subsection{Default leg}
+The value of the default leg ($DL$) can be calculated as the expected value of the discounted default payments: 
+\begin{align*}
+    DL & = \E \Bigl( \sum_{j=1}^n \mathbf{1}_{\tau_j \le T} D(\tau_j) \bigl(M_{A,B}(\tau_j) - M_{A,B}(\tau_j^-) \bigr) \Bigr),\\
+    &= \E \Bigl( \int_0^T D(t) d M_{A,B}(t) \Bigr). 
+\end{align*}
+We consider a time grid $0 = \tilde{t}_0 < \dots < \tilde{t}_{\tilde{m}} = T$ such that $\forall i \in \{1,\dots,m\}, \exists j \in \{1,\dots,\tilde{m}\}, \tilde{t}_j = t_i$. This time grid is the \code{grid} \code{t} in the code. We approximate the default leg by 
+\begin{equation*}
+    DL \simeq \sum_{j=0}^{\tilde{m}-1} D\Bigl( \frac{\tilde{t}_j + \tilde{t}_{j+1}}{2} \Bigr) \bigl(\E(M_{A,B}(\tilde{t}_{j+1})) - \E(M_{A,B}(\tilde{t}_j))\bigr).
+\end{equation*}
+This is done by the function
+\begin{lstlisting}
+    dl = default_leg(cdo, rates, t, meanloss);
+\end{lstlisting}
+in file \code{cdo.c}. We recall that the grid \code{meanloss} contains $\{\E(M_{A,B}(\tilde{t}_j))\}_{j=0,\dots,\tilde{m}}$.
+
+\subsection{Payment leg}
+The value of the payment leg (or premium leg) ($PL$) of the tranche is 
+\begin{equation*}
+    PL = \E \Bigl( \underbrace{\sum_{j=1}^n \mathbf{1}_{\tau_j \le T} X D(\tau_j) \bigl(M_{A,B}(\tau_j) - M_{A,B}(\tau_j^-) (\tau_j - t_{k(j)})\bigr)}_{\text{accrued margin}} \Bigr) + \underbrace{\sum_{i=1}^m X D(t_i) \bigl(B-A-\E(M_{A,B}(t_i))\bigr)}_{\text{payments made at regular payment dates}},
+\end{equation*}
+where $X$ is the premium of the tranche $[A,B]$.
+The valuation of the accrued margins is computed as above, using the same time grid $0 = \tilde{t}_0 < \dots < \tilde{t}_{\tilde{m}} = T$ and we obtain the following approximation of the payment leg  
+\begin{equation*}
+    PL \simeq \sum_{j=0}^{\tilde{m}-1} D\Bigl( \frac{\tilde{t}_j + \tilde{t}_{j+1}}{2} \Bigr) \bigl(\E(M_{A,B}(\tilde{t}_{j+1})) - \E(M_{A,B}(\tilde{t}_j))\bigr) (\tilde{t}_{j+1} - \tilde{t}_j) + \sum_{i=1}^m X D(t_i) \bigl(B-A-\E(M_{A,B}(t_i))\bigr).
+\end{equation*}
+This is done by the function
+\begin{lstlisting}
+    dl = default_leg(cdo, rates, t, meanloss);
+\end{lstlisting}
+in file \code{cdo.c}. 
+
+\subsection{Price}
+The price of the tranche $[A,B]$ is the premium $X$ such that $DL = PL$ \emph{i.e.} 
+\begin{equation*}
+    X = \frac{\sum_{j=0}^{\tilde{m}-1} D\Bigl( \frac{\tilde{t}_j + \tilde{t}_{j+1}}{2} \Bigr) \bigl(\E(M_{A,B}(\tilde{t}_{j+1})) - \E(M_{A,B}(\tilde{t}_j))\bigr)}{\sum_{j=0}^{\tilde{m}-1} D\Bigl( \frac{\tilde{t}_j + \tilde{t}_{j+1}}{2} \Bigr) \bigl(\E(M_{A,B}(\tilde{t}_{j+1})) - \E(M_{A,B}(\tilde{t}_j))\bigr) (\tilde{t}_{j+1} - \tilde{t}_j) + \sum_{i=1}^m X D(t_i) \bigl(B-A-\E(M_{A,B}(t_i))\bigr)}.
+\end{equation*}
+
+\section{Monte-Carlo methods}
+We recall that $DL = \E(Y_{DL})$ where $Y_{DL} = \sum_{j=1}^n \mathbf{1}_{\tau_j \le T} D(\tau_j) \bigl(M_{A,B}(\tau_j) - M_{A,B}(\tau_j^-) \bigr)$.
+An approximation of the default leg $DL$ is 
+\begin{equation*}
+    DL \simeq \frac{1}{K} \sum_{k=1}^K Y_{DL}^{(k)}
+\end{equation*}
+with
+\begin{equation*}
+    Y_{DL}^{(k)} = \sum_{j=1}^n \mathbf{1}_{\{\tau_j^{(k)} \le T\}} D(\tau_j^{(k)}) \bigl(M_{A,B}(\tau_j^{(k)}) - M_{A,B}({\tau_j^{(k)}}^-) \bigr).
+\end{equation*}
+In the same way, an approximation of the payment leg $PL$ is 
+\begin{equation*}
+    PL \simeq \frac{1}{K} \sum_{k=1}^K X Y_{PL}^{(k)}
+\end{equation*}
+with
+\begin{equation*}
+    Y_{PL}^{(k)} = \sum_{j=1}^n \mathbf{1}_{\{\tau_j^{(k)} \le T\}} D(\tau_j^{(k)}) \bigl(M_{A,B}(\tau_j^{(k)}) - M_{A,B}({\tau_j^{(k)}}^-) (\tau_j^{(k)} - t_{k(j)})\bigr) + \sum_{i=1}^m D(t_i) \bigl(B-A-M_{A,B}(t_i)\bigr).
+\end{equation*}
+
+This algorithm is implemented in the functions \code{mc_payment_leg} and \code{mc_default_leg}: 
+\begin{lstlisting}
+    n_mc = 100000; 
+    pl = mc_payment_leg(cdo, cop, rates, n_mc);
+    dl = mc_default_leg(cdo, cop, rates, n_mc);
+\end{lstlisting}
+
+\subsection{Monte-Carlo with control variate}
+We consider as control variate an homogeneous CDO built with the following nominal and recovery rate: 
+\begin{equation*}
+    N^h = \frac{1}{n} \sum_{j=1}^n N_j, \quad \text{and} \quad \delta^h = \frac{1}{n} \sum_{j=1}^n \E(\delta_j).
+\end{equation*}
+Then we compute the legs of this homogeneous CDO using the Laurent and Gregory approach (see section \ref{lg}). Hence we have $N^h(t)$ the number of default distribution, $L^h(t)$ the loss distribution, and $PL^h$ and $DL^H$ the price of the payment leg and the default leg respectively. 
+
+The value of the default leg of the initial CDO is then equal to 
+\begin{equation*}
+    DL = DL^h + \E \Bigl( \sum_{j=1}^n \mathbf{1}_{\tau_j \le T} D(\tau_j) \bigl(M_{A,B}(\tau_j) - M_{A,B}(\tau_j^-) - (M^h_{A,B}(\tau_j) - M^h_{A,B}(\tau_j^-)) \bigr) \Bigr),
+\end{equation*}
+where $M^h_{A,B}(t) = (L^h(t) - A) \mathbf{1}_{L^h(t) \in [A,B]} + (B-A) \mathbf{1}_{L^h(t) \ge B}$. 
+We approximate the expectation by a Monte-Carlo procedure as above. In the same way, we can express the payment leg with $PL^h$. 
+
+This algorithm is implemented in the functions \code{mc_payment_vc_leg} and \code{mc_default_vc_leg}: 
+\begin{lstlisting}
+    n_mc = 100000;
+    t = init_fine_grid(cdo->dates, 4);
+    hcdo = homogenize_CDO(cdo);
+    cp = init_cond_prob(hcdo, cop, t);
+    numdef = lg_numdef(hcdo, cop, t, cp);
+    meanloss = mean_losses_from_numdef(hcdo, t, numdef);
+    hpl = payment_leg(hcdo, rates, t, meanloss);
+    hdl = default_leg(hcdo, rates, t, meanloss);
+    pl = mc_payment_vc_leg(cdo, cop, rates, n_mc);
+    dl = mc_default_vc_leg(cdo, cop, rates, n_mc);
+    for (jtr = 0; jtr < cdo->n_tranches-1; jtr++) {
+      pl[jtr] = hpl[jtr] + pl[jtr];
+      dl[jtr] = hdl[jtr] + dl[jtr];
+    }
+\end{lstlisting}
+
+\begin{thebibliography}{99}
+\bibitem{as:04} L.Andersen, J.Sidenious (2004) \it Extension to the Gaussian Copula: Random Recovery and Random Factor Loadings
+\rm Preprint
+
+\bibitem{blg:05}
+X.Burtschell, J.P.Laurent, J.Gregory (2005) \it A comparative analysis of CDO pricing models.\rm Preprint. 
+
+\bibitem{hw:04}
+J.Hull, A.White (2004) \it Valuation of a CDO and an $n^{th}$ to default CDS without Monte Carlo simulation. \rm Journal of Derivatives,2, 8-23.
+
+\bibitem{lg:03}
+J.P.Laurent, J.Gregory (2003) \it  Basket Default Swaps, CDO's and Factor Copulas.\rm Preprint.
+
+\bibitem{ksw:05}
+Kalemanova, Schmid, Werner (2005) \it The Normal Inverse Gaussian distribution for synthetic CDO pricing. \rm Preprint.
+
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,11 @@
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_sigma1_ddl : name of the file containing the ddl
+v2_008_1_sigmaest_n1m1_0_013.ddl
+# nbsplit_y : number (integer) of subdivisions in y
+3
+# nbsplit_T : number (integer) of subdivisions in T
+3
+# name_out_sigma2_ddl : name of the out file containing the new ddl
+v2_008_1_sigmainit_n3m3_0_013.ddl

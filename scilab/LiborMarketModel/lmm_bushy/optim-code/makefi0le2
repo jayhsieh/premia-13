@@ -1,0 +1,20 @@
+.SUFFIXES: .c .o .a
+
+LIBOBJS = main.o QuasiNewton.o BFGSupdate.o lineSearch.o cholesky.o  stopping.o testing.o
+HEADERS =	QuasiNewton.h BFGSupdate.h lineSearch.h cholesky.h  stopping.h testing.h			
+LIB = utility.a
+LDFLAGS =       -lm 
+
+.c.o:
+	gcc -c $<
+
+.c.a:
+	gcc -c $<
+	ar cr $@ $%
+
+$(LIB): $(LIB)($(LIBOBJS))
+
+all::	utility.a
+
+clean:
+	rm *.o utility.a

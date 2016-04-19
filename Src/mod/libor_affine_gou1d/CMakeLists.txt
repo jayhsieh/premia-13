@@ -1,0 +1,6 @@
+add_library (liblibor_affine_gou1d OBJECT
+	libor_affine_gou1d.c
+	libor_affine_gou1d_stdi/libor_affine_gou1d_stdi.c
+	libor_affine_gou1d_stdi/cf_libor_affine_gou1d_swaption_fourier.c
+	libor_affine_gou1d_stdi/cf_libor_affine_gou1d_capfloor_fourier.c
+	)

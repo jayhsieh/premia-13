@@ -1,0 +1,8 @@
+add_library (libblackkarasinski1d OBJECT
+	blackkarasinski1d_stdi/blackkarasinski1d_stdi.c
+	blackkarasinski1d_stdi/tr_blackkarasinski1d_capfloor.c
+	blackkarasinski1d_stdi/tr_blackkarasinski1d_swaption.c
+	blackkarasinski1d_stdi/tr_blackkarasinski1d_zbo.c
+	blackkarasinski1d_stdi/tr_blackkarasinski1d_zcbond.c
+	blackkarasinski1d.c
+	)

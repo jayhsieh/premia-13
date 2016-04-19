@@ -1,0 +1,25 @@
+add_library (libmer1d OBJECT
+	mer1d.c
+	mer1d_lim/fd_impexpdownout_mer.C
+	mer1d_lim/fd_impexpupout_mer.C
+	mer1d_lim/mer1d_lim.c
+	mer1d_pad/mer1d_pad.c
+	mer1d_pad/ap_fixedasian_fusaimeucci_mer.c
+	mer1d_pad/ap_asian_fmm_mer.c
+	mer1d_pad/mc_merton_fixedlookback.c
+	mer1d_pad/mc_merton_floatinglookback.c
+	mer1d_std/ap_carr_mer.C
+	mer1d_std/cf_call_merton.c
+	mer1d_std/cf_put_merton.c
+	mer1d_std/tr_mss_merton.c
+	mer1d_std/fd_andersenandreasen.c
+	mer1d_std/fd_explicit_mer.c
+	mer1d_std/fd_impexp2.C
+	mer1d_std/fd_impexp_mer.c
+	mer1d_std/mc_merton.c
+	mer1d_std/mc_privault.c
+	mer1d_std/ap_statichedging_carrwu.c
+	mer1d_std/mer1d_std.c
+    mer1d_stda/ap_gap_merton.C
+	mer1d_stda/mer1d_stda.c
+	)

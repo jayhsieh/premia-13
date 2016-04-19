@@ -1,0 +1,26 @@
+
+executable : codecalib param1 param2 param3
+
+param1 = alpha
+param2 = lamda0 (lagrange initiale)
+param3 = prior (il va etre changer par la moyenne des vol implicites)
+
+il faut changer les variables dans le main en attendant de faire un fichier "Input.in"
+char *title=/*"dupireprices.data"*//*"sp500prices.data"*/"VolStoCall.data"/*"100surK.data"*//*"avellaneda.data"*/;
+
+param.S0 = 100;
+param.N = 100 ;
+param.dividende = 0;
+param.r = 0.05;
+param.prior = 0.21;
+param.prior_max = 0.35 ;
+param.prior_min = 0.13 ;
+param.sigmabar =0.36; ATTENTION IL FAUT QUE sigmabar > prior_max
+
+les noms des fichiers sur lesquels j'ai teste
+"sp500prices.data" : donnees de Cognet a partir d'un article
+"VolStoCall.data" : des prix que j'ai simules
+"100surK.data" :des prix que j'ai simules a partir d'une vol implicite =100/strike,
+"avellaneda.data" : les prix de l'article d'Avellaneda et al
+"dupireprices.data" : les donnees de patrik pipolot
+

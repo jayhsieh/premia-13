@@ -1,0 +1,25 @@
+LIBRARY    libcalib.dll
+EXPORTS
+	fplus
+	ECUYER
+	repartition
+	putBlackScholes
+	tiragedetrajectoires
+	donnees
+	normeinfinie
+	produitscalaire
+	addition
+	multiplication
+	fonctionnelle
+	gradient
+	fonctiondemerite
+	RegledeWolfe
+	methodedugradient
+	methodedugradient2
+	poids
+	loadParameters
+	loadDataPrices
+	volatiliteimplicite
+	calib
+	dcalib
+	libcalib_

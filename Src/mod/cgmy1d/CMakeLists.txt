@@ -1,0 +1,25 @@
+add_library (libcgmy1d OBJECT
+	cgmy1d_pad/cgmy1d_pad.c
+	cgmy1d_pad/ap_fixedasian_fusaimeucci_cgmy.c
+	cgmy1d_pad/ap_asian_fmm_cgmy.c
+	cgmy1d_pad/mc_cgmy_lookbackfixed.c
+	cgmy1d_pad/mc_cgmy_lookbackfloating.c
+	cgmy1d_pad/mc_cgmy_asianfixed.c
+	cgmy1d_pad/mc_cgmy_asianfloating.c
+	cgmy1d_pad/ap_cernykyriakou_cgmy_asianfixed.c
+	cgmy1d_pad/ap_cernykyriakou_cgmy_asianfloating.c
+	cgmy1d_pad/ap_cgmy_lookbackfloating_fft.c
+	cgmy1d_pad/ap_cgmy_lookbackfixed_fft.c
+	cgmy1d_pad/ap_fastwh_cgmy_lookbackfixed.c
+	cgmy1d_pad/ap_fastwh_cgmy_lookbackfloating.c
+	cgmy1d_std/mc_tankovpoirot_cgmy.C
+	cgmy1d_std/mc_madan_yor.C
+	cgmy1d_std/cgmy1d_std.c
+	cgmy1d_std/ap_cosine_cgmy1d_euro.c
+	cgmy1d_std/ap_cosine_cgmy1d_amer.c
+	cgmy1d_stdg/cgmy1d_stdg.c
+	cgmy1d_stdg/ap_cgmy_swing_wienerhopf.c
+	cgmy1d_stdr/cgmy1d_stdr.c
+	cgmy1d_stdr/ap_cgmy_var.c
+	cgmy1d.c
+	)

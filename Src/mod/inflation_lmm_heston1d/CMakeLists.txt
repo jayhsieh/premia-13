@@ -1,0 +1,5 @@
+add_library (libinflation_lmm_heston1d OBJECT
+	inflation_lmm_heston1d.c
+	inflation_lmm_heston1d_stdf/inflation_lmm_heston1d_stdf.c
+	inflation_lmm_heston1d_stdf/ap_mercuriomoreni_inflationlmmheston.C
+	)

@@ -1,0 +1,18 @@
+
+				Calibration of LIBOR model	
+
+_________________Input Information:____________
+Date of market data: 18/10/2001
+The maximum time in tenor structure (by year): 1
+Unit of tenor structure (by year): 0.5
+
+
+______________Calibrate Result:____________
+
+ b   =0.000000 
+ ginf=any value 
+ **********special case: b=0, then volatility norm equals to constant 1 
+ eta1=0.119080 (calibrate)
+ eta2=0.000000 (calibrate)
+ rhoinf=0.000000 (calibrate)
+ 

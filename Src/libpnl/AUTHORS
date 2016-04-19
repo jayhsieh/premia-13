@@ -1,0 +1,32 @@
+Jérôme Lelong <jerome.lelong@gmail.com> (2007 - 2011)
+
+   - Band matrices
+   - FFT
+   - Laplace inversion
+   - Linear algebra
+   - Matrix matrix multiplication
+   - Multidimensional root finding
+   - Multivariate polynomial regression
+   - MPI Bindings
+   - Numerical integration
+   - ODE solvers
+   - Overall design
+   - Random number generators
+   - Sorting
+   - Special functions
+   - Tridiagonal matrices
+   - Hyper matrices
+   - Lists
+
+David Pommier <pommier.david@gmail.com> (2007 - April 2009)
+
+   - Financial functions
+   - Iterative solvers for linear systems
+   - Matrix matrix multiplication
+   - One dimensional root finding
+   - Tridiagonal matrices
+
+Contributions from
+
+   Ismail Laachir <ismail.laachir@inria.fr>
+      - Optimization routine

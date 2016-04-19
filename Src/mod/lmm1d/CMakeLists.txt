@@ -1,0 +1,16 @@
+add_library (liblmm1d OBJECT
+	lmm1d.c
+	lmm1d_exoi/lmm1d_exoi.c
+	lmm1d_exoi/mc_longstaffschwartz_callable_capped_floater.c
+	lmm1d_exoi/mc_longstaffschwartz_callable_inverse_floater.c
+	lmm1d_exoi/mc_longstaffschwartz_callable_cms_spread.c
+	lmm1d_exoi/mc_longstaffschwartz_callable_range_accrual.c
+	lmm1d_stdi/lmm1d_stdi.c
+	lmm1d_stdi/mc_glassermanzhao_swaption.c
+	lmm1d_stdi/mc_pedersen_bermswaption.c
+	lmm1d_stdi/ap_rebonato_swaption.c
+	lmm1d_stdi/mc_andersen_bermudanswaption.c
+	lmm1d_stdi/mc_longstaffschwartz_bermudanswaption.c
+	lmm1d_stdi/mc_andersenbroadie_bermudanswaption.c
+	lmm1d_stdi/mc_schoenmakers_bermudanswaption.c
+	)

@@ -1,0 +1,24 @@
+  MATHFI Project, Inria Rocquencourt & University of Paris 12
+  Jacques Printems and Marouen Messaoud, 2004.
+
+The source files of the calibration code are in the subdirectory:
+ ./src
+
+To compile the two programs calib_Avellaneda and pricer_Avellaneda:
+
+ cd ./src
+ make or make all
+or you can compile each program separately:
+ make calib_Avellaneda
+ make pricer_Avellaneda
+
+To execute a program, e.g. calib_Avellaneda,
+you have to edit a file ended by .in, calib_Avellaneda.in in this case.
+You can find examples of files calib_Avellaneda.in in the subdirectory ./src.
+The file pricer_Avellaneda.in is automatically created by calib_Avellaneda.
+See the documentation ./doc/documentation.ps for the detailed description
+of those input files.
+
+The subdirectory ./doc contains the documentation of the code
+containing more details concerning the execution of each programs.
+See the file ./doc/documentation.ps.

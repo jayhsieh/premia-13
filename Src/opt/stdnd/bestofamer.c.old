@@ -1,0 +1,45 @@
+#include "stdnd.h"
+#include "error_msg.h"
+#include "matrix.h"
+
+static NumFunc_nd bestof=
+{
+  BestOf,
+  {{"Strike",PREMIAVECT,{1},FORBID,SETABLE},
+   {" ",END,{0},FORBID,SETABLE}},
+  CHK_digit
+};
+
+static TYPEOPT BestOfAmer=
+{
+  /*Size*/        {"Size", PINT, {1}, FORBID, UNSETABLE},
+  /*Maturity*/    {"Maturity",DATE,{1.0},ALLOW,SETABLE},
+  /*PayOff*/      {"Payoff",NUMFUNC_ND,{0},FORBID,SETABLE},
+  /*EurOrAmer*/  {"Amer",BOOL,{AMER},FORBID,UNSETABLE},
+};
+
+static int OPT(Init)(Option *opt,Model *mod)
+{
+  TYPEOPT* pt=(TYPEOPT*)(opt->TypeOpt);
+  VAR* ptMod=(VAR*)(mod->TypeModel);
+
+  if ( opt->init == 0)
+    {
+      opt->init = 1;
+      opt->nvar = 4;
+      opt->nvar_setable=2;
+
+      pt->PayOff.Val.V_NUMFUNC_ND=&bestof;
+      pt->Maturity.Val.V_DATE=1.0;
+      pt->EuOrAm.Val.V_BOOL=AMER;
+      pt->Size.Val.V_PINT=ptMod[0].Val.V_INT;
+      if(((pt->PayOff.Val.V_NUMFUNC_ND)->Par[0].Val.V_PREMIAVECT=premia_vect_create_from_double(pt->Size.Val.V_PINT, 100.0))==NULL)
+        return MEMORY_ALLOCATION_FAILURE;
+    }
+
+    pt->Size.Val.V_PINT=ptMod[0].Val.V_INT;
+    premia_vect_resize_with_double((pt->PayOff.Val.V_NUMFUNC_ND)->Par[0].Val.V_PREMIAVECT,pt->Size.Val.V_PINT,100.0);
+    return OK;
+}
+
+MAKEOPT(BestOfAmer);

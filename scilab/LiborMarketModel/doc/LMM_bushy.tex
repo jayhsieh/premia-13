@@ -1,0 +1,169 @@
+%\newcommand{\winlin}{\backslash}
+\newcommand{\winlin}{/}
+\section{Bushy Tree Technique}
+The bushy technique consists in using a non-recombining tree to estimate the evolution of the libor vector needed to price a fixed income derivative(Swaption, Cap, Floor, Bermudean Swaption). The feature of the tree method is clear when we need to compute American contract. Actually, in this case we need to compare between the exercise and the continuation strategies, and in order to compute the continuation value we must compute a conditional expectation for each realization of the libor vector, and here a tree method seems to be the easiest to establish.\\
+The Libor Market Model is path dependent model, this appears in the drift, then we cannot use recombining tree methods. The disadvantage is that the number of nodes explodes with the number of time step and since we must enlarge the time step number to make the discontinuous process converge to the continuous one we are very quickly limited by the calculation time and by the finite memory size in the PC. This study is based on the \cite{Jackel} and \cite{TANGLANGE}. In the first the author gives a method to establish the transition matrix and also proposes a recursive algorithm to construct the Libor tree in order to compute the price. In the second article the authors present an non exploding bushy tree technique. It consists in choosing at a time step some number of nodes form which the tree continues diffusing and interpolate to get the value on the others.
+
+\subsection{Optimal simplex alignment}
+A tree is defined by its transition matrix which gives the probability of the underlying to move from one realization at time t to another one at time t+dt. We must also define the realizations on the tree or more simply, we must know the possible realizations that the underlying can do form one node. For example in the trinomial tree we must choose or compute the (u,m,d) parameters. In many cases methods are proposed to fit the first and second moment of the underlying. It is much careful to consider directly the gaussian variable since it is the source of randomness. For example  :
+
+\begin{math}
+S^{(1)} = \left(
+\begin{array}{c}
+			-1 \\
+      1 
+\end{array}
+\right)
+\end{math}
+
+\begin{math}
+S^{(2)} = \left(
+\begin{array}{c c}
+			-\sqrt{\frac{3}{2}} & -\sqrt{\frac{1}{2}} \\
+      \sqrt{\frac{3}{2}} & -\sqrt{\frac{1}{2}} \\
+      0 & \sqrt{2} \\ 
+\end{array}
+\right)\\
+\end{math}
+For a m dimension general case we define the simplex $S^{(m)}$ as :
+\begin{math}
+S^{(m)}_{ij} = \left\{
+\begin{array}{c c}
+			-\sqrt{\frac{m+1}{(j+1)j}} & for\  j\geq i \\
+			\sqrt{\frac{m+1}{(j+1)j}} & for\  j= i-1 \\
+			0 & for\  j< i-1
+\end{array}
+\right.
+\end{math}
+Given the uncorrelated covariance matrix $\overline{A}$ after a Cholesky decomposition we can define the branching matrix
+$$\overline{B}=\overline{A}.S^{T}$$
+and construct the bushy tree of the libor.
+the recursive algorithm for a European swaption is called by Recurse(0) :
+\small{
+\begin{verbatim}
+double Recurse(long h){
+	long i,k;
+	double tmp=0;
+	double ProdLibor=1,SumLibor=0.0,SwapRate,Bsi=1,SumBsi=0.0,res=0.0;
+	if (h==NSteps){
+		for(i=0;i<NRates;i++)
+		{
+			ProdLibor*=(1+EvolvedFra[h][i]*period);
+			SumLibor += period/ProdLibor;
+		}
+		SwapRate=(1-(1/ProdLibor))/(SumLibor);
+		
+		for(i=0;i<NRates;i++)
+		{
+			Bsi*=1.0/(1+period*EvolvedFra[h][i]);
+			SumBsi += Bsi;
+		}
+		res = (B0*SumBsi*period*MAX(type*(SwapRate-strike),0.0));
+		return res;
+	}
+	
+	for (i=0;i<NRates;i++){ // Calculate the drift for all rates and store them.
+		mu_dT[h][i] = 0.;
+		for (k=NumeraireIndex;k<=i;k++)
+			mu_dT[h][i] += C[h][i][k] * EvolvedFra[h][k] * period / ( 1. + EvolvedFra[h][k] * (period) );
+	}
+	
+	for (k=0;k<NBranches;k++){ // Loop over all branches.
+		for (i=0;i<NRates;i++){
+			EvolvedFra[h+1][i] = EvolvedFra[h][i] * exp( mu_dT[h][i]*(Tau[h+1]-Tau[h]) +
+																											 LogShiftOfBranch[h][k][i] );
+		}
+		tmp += Recurse(h+1); // Sum up the results from all of the branches.
+	}
+	return tmp/NBranches;
+}
+
+\end{verbatim}
+}
+The author proposes also a method to rotate the branching matrix in order to fill the space in a best way and take benefit out of the use of more branches.
+$ S^{m} \stackrel{R^m}{\rightarrow}S^{'m}$ such that
+\begin{eqnarray}\label{rotate}
+ S^{'(m)}_{i j}=-S^{'(m)}_{m+2-i j}\ for \ m \ even \ and \ j=1\ldots \frac{m}{2}\\
+ S^{'(m)}_{i j}=-S^{'(m)}_{m+2-i j}\ for \ m \ odd \ and \ j=1\ldots \frac{m+1}{2}
+\end{eqnarray}
+This can be done using some optimization technique. In the space $\mathbb{R^{m}}$ a rotation can be construct by a composition of $\frac{m(m-1)}{2}$ rotation in a each hyperplane. Then we can write 
+\begin{equation}
+R^m = R^{m}(\theta_1) \ldots R^{m}(\theta_{\frac{m(m-1)}{2} } )
+\end{equation}
+
+The problem is to find the $\frac{m(m-1)}{2}$ unknown variables $\theta$ in order to get a rotated matrix $S$ that solve the system (\ref{rotate}). We used a MCO criteria that we minimized using a newton method based on BFGS algorithm. This procedure can be done before calling the pricing routine and we do it only one time for all the tree and for all the product to price. We recall that in our approach we construct a tree for the gaussian random variable and this is independent from the volatility structure and from the other parameters of the BGM model, then we plug it in our model to get a tree that corresponds to our specific model.
+\subsection{Remarks}
+\label{sec:Remarks}
+The non recombining tree method is huge time consuming and the time of calculation explodes very fast with the number of time step that leading to maturity. This method can not be used to price a non path dependent product since the Monte-Carlo method is much simpler to implement and is very fast. For path dependent product the non recombining tree can give an indicative price and is suitable for these products but it falls down with the limitation of the number of time step.
+For the non exploding bushy tree we can price with more number of time step. The only limitation is the interpolation on the nodes where the tree does not continue diffusing. The problem is that this method is very sensitive to the moneyness of the product. Actually suppose that we have a vector of nodes with a their real corresponding values
+\begin{math}
+\left[
+\begin{array}{c}
+			5\\
+      4\\
+      0\\ 
+      0\\
+      0\\
+      0\\
+\end{array}
+\right]\\
+\end{math}
+on a uniform distributed tree the average is 1.5. On a non exploding bushy tree suppose that we used only the first and the last nodes to continue the expansion of the tree and interpolate on the 4 interior nodes, we get
+\begin{math}
+\left[
+\begin{array}{c}
+			5\\
+      4\\
+      3\\ 
+      2\\
+      1\\
+      0\\
+\end{array}
+\right]\\
+\end{math}
+and the average is 2.5 which is much bigger than the real value. This is only an illustrative example, but this is what it happens on the non exploding bushy tree. If our product is deep in the money we get a quite reasonable error. If the product is out of the money the error is too big and we can not accept this method. In the figures (\ref{fig:SwaptionPayeur75}) , (\ref{fig:SwaptionPayeur25}) ,(\ref{fig:SwaptionReceveur75}),(\ref{fig:SwaptionReceveur25}) the sign $+$ means with and the sign $-$ means without. The figure (\ref{fig:SwaptionReceveurTime25}) shows the exponential growth of the computation time with the bushy tree and with the non exploding bushy tree. We see that we can use the bushy tree technique up to 20 time steps and we can go further up to 30 steps using the non exploding bushy tree. The problem is the using a tree to model a diffusion we must use a large number of time step to get the convergence of our scheme to the continuous model. With the bushy tree technique this can not be fulfill since we are limited by the exponential growth of the computation time. Figures (\ref{fig:SwaptionPayeur25_6}),(\ref{fig:SwaptionReceveur25_6}) shows the impact of rotating the simplex on the Bushy tree techniques. This is similar to using a less discrepancy random generator in the Quasi Monte-Carlo approach. Also here, rotating the simplex is efficient when we deal with large dimension problem and this is shown on the following figures.
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionPayeur75.eps}
+	\caption{SwaptionPayeur75}
+	\label{fig:SwaptionPayeur75}
+\end{figure}
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionReceveur75.eps}
+	\caption{SwaptionReceveur75}
+	\label{fig:SwaptionReceveur75}
+\end{figure}
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionPayeur25.eps}
+	\caption{SwaptionPayeur25}
+	\label{fig:SwaptionPayeur25}
+\end{figure}
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionReceveur25.eps}
+	\caption{SwaptionReceveur25}
+	\label{fig:SwaptionReceveur25}
+\end{figure}
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionPayeur25_6.eps}
+	\caption{SwaptionReceveur25,6 libor}
+	\label{fig:SwaptionPayeur25_6}
+\end{figure}
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionReceveur25_6.eps}
+	\caption{SwaptionReceveur25,6libor}
+	\label{fig:SwaptionReceveur25_6}
+\end{figure}
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.60\textwidth,angle=-90]{figures\winlin SwaptionReceveurTime25.eps}
+	\caption{SwaptionReceveur25}
+	\label{fig:SwaptionReceveurTime25}
+\end{figure}
+
+
+

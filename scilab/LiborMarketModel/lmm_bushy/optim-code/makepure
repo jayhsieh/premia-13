@@ -1,0 +1,6 @@
+rlogin login-solaris
+cd program_C/optim/
+setenv LM_LICENSE_FILE /usr/Rational/config/zuni.dat
+rm *.o
+make pure
+./pure_optim

@@ -1,0 +1,62 @@
+################################################################################
+###################### VARIABLES S_0, R, Q AND OPTIONTYPE ######################
+################################################################################
+# S_0 : price of the underlying asset at t=t_0
+100
+# r : risk-free rate     
+0.05
+# q : dividends (continuously compounded) 
+0.02
+# optionType : type of the option (1 for call, 0 for put)  
+1
+################################################################################
+########################### DUPIRE OR BLACK-SCHOLES ? ##########################
+################################################################################
+# optionSimul :
+#   1 for PDE Dupire                --> t_0, T_max, y_min, y_max, N, M, gridType
+#                                   --> theta, name_ddl or sigma_func (spline.c)
+#   2 for Black-Scholes (sigma cte) --> sigmaCte
+#   3 for Black-Scholes (sigma(t))  --> intSigma (DupirePDE.c)
+1
+################################################################################
+########################### IF OPTIONSIMUL=1 (DUPIRE) ##########################
+################################################################################
+# t_0 : time origin
+0
+# T_max : maximal maturity (in year)
+1
+# y_min : --> S_min=exp(y_min)     
+-5.29831736654804
+# y_max : --> S_max=exp(y_max)
+5.29831736654804
+# N : number of space steps of the fine grid
+400
+# M : number of time steps of the fine grid
+100
+# gridType : type of the y_fineGrid (0 for regular, 1 for tanh)
+0
+# theta : type of scheme used
+.5
+# name_ddl : name of the file containing the degrees of freedom of sigma
+#   Type "_" if sigma has to be defined from the function sigma_func (spline.c)
+_
+################################################################################
+############# IF OPTIONSIMUL=2 (B-S WITH SIGMA CONSTANT) #######################
+################################################################################
+# sigmaCte : value of sigma
+.2
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_visu : name of the file containing the visualization parameters
+#   Type "_" if no visualization is required
+visuprices
+# name_out_visu : name of the out file containing the prices to be visualized
+#   used if name_in_visu is not given by "_"
+dupireprices.visu
+# name_in_data : name of the file containing Ki and Tj
+#   Type "_" if no data have to be computed
+dataprices
+# name_out_data : name of the out file containing Ki, Tj and the prices Vij
+#   used if name_in_data is not given by "_"
+dupireprices.data

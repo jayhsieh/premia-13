@@ -1,0 +1,37 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'Excel_2'
+		'Excel_2.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}
+
+HKCU
+{
+    Software
+    {
+        Microsoft
+        {
+            Office
+            {
+                Excel
+                {
+                    Addins
+                    {
+                        'Excel_2.PremiaAddin'
+                        {
+                            val FriendlyName = s 'Premia experimental Addin on ATL'
+                            val Description = s 'ATLCOM Excel Addin'
+                            val LoadBehavior = d '00000003'
+                            val CommandLineSafe = d '00000000' 
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

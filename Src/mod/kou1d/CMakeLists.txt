@@ -1,0 +1,34 @@
+add_library (libkou1d OBJECT
+	kou1d.c
+	kou1d_lim/ap_kou_barrier_out.C
+	kou1d_lim/ap_kou_barrier_in.C
+	kou1d_lim/fd_impexpdownout_kou.C
+	kou1d_lim/fd_impexpupout_kou.C
+	kou1d_lim/ap_fastwhbar_kou.c
+	kou1d_lim/mc_kou_in_lrm.C
+	kou1d_lim/mc_kou_out_lrm.C
+	kou1d_lim/kou1d_lim.c
+	kou1d_pad/ap_kou_lookbackfloating.C
+	kou1d_pad/ap_kou_lookbackfixed.C
+	kou1d_pad/ap_fixedasian_fusaimeucci_kou.c
+	kou1d_pad/mc_kou_lookbackfixed.c
+	kou1d_pad/mc_kou_lookbackfloating.c
+	kou1d_pad/ap_kou_lookbackfixed_fft.c
+	kou1d_pad/ap_kou_lookbackfloating_fft.c
+	kou1d_pad/ap_asian_fmm_kou.c
+	kou1d_pad/ap_fastwh_kou_lookbackfixed.c
+	kou1d_pad/ap_fastwh_kou_lookbackfloating.c
+	kou1d_pad/kou1d_pad.c
+	kou1d_std/ap_carr_kou.C
+	kou1d_std/ap_kou_eu.C
+	kou1d_std/ap_kou_am.C
+	kou1d_std/fd_impexp_kou.C
+	kou1d_std/mc_kou.C
+	kou1d_std/ap_fastwh_kou.c
+	kou1d_std/ap_fastwhdig_kou.c
+	kou1d_std/mc_kou_digital_lrm.c
+	kou1d_std/kou1d_std.c
+	kou1d_stda/ap_gap_kou.C
+	kou1d_stda/kou1d_stda.c
+
+	)

@@ -1,0 +1,359 @@
+\documentclass[%
+%pdf,
+ps,
+ nocolorBG,
+%colorBG,
+%slideColor,
+slideBW,
+%draft,
+%frames
+%azure
+%contemporain
+%nuancegris
+%troispoints
+%lignesbleues
+%darkblue
+%alienglow
+%autumn
+]{prosper}
+\title{Semi Groupe Empirique et Calibration}
+\author{Vlad Bally et Emmanuel Temam}
+\institution{INRIA}
+
+\slideCaption{}
+%\Logo{\includegraphics[width=3cm]{Logo-INRIA.eps}}
+\usepackage{amsmath,amssymb,amsthm,array,multicol,verbatim,graphics,pstricks,pst-node,pst-text,pst-3d}
+\usepackage[latin1]{inputenc}
+%\usepackage[french]{babel}
+
+\begin{document}
+\maketitle
+
+\overlays{3}{
+\begin{slide}{Plan}
+\begin{itemstep}
+\item Processus de Markov
+\item Algorithme de Calibration
+\item Résultats numériques
+\end{itemstep}
+\end{slide}}
+
+\begin{slide}{Market Prices}
+\begin{small}
+Market: $S^0_t= S_0^0 e^{rt}$, $r$ interest rate \\
+$S_t$ = $(S_t^1, \ldots, S_t^d)$ risky asset.\\
+\begin{center}
+{\bf Only a Markov assumption for $S$}
+\end{center}
+Complete table of European price.
+\[ \Pi_{t,T}(\varphi)(x) = \text{price }(T,\varphi)\text{ option} \;
+\forall \varphi \in \mathcal{C}, \forall 0 \geq t \geq T.\]
+\begin{Itemize}
+\item $T$  is the maturity
+\item $\varphi$ is the payoff (the option pays $\varphi(S_T)$ at
+time $T$).
+\item $t$ the instant where the price is computed
+\item $x=S_t$.
+\end{Itemize}
+\begin{center}{\bf No arbitrage.}\end{center}
+\end{small}
+\end{slide}
+
+\begin{slide}{Semi-groupe associé}
+\begin{small}
+Sous l'hypothèse de non arbitrage on démontre
+\begin{enumerate}
+  \item $\exists \mu_{t,T}(x,dy)$ mesures positives t.q.
+  \begin{eqnarray*}
+    \mu_{t,T}(x,\mathbb{R}^d) &= \exp(-r(T-t))\\
+    \Pi_{t,T}(\varphi)(x) &= \int \varphi(y) \mu_{t,T}(x,dy)\\
+    \end{eqnarray*}
+  \item Martingales: $\int y  \mu_{t,T}(x,dy)=x$
+  \item Semi-Groupe (Eq Chapman-Kolmogorov):
+  $\Pi_{t,s}\Pi_{s,T}=\Pi_{t,T} \quad \forall t\leq s\leq T$.
+\end{enumerate}
+{\bf Réciproque:} Si $\Pi$ a les propriétés 1 et 2, il n'y a pas
+d'arbitrage.
+\end{small}
+\end{slide}
+
+
+\begin{slide}{Opportunité d'arbitrage}
+\begin{tiny}
+Opération financière: on se donne
+\begin{Itemize}
+  \item $t\leq T$
+  \item $\alpha \in \mathbb{R}^d$, $\gamma \in \mathbb{R}$.
+  \item $\beta_i \in \mathbb{R},\; \varphi_i \in \mathcal{C}, \;
+  i=1,\ldots,m$
+\end{Itemize}
+\begin{center}$\alpha^i >0$ $\rightarrow$ on vend $\alpha^i$ unités de stock $S_t^i$\\
+$\alpha^i <0$ $\rightarrow$ on achète $-\alpha^i$ unités de stock $S_t^i$\\
+$\beta_i>0$ $\rightarrow$ on vend $\beta_i$ unités de $(\varphi_i,T)$-option\\
+$\beta_i<0$ $\rightarrow$ on achète $-\beta_i$ unités de $(\varphi_i,T)$-option\\
+\end{center}On définit les fonctions\\
+\begin{center}$G_t(x) = \gamma + \sum_i \alpha^i x^i + \sum_j \beta_j
+\Pi_{t,T}(\varphi_j)(x)$\\
+$ s_T(x) =-\gamma e^{r(T-t)} - \sum_i \alpha^i x^i - \sum_j
+\beta_j \varphi_j(x)$\\\end{center} Signification
+\begin{Itemize}
+  \item $G_t(S_t)=$ le co\^ut de l'opération au moment $t$.
+  \item $s_T(S_T)=$ le solde de l'opération au moment $T$.
+\end{Itemize}
+\end{tiny}
+\end{slide}
+
+
+\begin{slide}{Opportunité d'arbitrage}
+{\bf Définition:} il existe une opération financière telle que:
+\begin{Itemize}
+\item $s_T(x) \leq 0 \quad \forall x\in \mathbb{R}^d$.
+\item $ \exists \theta,\epsilon$ t.q. $G_t(x)>0$ $\forall x \in
+\mathcal{B}_\epsilon(\theta)$.
+\end{Itemize}
+S'il existe une opportunité d'arbitrage on fabrique une stratégie
+d'arbitrage:
+\begin{Itemize}
+\item Si $S_t\in\mathcal{B}_\epsilon(\theta)$, on fait l'opération
+et on gagne $G_t(S_t)>0$.
+\item Au moment $T$, on paye $s_T(S_T)\leq 0$.
+\item Le solde total de l'opération: $G_t(S_t)-s_T(S_T)\geq
+G_t(S_t)>0$.
+\end{Itemize}
+\end{slide}
+
+\begin{slide}{Exemple}
+\begin{tiny} {\bf Lemme:} Si il n'y a pas d'arbitrage alors,
+\[ \phi \leq \psi \Rightarrow \Pi_{t,T}\phi \leq \Pi_{t,T}\psi.\]
+{\bf Preuve:} Si $\Pi_{t,T}\phi(\theta) > \Pi_{t,T}\psi(\theta)$
+alors
+\[\exists \epsilon>0 \text{ t.q. } \Pi_{t,T}\phi(x) >
+\Pi_{t,T}\psi(x)\quad \forall x \in
+\mathcal{B}_\epsilon(\theta).\] Si $S_t \in
+\mathcal{B}_\epsilon(\theta)$
+\begin{Itemize}
+\item On achète une $(\psi,T)-$option
+\item On vend une $(\phi,T)-$option
+\end{Itemize}
+\[ G_t(S_t) = \Pi_{t,T}(\phi)(S_t)-\Pi_{t,T}(\psi)(S_t)>0,\]
+Au moment $T$ on solde:
+\[ s_T(S_T)  = \phi(S_T) - \psi(S_T)\leq 0.\]
+\end{tiny}
+\end{slide}
+
+
+\begin{slide}{Interprétation probabiliste}
+Hypothèses supplémentaires:
+\begin{Itemize}
+\item Homogénéité: $\Pi_{t,T} = \Pi_{0,T-t}$.
+\item Continuité: $\lim_{t\downarrow 0} \Pi_{0,t}(f)(x)=f(x)$.
+\end{Itemize}
+{\bf Théorème:} il existe un processus de Markov homogène
+standard $X_t$ tel que
+\[ \Pi_{0,t}(\phi)(x) = \mathbb{E}^x[\phi(X_t)].\]
+{\bf Remarque:} il n'y a pas encore de calcul stochastique.
+\end{slide}
+
+
+\begin{slide}{Calibration}
+\begin{small}
+On cherche une famille de mesures positives $\mu_{t,T}(x,dy)$ t.q.
+\begin{Itemize}
+\item $\mathcal{P}: \quad\mu_{t,T}(x,\mathbb{R}^d) = \exp(-r(T-t))$.
+\item $\mathcal{M}: \quad\int y\mu_{t,T}(x,dy) = x$.
+\item $\mathcal{S}: \quad\int \phi(y)\mu_{0,T}(x,dy) = \int \int \phi(z) \mu_{t,T}(y,dz)
+\mu_{0,T}(x,dy)\; \forall t\in [0,T].$
+\end{Itemize}
+Problème infini-dimensionnel $\Rightarrow$ discrétisation
+\begin{Itemize}
+\item Temps: $0=t_0 < t_1< \ldots< t_n$.
+\item Espace: $0<y_1< \ldots<y_M$.
+\end{Itemize}
+\begin{center}$\mu_{t_k,t_{k+1}}(y_i,dy) =\sum\limits_{j=1}^M \pi_{k,k+1}^{ij}
+\delta_{y_j}(dy).$\end{center}
+\end{small}
+\end{slide}
+
+
+\begin{slide}{Equations}
+\begin{tiny}
+\begin{Itemize}
+\item $\mathcal{P}_i: \quad \sum\limits_{j=1}^M \pi_{k,k+1}^{ij}= \exp(-r(T-t))
+ ,\;\pi_{k,k+1}^{ij}\geq 0 $.
+\item $\mathcal{M}_i: \quad\sum\limits_{j=1}^M y_j \pi_{k,k+1}^{ij}=y_i$.
+\item $\mathcal{S}_j: \quad\sum\limits_{p=1}^M \pi_{0,k}^{p}\pi_{k,k+1}^{pj}=\pi_{0,k+1}^{j}$
+\item $\mathcal{C}_j:$
+%\begin{multline*}
+\[C_{0,t_{k+1}}(x_0,y_j)= \sum\limits_{l\geq
+j}(y_l-y_j)\pi_{0,k+1}^{j} =\sum\limits_{l\geq
+j}(y_l-y_j)\sum\limits_{p=1}^M \pi_{0,k}^{p}\pi_{k,k+1}^{pj}
+%\end{multline*}
+\]
+\end{Itemize}
+Données de marché: \[K_1=y_{j_1},\ldots, K_{10}=y_{j_{10}}\] {\bf
+Problème:} $2M+10$ équations, $M^2$ inconnues.
+
+Possibilité: arbre trinomial.
+\end{tiny}
+\end{slide}
+
+
+\begin{slide}{Eléments Finis}
+%\begin{tiny}
+$y \rightarrow \phi_p\left( \log(y/y_j)\right)$, $p=1,2,\;3$. \\
+{\bf Construction:} $X_i = \exp(-\frac{\sigma_i}{\delta}\Delta)$,
+avec $\sigma_i$ volatilité implicite expérimentale \\
+$\delta$ pas de temps. \\
+$a_0, \ldots,a_4$ tels que:
+\begin{Itemize}
+\item $\mathbb{P} [X\leq a_0] =0.01$
+\item $\mathbb{P} [X\geq a_4] =0.01$
+\item $\mathbb{P} [X\in [a_i,a_{i+1}]]=(1-2/100)/4$.
+\end{Itemize}
+Représentation:
+\begin{center}$\pi_{k,k+1}^{ij} = \pi_{k,k+1}^{i}(y_j) =
+\sum\limits_{p=1}^3 \lambda_p^i \phi_p \log(y_j
+/y_i).$\end{center}
+%\end{tiny}
+\end{slide}
+
+\begin{slide}{Résolution du système}
+%\begin{tiny}
+\begin{Itemize}
+\item {\bf Pas 1} On réécrit $\mathcal{P}_i$, $\mathcal{M}_i$
+en termes de $\lambda_p^i, \;p=1,2,3$.
+\item {\bf Pas 2} On élimine $\lambda_1^i$ et $\lambda_3^i$ en
+employant $\mathcal{P}_i$ et $\mathcal{M}_i$. \\
+$\Rightarrow$ Nouvelles inconnues: $(\lambda_2^1,\ldots,
+\lambda_2^M)= \lambda$
+\item {\bf Pas 3} On réécrit l'équation $\mathcal{C}_j$ en terme
+de $\lambda$.
+\begin{center}$C_{0,t_{k+1}}(x_0,y_j) = \sum\limits_{i=1}^M
+(\lambda_2^i \alpha_i+\beta_i) \sum\limits_{l\geq j} (y_l-y_j)
+\pi_{0,k}^i \phi_p( y_l /y_i ).$\end{center}
+\end{Itemize}
+On a 10 équations correspondant à $y_j=K_1, \ldots, K_{10}$.
+%\end{tiny}
+\end{slide}
+
+\begin{slide}{Importance de la Volatilité implicite}
+\includegraphics[height=11cm,width=8cm,angle=270]{VolCall.eps}
+\end{slide}
+
+\begin{slide}{Volatilité implicite}
+$Iv_j(\lambda)$ est la volatilité implicite de $C_{0,t_{k+1}}
+(x_0,y_j)$\\
+$\bar{Iv}_l$ est la volatilité implicite de $C_{0,t_{k+1}}
+(x_0,K_l)$\\
+On prend la fonction co\^ut:
+\begin{center}$C(\lambda)=\sum\limits_{l=1}^{10} |Iv_{jl}(\lambda)
+- \bar{Iv}_l |^2 + p\sum\limits_{i=1}^{M} ((\lambda_1^i
+-\lambda_2^i)^2+(\lambda_3^i -\lambda_2^i)^2) .$\end{center} {\bf
+problème:} \begin{center} Trouver $\lambda^\star = \arg\min
+C(\lambda)$\\ sous la contrainte $ \pi_{k,k+1}^{ij} \geq
+0$.\end{center} {\bf Solution:} Quasi-Newton
+\end{slide}
+
+\begin{slide}{Calcul de la volatilité locale}
+On suppose que
+\begin{center}$X_{k+1} = X_k + \sigma (X_k) X_k \Delta_k \sqrt
+\delta $.\end{center} Alors \begin{multline*}\sigma_k(y_i)^2 =
+\frac{\mathbb{E} \left( (X_{k+1}- X_k)^2 \mid X_k=y_i
+\right)}{y_i^2 \delta} \\= \frac{1}{y_i^2\delta}
+\sum\limits_{j=1}^M (y_j-y_i)^2 \pi_{k,k+1}^{ij} .\end{multline*}
+\end{slide}
+
+\begin{slide}{\small{Calcul de prix d'options américaines de payoff
+$\phi$}}
+\begin{eqnarray*}
+u_n(y_i)&=& \phi(y_i)\\
+u_k(y_i)&=& \max \left( \phi(y_i), \sum\limits_{j=1}^M
+u_{k+1}(y_j) \pi_{k,k+1}^{ij}\right).
+\end{eqnarray*}
+\end{slide}
+
+
+
+\overlays{4}{
+\begin{slide} {Tests Numériques}
+\begin{tiny}
+\begin{Itemize}
+\item Les strikes sont répartis entre 80 et 120 (Pour 5 strikes on
+a $80,88,96,104,112,120$).
+\item $x_0 =100$
+\item Les Call ont 4 maturités (1, 3, 6 mois et 1 an) et sont
+interpolés sur 12 maturités.
+\item Les taux d'intér\^ets et de dividendes sont supposés nuls.
+\end{Itemize}
+\end{tiny}
+\begin{small}
+Les tests ont été réalisés avec les volatilités suivantes:
+\begin{itemstep}
+\item $\sigma$ constant: $\sigma=0.3$.
+\item $\sigma (t,x) = 15/x$.
+\item $\sigma (t,x) = 0.05+0.1*\exp(-x/100)+0.01*t$.
+\item $\sigma (t,x) =0.3*\mathbf{1}_{x\in [90,110]}+0.15*\mathbf{1}_{x\notin  [90,110]}$.
+\end{itemstep}
+\end{small}
+\end{slide}
+}
+\begin{slide}{\small{Computation of the density for $x=S_0$: time step $=2$,
+20 experimental datas}}
+\includegraphics[height=8cm,angle=270]{ArticlePS/20BS2CallPut.eps}
+\end{slide}
+
+\begin{slide}{\small{Computation of the density for $x=80$ and $x=120$: time
+step $=2$, 20 experimental datas}}
+\includegraphics[height=8cm,angle=270]{ArticlePS/20BS2Vol.eps}
+\end{slide}
+
+\begin{slide}{\small{Computation of the density for $x=S_0$: time step $=2$,
+20 experimental datas}}
+\includegraphics[height=8cm,angle=270]{ArticlePS/20BS2Poids.eps}
+\end{slide}
+
+\begin{slide}{\small{Computation of the density for $x=80$ and $x=120$: time
+step $=2$, 20 experimental datas}}
+\includegraphics[height=8cm,angle=270]{ArticlePS/20BS2Poids2.eps}
+\end{slide}
+
+
+\begin{slide}{\small{Computation in the Black Scholes model: time step $=6$,
+20 experimental datas}}
+\includegraphics[width=8cm,angle=270]{ArticlePS/20BS6.eps}
+\end{slide}
+
+\begin{slide}{\small{Computation in the Black Scholes model: time step $=12$,
+20 experimental datas}}
+\includegraphics[width=8cm,angle=270]{ArticlePS/20BS12.eps}
+\end{slide}
+
+
+
+\begin{slide}{American Options}
+\includegraphics[height=8cm,angle=270]{ArticlePS/amer.eps}
+\end{slide}
+
+\begin{slide}{Barrier options}
+\includegraphics[height=8cm,angle=270]{ArticlePS/barr.eps}
+\end{slide}
+
+
+\begin{slide}{\small{Computation in local volatility model, step
+12}}
+\includegraphics[width=8cm,angle=270]{ArticlePS/Voltx12.eps}
+\end{slide}
+
+\begin{slide}{\small{Computation in local volatility model, step
+6}}
+\includegraphics[width=8cm,angle=270]{ArticlePS/Saut6.eps}
+\end{slide}
+
+\begin{slide}{Heston volatility 0.2}
+\includegraphics[width=8cm,angle=270]{hes2.eps}
+\end{slide}
+
+\begin{slide}{Heston volatility 1}
+\includegraphics[width=8cm,angle=270]{hes10.eps}
+\end{slide}
+\end{document}

@@ -1,0 +1,16 @@
+	***********************************
+			PREMIA
+	***********************************	
+
+Calibration in the Hunt-Kennedy n dimensional model.
+
+The program directory the following files:
+
+- source files : main.c
+- input data  CorrelMatrix.txt  DigitalCpletPrices.txt Bond.txt
+- make files : Makefile Makeuser.incl
+
+Compilation 
+===========
+Compilation command under Linux:use the command make
+This generates the executable binary file "Calibration_HKnd". 

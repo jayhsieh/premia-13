@@ -1,0 +1,124 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{amssymb,amsmath}
+\begin{document}
+\pagestyle{empty}
+\begin{center}
+{\Large Calibration by a weighted Monte Carlo method. }
+
+\
+
+
+
+\
+
+\Large Routine documentation.
+
+\
+
+\Large Yael BEER-GABEL
+
+\Large June 2003
+\end{center}
+
+\
+
+\
+
+\begin{flushleft}
+
+\
+This documentation is devoted to the weighted Monte-Carlo calibration routine
+{\bf Interfaceutilisateur.c}. 
+
+
+
+
+
+\section*{Functions}
+
+
+\textbullet{``repartition  ''}: returns an approximation of the
+cumulative distribution function of the Normal law
+$$N(d)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{d}e^{-x^{2}}\,dx$$
+\vspace{0.5 cm}
+\textbullet{``samplepathsgeneration''} : generates discretized
+sample-paths
+$$\omega^{(i)}=(\overline{S}_{\Delta
+t}(\omega^{(i)}),\hdots,\overline{S}_{M \Delta t}(\omega^{(i)})) ,
+i=1,\hdots,\nu$$ of the stochastic volatility model
+\begin{equation*}
+\begin{cases}
+\overline{S}_{(n+1)\Delta t} =  \overline{S}_{n\Delta
+t}(1+(r-q)\Delta t +\overline{\sigma}_{n\Delta
+  t}\sqrt{\Delta t}g^1_{n+1}) , n=1,\hdots,M\\
+\overline{\sigma}_{(n+1)\Delta t}= \sigma_0+
+(\overline{\sigma}_{n\Delta t}-\sigma_0)(1- \beta \Delta t)+
+\alpha \sqrt{\Delta t}(\rho g^1_{n+1}+\sqrt{1-\rho^2} g^2_{n+1})
+\end{cases}
+\end{equation*}by the standard Euler scheme with
+timestep $\Delta t=\frac {T}{M}$.
+
+\vspace{0.5 cm}
+
+\textbullet{``payoffs ''}: for $ 1 \leq j \leq N$, this function evaluates
+the actualized payoff of the jth calibration put with strike $K_j$
+and maturity $T_j$ on each path : $$ \mbox{for }1\leq i\leq \nu,\;g_{ij}=e^{-rT_j}\left(K_{j}-
+\overline{S}_{\big[\frac{T_j}{\Delta t}\big]\Delta t}^{i}\right)^{+}.$$ Then, it
+computes $\alpha_j=\sup_{1 \leq i
+  \leq \nu}|g_{ij}-P_j|$ where $P_j$ is the market price of the jth calibration Put and returns the normalized payoffs
+  $\tilde{g}_{ij}=\frac{g_{ij}-P_j}{\alpha_j}$ for $ 1 \leq i \leq \nu$ and $1\leq j \leq N$.
+
+\vspace{0.5 cm}
+
+\textbullet{``functionW''}: computes $W(\tilde{\lambda}_1, \hdots,
+\tilde{\lambda}_N)=\ln\bigg(\sum_{i=1}^{\nu}{e^{\sum_{j=1}^{N}{\tilde{\lambda}_j\tilde{g}_{ij}}}}\bigg)+\frac{1}{2}\sum_{j=1}^{N}{
+  \frac{w_j}{\alpha_j^2}\tilde{\lambda}_j^2}$.
+
+\vspace{0.5 cm}
+
+\textbullet{``gradient''}:returns $(\tilde{\lambda}_{1}, \hdots,
+\tilde{\lambda}_N)$ which minimizes  $W(\tilde{\lambda}_1, \hdots,
+\tilde{\lambda}_N)$  by a conjugate gradient algorithm combined
+with Wolfe's Rule.
+
+\vspace{0.5 cm}
+
+\textbullet{''weights''}: computes the optimal weights
+$p_i=p(\omega^{(i)})=\frac{e^{\sum_{j=1}^{N}{\tilde{\lambda}_j\tilde{g}_{ij}}}}{\sum_{k=1}^{\nu}{e^{\sum_{j=1}^{N}{\tilde{\lambda}_j\tilde{g}_{kj}}}}},
+1 \leq i \leq \nu$.
+
+\section*{Input files}
+
+There are 2 input files called \emph{name in parameters} and
+\emph{name in data}.
+
+\
+
+\emph{name in parameters} contains the parameters such as the
+\textbf{spot}, the interest rate \textbf{r}, the dividend rate
+\textbf{q}, \textbf{option volatility} to choose whether you want
+to enter the parameters of the a priori model of the sample paths
+or if you prefer the routine to determine them, \textbf{option
+step} to choose whether you want to enter the timestep for the
+discretized Euler scheme or if you prefer the routine to fix it
+, the maturity \textbf{horizon} ($T$), the mean volatility of the
+generated paths \textbf{sigma0} ($\sigma_0$), the timestep \textbf{deltat} ($\Delta t$), the
+number of calibration puts \textbf{N} , the perturbation coefficient of
+the volatility
+\textbf{alpha} ($\alpha$), the return to mean coefficient \textbf{beta}
+($\beta$), the correlation coefficient
+\textbf{rho} ($\rho$), \textbf{option constraint} to choose whether you want
+to use penalized constraints ($w_j>0$) or not ($w_j=0$). The name of the parameter you
+need to enter is written on the right end of each line.
+
+\
+
+\emph{name in data} contains the calibration datas: each line of
+the file consists in the datas of each calibration put $ K_j$,$T_j$
+and $P_j$, $j=1 \hdots N$.
+
+\
+
+Examples are given in those files.
+\end{flushleft}
+\end{document}

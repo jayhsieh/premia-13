@@ -1,0 +1,9 @@
+################################################################################
+################################# FILES IN/OUT #################################
+################################################################################
+# name_in_sigma_ddl : name of the file containing the ddl
+v2_008_1_sigmaest_n1m1_0_013.ddl
+# name_in_sigma_visu : name of the file containing the visualization parameters
+visusigma
+# name_out_sigma_visu : name of the out file containing sigma 
+v2_008_1_sigmaest_n1m1_0_013.visu

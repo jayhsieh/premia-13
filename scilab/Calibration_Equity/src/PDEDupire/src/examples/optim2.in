@@ -1,0 +1,14 @@
+# pgtol : tolerance on the infinity norm of the projected gradient
+0.00001
+# factr : tolerance on the change of the objective function
+10000000
+# iprint : level of printed information
+1
+# maxCounter : maximum number of iterations
+30
+# sigma_min : minimal bound on sigma
+0.08
+# sigma_max : maximal bound on sigma
+1.0
+# lambda : coeff of F1 in the obj function : F = G+lambda*F1
+0

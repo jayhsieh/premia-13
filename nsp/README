@@ -1,0 +1,24 @@
+
+The code in this directory is devoted to the Nsp interface for
+Premia. Before going any further, you need to have a working Nsp
+version. If not, we refer to
+    http://cermics.enpc.fr/~jpc/scilab/site/Nsp/Nsp/index.htm 
+for downloadind and installing Nsp.
+
+
+1. Compilation
+
+   First, make sure you have already compiled Premia and issued the
+   make install command in the top directory
+
+   make 
+
+2. Usage
+
+   Launch Nsp. Within Nsp run
+   exec loader.sce;
+   exec interface.sci;
+
+   The function to run the interface is premia()
+
+

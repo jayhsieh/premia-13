@@ -1,0 +1,1263 @@
+\section{R\'esultats num\'eriques de calibration}
+\label{SEC:RESULTATS}
+
+\subsection{Tests sur donn\'ees synth\'etiques~: choix de 
+la grille $n \times m$ et du coefficient de r\'egularisation 
+$\lambda$}
+
+Dans un premier temps, nous testons l'algorithme de calibration 
+sur donn\'ees synth\'etiques, c'est-\`a-dire sur des donn\'ees 
+g\'en\'er\'ees avec notre mod\`ele en r\'esolvant 
+l'\'equation de Dupire. Nous appelons ``$\sigma_{true}$'' 
+la ``vraie'' volatilit\'e que nous utilisons pour 
+cr\'eer les donn\'ees.
+Ces donn\'ees correspondent \`a des call europ\'eens avec~:
+\begin{itemize}
+\item
+$S_0 = 100$~;
+\item
+$r = 0.05$~;
+\item
+$q = 0.02$.
+\end{itemize}
+Concernant la r\'esolution num\'erique de l'EDP de Dupire, 
+nous choisissons les param\`etres suivants~:
+\begin{itemize}
+\item
+$\left[y_{min};y_{max}\right] = [-5.298;5.298]$ 
+(donc $\left[K_{min};K_{max}\right] = [0.005;200]$) est 
+discr\'etis\'e par $N~=~400$ points (grille r\'eguli\`ere)~;
+\item
+$\left[t_0;T_{max}\right] = [0;1]$ est discr\'etis\'e 
+par $M = 100$ points~;
+\item
+$\theta = 0.5$.
+\end{itemize}
+Nous avons g\'en\'er\'e $22$ donn\'ees avec la vraie volatilit\'e 
+suivante~:
+$$
+\sigma_{true}(S,t) = \displaystyle\frac{15}{S}
+$$
+pour $11$ prix d'exercice et $2$ maturit\'es~:
+\begin{itemize}
+\item 
+$K = [90,92,94,...,110]$~;
+\item
+$T = [0.5,1]$.
+\end{itemize}
+En ce qui concerne l'optimisation, nous effectuons $30$ it\'erations 
+de l'algorithme de Quasi-Newton sans contraintes, en partant d'une 
+volatilit\'e initiale constante~:
+$$
+\sigma_{init} = 0.15.
+$$
+Pour chaque test d'inversion, nous comparons la vraie volatilit\'e 
+\`a la volatilit\'e estim\'ee avec notre algorithme de calibration. 
+Nous montrons \'egalement l'erreur relative entre les deux 
+volatilit\'es ainsi que la d\'ecroissance du crit\`ere au cours 
+des it\'erations.
+
+Les premiers tests (figures~\ref{FIG:CALIB2_NM1_0}, 
+\ref{FIG:CALIB2_NM1_10} et \ref{FIG:CALIB2_NM1_100}) correspondent 
+\`a une grille de param\'etrage de $\sigma$ tr\`es grossi\`ere 
+avec~:
+$$
+n = m = 1
+$$
+(donc $16$ degr\'es de libert\'e) et \`a diff\'erentes valeurs de 
+$\lambda$~: $0$, $10$ et $100$. On constate que le meilleur 
+r\'esultat est obtenu avec $\lambda = 0$. Le fait d'ajouter un 
+terme de r\'egularisation n'a rien am\'elior\'e sur 
+cet exemple.
+
+Avec $\lambda = 0$, nous choisissons de discr\'etiser $\sigma$ 
+sur une grille plus grossi\`ere avec~:
+$$
+n = m = 3
+$$
+($36$ degr\'es de libert\'e). Le r\'esultat montr\'e \`a la 
+figure~\ref{FIG:CALIB2_NM3_0} est 
+moins bon que celui obtenu avec une grille $1 \times 1$~; c'est 
+tr\`es net lorsque l'on observe l'erreur relative.
+
+Compte tenu de ces premiers r\'esultats, nous choisirons dans la 
+suite une grille tr\`es grossi\`ere ($n = m = 1$) et un 
+coefficient de r\'egularisation $\lambda = 0$.
+
+\pagebreak
+
+% FIG:CALIB2_NM1_0
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmaest_nm1_0}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_errorrel_nm1_0}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_decfcout_nm1_0}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere.
+\end{minipage}
+\end{center}
+
+\caption{Calibration avec $n = m = 1$ et $\lambda = 0$.}
+\label{FIG:CALIB2_NM1_0}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB2_NM1_10
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmaest_nm1_10}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_errorrel_nm1_10}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_decfcout_nm1_10}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere.
+\end{minipage}
+\end{center}
+
+\caption{Calibration avec $n = m = 1$ et $\lambda = 10$.}
+\label{FIG:CALIB2_NM1_10}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB2_NM1_100
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmaest_nm1_100}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_errorrel_nm1_100}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_decfcout_nm1_100}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere.
+\end{minipage}
+\end{center}
+
+\caption{Calibration avec $n = m = 1$ et $\lambda = 100$.}
+\label{FIG:CALIB2_NM1_100}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB2_NM3_0
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_sigmaest_nm3_0}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_errorrel_nm3_0}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib2_decfcout_nm3_0}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere.
+\end{minipage}
+\end{center}
+
+\caption{Calibration avec $n = m = 3$ et $\lambda = 0$.}
+\label{FIG:CALIB2_NM3_0}
+\end{figure}
+
+\pagebreak
+
+\subsection{R\'egularisation par une approche multi\'echelle}
+\label{SSEC:MULTIECHELLE}
+
+Avec le choix d'une grille de param\'etrage de $\sigma$ tr\`es 
+grossi\`ere ($n = m = 1$), nous retrouvons une volatilit\'e 
+tr\`es r\'eguli\`ere par construction puisque l'on ne peut 
+pas repr\'esenter des volatilit\'es tr\`es irr\'eguli\`eres. 
+La contre-partie est qu'il est difficile d'affiner $\sigma$ 
+dans certaines r\'egions du domaine, ce qui permettrait 
+de mieux coller aux donn\'ees.
+
+Pour r\'esoudre ce probl\`eme, nous choisissons d'utiliser 
+une approche multi\'echelle. Cette approche a d\'ej\`a utilis\'ee 
+sur des probl\`emes inverses issus de la G\'eophysique~; voir par 
+exemple Chavent {\em et~al.}~\cite{bun:geo:95} ou 
+Cl\'ement~\cite{fcl:inria:99}. Le principe de la m\'ethode 
+est de rechercher dans un premier temps l'allure g\'en\'erale 
+de la volatilit\'e sur une grille tr\`es grossi\`ere, puis 
+d'optimiser sur une grille plus fine en partant du point 
+initial que l'on vient d'obtenir, et ainsi de suite. 
+Par exemple~:
+$$
+\sigma_{init}^{1 \times 1} \longrightarrow 
+{\rm (Q.-Newton)} \longrightarrow 
+\sigma_{est}^{1 \times 1} \rightarrow 
+\sigma_{init}^{3 \times 3} \longrightarrow 
+{\rm (Q.-Newton)} \longrightarrow 
+\sigma_{est}^{3 \times 3} \rightarrow ...
+$$
+
+\begin{center}
+\begin{minipage}{4.5cm}
+\centerline{\includegraphics[width=4.5cm,angle=0,draft=\draft]
+{./fig/grille1}}
+\end{minipage}
+$\longrightarrow$
+\begin{minipage}{4.5cm}
+\centerline{\includegraphics[width=4.5cm,angle=0,draft=\draft]
+{./fig/grille3}} 
+\end{minipage}
+$\longrightarrow$ ...
+\end{center}
+
+Nous allons appliquer cette m\'ethode sur les prochains 
+r\'esultats sur donn\'ees synth\'etiques et sur donn\'ees 
+r\'eelles.
+
+\subsection{Tests sur donn\'ees synth\'etiques~: influence du 
+point initial, choix d'un algorithme de Quasi-Newton avec bornes}
+\label{SSEC:CALIB3}
+
+Nous avons g\'en\'er\'e de nouvelles donn\'ees synth\'etiques 
+correspondant \`a des call europ\'eens avec~:
+\begin{itemize}
+\item
+$S_0 = 100$~;
+\item
+$r = 0.05$~;
+\item
+$q = 0.02$, 
+\end{itemize}
+avec le m\^eme choix de grille de diff\'erences finies que dans 
+l'exemple pr\'ec\'edent~:
+\begin{itemize}
+\item
+$\left[y_{min};y_{max}\right] = [-5.298;5.298]$ 
+(donc $\left[K_{min};K_{max}\right] = [0.005;200]$) est 
+discr\'etis\'e par $N~=~400$ points (grille r\'eguli\`ere)~;
+\item
+$\left[t_0;T_{max}\right] = [0;1]$ est discr\'etis\'e 
+par $M = 100$ points~;
+\item
+$\theta = 0.5$.
+\end{itemize}
+La vraie volatilit\'e utilis\'ee est~:
+$$
+\sigma_{true}(S,t) = 0.05 
++ 0.1 \exp \left( -\frac{S}{100} \right) + 0.5 t
+$$
+et nous avons simul\'e $22$ donn\'ees correspondant aux couples 
+$(K,T)$ suivants~:
+\begin{itemize}
+\item
+$K = [90,92,94,...,110]$~;
+\item
+$T = [0.5,1]$.
+\end{itemize}
+
+Nous avons utilis\'e l'approche multi\'echelle d\'ecrite au 
+paragraphe pr\'ec\'edent, en passant d'une grille $1 \times 1$ 
+($30$ it\'erations) \`a une grille $3 \times 3$ 
+($30$ it\'erations).
+
+Nous avons test\'e la robustesse de l'algorithme en partant de 
+diff\'erentes volatilit\'es initiales (constantes)~: 
+$$
+\sigma_{init} = 0.1,\;0.35,\;,0.5\;{\rm et}\;0.9.
+$$
+Les r\'esultats obtenus apr\`es utilisation de l'approche 
+multi\'echelle (sur la grille $3 \times 3$) sont montr\'es 
+respectivement aux figures~\ref{FIG:CALIB3_NM3_01}, 
+\ref{FIG:CALIB3_NM3_035}, \ref{FIG:CALIB3_NM3_05} et 
+\ref{FIG:CALIB3_NM3_09}. Notons que dans chaque cas, la 
+volatilit\'e estim\'ee sur la grille $3 \times 3$ (apr\`es 
+multi\'echelle) est proche (graphiquement) de celle 
+estim\'ee sur la grille $1 \times 1$, c'est pourquoi nous ne 
+montrons pas cette derni\`ere. En revanche, l'approche 
+multi\'echelle a permis de faire d\'ecro\^{\i}tre encore la 
+fonction co\^ut et ainsi de mieux reproduire les donn\'ees. 
+Les trois premiers r\'esultats obtenus sont bons puisque 
+l'erreur relative entre la vraie volatilit\'e et la 
+volatilit\'e estim\'ee est inf\'erieure \`a $5$\% sur une 
+grande partie du domaine. Si on part du point initial tr\`es 
+\'eloign\'e $\sigma_{init} = 0.9$ (figure~ \ref{FIG:CALIB3_NM3_09}), 
+on constate que la volatilit\'e estim\'ee poss\`ede des valeurs 
+n\'egatives pour des maturit\'es inf\'erieures \`a $0.5$. Notons que 
+ce n'est pas tr\`es g\^enant puisque c'est $\sigma^2$ qui intervient 
+dans les calculs et non $\sigma$. Cependant, il est possible de 
+r\'esoudre ce probl\`eme en ajoutant des contraintes de bornes sur 
+$\sigma$ dans le probl\`eme d'optimisation.
+
+Par cons\'equent, nous avons choisi de remplacer l'algorithme 
+de Quasi-Newton sans contraintes utilis\'e jusqu'\`a pr\'esent 
+par un algorithme de Quasi-Newton (\`a m\'emoire limit\'ee) avec 
+contraintes de bornes. Il s'agit d'un algorithme d\'evelopp\'e 
+par Nocedal {\em et~al.} (voir~\cite{noce:siam:95,noce:acm:97}). 
+Notons que les contraintes de bornes sont impos\'ees sur les 
+degr\'es de libert\'e de $\sigma$ correspondant aux valeurs 
+de la fonction en chaque n{\oe}ud. Nous pouvons remarquer 
+que ceci ne garantit pas que la fonction $\sigma$ n'ait pas de 
+valeurs n\'egatives \`a l'int\'erieur du domaine puisque les 
+degr\'es de libert\'e correpondant aux d\'eriv\'ees sont laiss\'es 
+libres. 
+
+En choisissant les bornes min et max \`a $0$ et \`a $1$, nous 
+obtenons le r\'esultat montr\'e \`a la 
+figure~\ref{FIG:CALIB3_V2_0_1_NM3_09}. La volatilit\'e estim\'ee 
+ne contient plus de valeurs n\'egatives et l'erreur est inf\'erieure 
+\`a $5$\% sur une grande partie du domaine. Nous avons 
+\'egalement refait les tests de calibration en 
+partant de $0.1$, $0.35$ et $0.5$ avec l'algorithme de Quasi-Newton 
+avec bornes et les r\'esultats sont similaires \`a ceux obtenus 
+pr\'ec\'edemment. Ainsi, en choisissant l'algorithme avec bornes, 
+nous obtenons des volatilit\'es estim\'ees tr\`es satisfaisantes 
+quel que soit le point initial choisi ($0.1$, $0.35$, $0.5$ ou 
+$0.9$).
+
+\pagebreak
+
+% FIG:CALIB3_NM3_01
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmaest_nm3_01}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_errorrel_nm3_01}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n1m1_0_01}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n3m3_0_01}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere~: $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(e) D\'ecroissance du crit\`ere~: $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration en partant de $\sigma_{init} = 0.1$.}
+\label{FIG:CALIB3_NM3_01}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB3_NM3_035
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmaest_nm3_035}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_errorrel_nm3_035}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n1m1_0_035}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n3m3_0_035}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere~: $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(e) D\'ecroissance du crit\`ere~: $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration en partant de $\sigma_{init} = 0.35$.}
+\label{FIG:CALIB3_NM3_035}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB3_NM3_05
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmaest_nm3_05}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_errorrel_nm3_05}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n1m1_0_05}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n3m3_0_05}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere~: $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(e) D\'ecroissance du crit\`ere~: $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration en partant de $\sigma_{init} = 0.5$.}
+\label{FIG:CALIB3_NM3_05}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB3_NM3_09
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmaest_nm3_09}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_errorrel_nm3_09}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n1m1_0_09}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_decfcout_n3m3_0_09}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere~: $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(e) D\'ecroissance du crit\`ere~: $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration en partant de $\sigma_{init} = 0.9$.}
+\label{FIG:CALIB3_NM3_09}
+\end{figure}
+
+\pagebreak
+
+% FIG:CALIB3_V2_0_1_NM3_09
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_sigmatrue}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_v2_0_1_sigmaest_nm3_09}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) Vraie volatilit\'e.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) Volatilit\'e estim\'ee.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_v2_0_1_errorrel_nm3_09}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) Erreur relative (en \%).
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_v2_0_1_decfcout_n1m1_0_09}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/calib3_v2_0_1_decfcout_n3m3_0_09}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(d) D\'ecroissance du crit\`ere~: $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(e) D\'ecroissance du crit\`ere~: $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration en partant de $\sigma_{init} = 0.9$ avec un 
+algorithme de Quasi-Newton avec bornes (0-1).}
+\label{FIG:CALIB3_V2_0_1_NM3_09}
+\end{figure}
+
+\clearpage
+\pagebreak
+
+\subsection{Tests sur donn\'ees r\'eelles du march\'e}
+
+Nous avons ensuite test\'e notre algorithme de calibration 
+sur des donn\'ees r\'eelles r\'ecup\'er\'ees dans l'article 
+de Coleman~{\em et~al.}~\cite{col:jcf:99}. Il s'agit de $70$ call 
+europ\'eens provenant du ``European S\&P 500 index'' avec~:
+\begin{itemize}
+\item
+$S_0 = 590$~;
+\item
+$r = 0.06$~;
+\item
+$q = 0.0262$~;
+\item
+$10$ prix d'exercice~: 
+$K = [501.5,531,560.5,590,619.5,649,678.5,708,767,826]$~;
+\item
+$7$ maturit\'es~: $T = [0.175,0.425,0.695,0.94,1,1.5,2]$.
+\end{itemize}
+
+Nous avons choisi $\lambda = 0$ et le point initial suivant~:
+$$
+\sigma_{init} = 0.13
+$$
+correspondant \`a la moyenne des volatilit\'es implicites. 
+Nous comparons les r\'esultats obtenus~:
+\begin{itemize}
+\item
+sans l'approche multi\'echelle~: $120$ it\'erations sur une 
+grille $1 \times 1$~;
+\item
+avec l'approche multi\'echelle~: $4 \times 30$ it\'erations 
+sur des grilles $1 \times 1$, $3 \times 3$, $6 \times 6$ puis 
+$12 \times 12$.
+\end{itemize}
+
+Nous avons utilis\'e dans un premier temps l'algorithme de 
+Quasi-Newton sans contraintes. Les r\'esultats obtenus sans et 
+avec l'approche multi\'echelle sont montr\'es respectivement aux 
+figures~\ref{FIG:REEL1_SANS} et~\ref{FIG:REEL1_AVEC}. On constate 
+qu'avec l'approche multi\'echelle, la fonction co\^ut descend plus 
+bas (cf. figure~\ref{FIG:REEL1_DECFCOUT} \`a gauche), donc on 
+reproduit mieux les donn\'ees avec cette volatilit\'e estim\'ee. 
+On constate qu'entre la grille $1 \times 1$ et la grille 
+$12 \times 12$, l'allure g\'en\'erale est conserv\'ee et la 
+volatilit\'e estim\'ee sur la grille $12 \times 12$ comporte de 
+l\'eg\`eres variations permettant de mieux expliquer les donn\'ees 
+dans certaines zones. Cependant, il y a des valeurs n\'egatives 
+dans une petite partie du domaine o\`u la volatilit\'e influe 
+peu sur les donn\'ees.
+
+Pour r\'esoudre ce probl\`eme, nous utilisons \`a nouveau 
+l'algorithme de Quasi-Newton avec bornes. En fixant les 
+bornes min et max \`a $0$ et \`a $1$, nous obtenons encore des 
+valeurs n\'egatives dans certaines parties du domaine. Cependant, 
+en augmentant la borne min \`a $0.08$, la volatilit\'e estim\'ee 
+ne contient plus de valeurs n\'egatives, comme le montrent les 
+r\'esultats obtenus sans et avec l'approche multi\'echelle 
+(figures~\ref{FIG:REEL1_SANS_V2_008_1} 
+et~\ref{FIG:REEL1_AVEC_V2_008_1}). A nouveau, l'approche 
+multi\'echelle permet de faire d\'ecro\^{\i}tre la fonction 
+co\^ut vers une valeur plus basse (cf. 
+figure~\ref{FIG:REEL1_DECFCOUT} \`a droite), proche de la valeur 
+obtenue avec l'algorithme de Quasi-Newton sans contraintes ($1.69$ 
+au lieu de $1.58$). La volatilit\'e estim\'ee apr\`es utilisation 
+de l'approche multi\'echelle (sur la grille $12 \times 12$) 
+poss\`ede des valeurs comprises entre $0.05$ et $0.3$ qui 
+ne semblent pas aberrantes. Compar\'ee aux r\'esultats obtenus par 
+Coleman~{\em et~al.}~\cite{col:jcf:99}, la volatilit\'e que nous 
+avons estim\'ee poss\`ede des oscillations comparables entre $0.1$ et 
+$0.25$, mais elle ne poss\`ede pas de grandes valeurs (proches 
+de $0.7$) pour des maturit\'es proches de $0$.
+
+\pagebreak
+
+% FIG:REEL1_SANS
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest_n1m1_0_013}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest60_n1m1_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) $30$ it\'erations.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) $60$ it\'erations.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest90_n1m1_0_013}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest120_n1m1_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) $90$ it\'erations.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) $120$ it\'erations.
+\end{minipage}
+\end{center}
+
+\caption{Calibration sur donn\'ees r\'eelles avec $n = m = 1$ sans 
+utiliser l'approche multi\'echelle. Algorithme de Quasi-Newton 
+sans contraintes. \newline
+$F : 263.5 \searrow 5.36 \searrow 4.63 
+\searrow 3.27 \searrow 3.24$.
+}
+\label{FIG:REEL1_SANS}
+\end{figure}
+
+\pagebreak
+
+% FIG:REEL1_AVEC
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest_n1m1_0_013}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest_n3m3_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) $30$ it\'erations~: grille $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) $30$ it\'erations~: grille $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest_n6m6_0_013}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_sigmaest_n12m12_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) $30$ it\'erations~: grille $6 \times 6$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) $30$ it\'erations~: grille $12 \times 12$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration sur donn\'ees r\'eelles en utilisant 
+l'approche multi\'echelle. Algorithme de Quasi-Newton 
+sans contraintes. \newline
+$F : 263.5 \searrow 5.36 \searrow 3.20 
+\searrow 2.09 \searrow 1.58$.
+}
+\label{FIG:REEL1_AVEC}
+\end{figure}
+
+\pagebreak
+
+% FIG:REEL1_SANS_V2_008_1
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest_n1m1_0_013}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest60_n1m1_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) $30$ it\'erations.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) $60$ it\'erations.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest90_n1m1_0_013}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest120_n1m1_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) $90$ it\'erations.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) $120$ it\'erations.
+\end{minipage}
+\end{center}
+
+\caption{Calibration sur donn\'ees r\'eelles avec $n = m = 1$ sans 
+utiliser l'approche multi\'echelle. Algorithme de Quasi-Newton 
+avec bornes (0.08-1). \newline
+$F : 263.5 \searrow 90.47 \searrow 13.21 
+\searrow 11.30 \searrow 10.95$.
+}
+\label{FIG:REEL1_SANS_V2_008_1}
+\end{figure}
+
+\pagebreak
+
+% FIG:REEL1_AVEC_V2_008_1
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest_n1m1_0_013}
+} 
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest_n3m3_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(a) $30$ it\'erations~: grille $1 \times 1$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(b) $30$ it\'erations~: grille $3 \times 3$.
+\end{minipage}
+\end{center}
+
+\medskip
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest_n6m6_0_013}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_sigmaest_n12m12_0_013}
+}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{5.8cm}
+(c) $30$ it\'erations~: grille $6 \times 6$.
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+(d) $30$ it\'erations~: grille $12 \times 12$.
+\end{minipage}
+\end{center}
+
+\caption{Calibration sur donn\'ees r\'eelles en utilisant 
+l'approche multi\'echelle. Algorithme de Quasi-Newton 
+avec bornes (0.08-1). \newline
+$F : 263.5 \searrow 90.47 \searrow 10.06 
+\searrow 3.66 \searrow 1.69$.
+}
+\label{FIG:REEL1_AVEC_V2_008_1}
+\end{figure}
+
+\pagebreak
+
+% FIG:REEL1_DECFCOUT
+\begin{figure}[!htbp]
+
+\begin{center}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_decfcout}
+}
+\end{minipage}
+\hspace*{0.1cm}
+\begin{minipage}{5.8cm}
+\centerline{\includegraphics
+[width=5.8cm,angle=0,draft=\draft] 
+{./fig/reel1_v2_008_1_decfcout}
+}
+\end{minipage}
+\end{center}
+
+\caption{D\'ecroissance du crit\`ere avec ou sans l'approche 
+multi\'echelle. A gauche~: Quasi-Newton sans contraintes. 
+A droite~: Quasi-Newton avec bornes.
+}
+\label{FIG:REEL1_DECFCOUT}
+\end{figure}

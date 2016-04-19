@@ -1,0 +1,553 @@
+\section{Calcul du gradient de $G$}
+\label{ANN:GRADG}
+
+On d\'ecrit dans cette annexe le calcul du gradient de la fonction 
+$$
+G(\sigma) = \dsp\frac{1}{2} \| V(\sigma) - \tilde{V} \|^2 
+$$
+qui mesure l'\'ecart entre les donn\'ees simul\'ees en r\'esolvant 
+l'EDP de Dupire et les donn\'ees du march\'e. Pour calculer ce 
+gradient de fa\c con analytique, nous utilisons la m\'ethode de 
+l'\'etat adjoint.
+
+Pour \'eviter toute confusion, nous notons $\Sigma$ l'ensemble 
+des degr\'es de libert\'e de la volatilit\'e et $\sigma$ la 
+fonction de deux variables associ\'ee. De plus, nous \'ecrivons 
+$G$ sous la forme 
+$$
+G(\Sigma) = \half \Arrowvert \varphi(U(\Sigma)) - 
+\tilde{V} \Arrowvert_2^2,
+$$
+avec $U \in \cR^{n_U}$ le vecteur d'\'etat 
+\begin{eqnarray*}
+U = (u^0,...,u^M)^T
+\end{eqnarray*}
+o\`u les $u^j = (u^j_1...u^j_{N-1})^T \in \cR^{N-1} \quad 
+\forall j=0,...,M$ sont calcul\'es par le syst\`eme d'\'equations 
+(\'equations d'\'etat) suivant~:
+\begin{equation*}
+(E)
+\begin{cases}
+f-u^0 = 0, \\
+b^j - H^ju^{j+1} = 0 & j=0,...,M-1. 
+\end{cases}
+\end{equation*}
+avec, pour $j=0,...,M-1$,
+\begin{eqnarray*}
+b^j &=& (I-\theta k \hat{A}^j)u^j - S_0k
+\biggl(\theta \alpha_{1,T_j}e^{-q(T_j-t_0)}+(1-\theta)
+\alpha_{1,T_{j+1}}e^{-q(T_{j+1}-t_0)}\biggr)e_1^{N-1}\\
+&& \in \cR^{N-1},\\
+H^j &=& I+(1-\theta)k\hat{A}^{j+1} \quad \in \mathcal{M}_{N-1,N-1}.
+\end{eqnarray*}
+On d\'efinit le lagrangien par~: 
+\begin{eqnarray*}
+\mathcal{L}:\cR^{n_U}\times\cR^{n_U}\times\cR^{n_{\Sigma}} & 
+\rightarrow & \cR \\
+(U,\bar{U},\Sigma) & \rightarrow & \mathcal{L}(U,\bar{U},\Sigma)
+\end{eqnarray*}
+avec 
+\begin{multline}
+\mathcal{L}(U,\bar{U},\Sigma) = \half \Arrowvert \varphi(U) - 
+\tilde{V} \Arrowvert_2^2 + <f-u^0,\bar{u}^0>_{N-1} \\
++ \sum_{j=0}^{M-1}<b^j-H^ju^{j+1},\bar{u}^{j+1}>_{N-1}.
+\end{multline}
+
+\begin{Rem}
+$b^j$ d\'epend de $u^j$ et de $\Sigma$, tandis que $H^j$ ne d\'epend 
+que de $\Sigma$.
+\end{Rem}
+
+Pour un $\Sigma$ fix\'e, on choisit $U$ solution de l'\'equation 
+d'\'etat (E) correspondante. On a alors l'\'egalit\'e suivante~:
+\begin{eqnarray*}
+G(\Sigma) &=& \mathcal{L}(U,\bar{U},\Sigma).
+\end{eqnarray*}
+En diff\'erentiant $G$, on obtient~:
+\begin{eqnarray*}
+\delta G &=& \frac{\partial \mathcal{L}}{\partial U}(U,\bar{U},\Sigma)
+\delta U + \frac{\partial \mathcal{L}}{\partial\Sigma}
+(U,\bar{U},\Sigma)\delta \Sigma \quad 
+\forall \quad\delta U \in \cR^{n_U}
+\end{eqnarray*}
+car, $U$ \'etant solution de $(E)$, 
+\begin{eqnarray*}
+\frac{\partial \mathcal{L}}{\partial \bar{U}}(U,\bar{U},\Sigma)
+\delta U &=& 0.
+\end{eqnarray*}
+On choisit alors $\bar{U}$ tel que
+\begin{eqnarray*}
+\frac{\partial \mathcal{L}}{\partial U}(U,\bar{U},\Sigma)\delta U = 0 
+\quad\forall\quad \delta U \in \cR^{n_U},
+\end{eqnarray*}
+c'est-\`a-dire
+\begin{eqnarray}
+\nabla_U\mathcal{L}(U,\bar{U},\Sigma)\ &=& \mathbf{0}.\label{adjoint}
+\end{eqnarray}
+Pour $\Sigma$ et $U$ fix\'es, cela revient \`a r\'esoudre un 
+syst\`eme lin\'eaire admettant comme unique solution l'\'etat adjoint 
+$\bar{U}$. Au point $(U,\bar{U},\Sigma)$ ainsi d\'efini, le gradient 
+de $G$ se r\'eduit \`a~:
+\begin{eqnarray}
+\nabla_{\Sigma} G = \nabla_{\Sigma}\mathcal{L}.
+\end{eqnarray}
+
+\subsection*{Equation de l'\'etat adjoint}
+
+R\'e\'ecrivons le syst\`eme (\ref{adjoint})~:
+\begin{equation*}
+\begin{cases}
+\nabla_{u^0}\mathcal{L} = \biggl[{\disp\frac{\partial \varphi}
+{\partial u^0}(U)}\biggr]^T(\varphi(U)-\tilde{V}) - \bar{u}^0 + 
+\biggl[{\disp\frac{\partial b^0}{\partial u^0}}\biggr]^T\bar{u}^1 
+= 0,\\
+\nabla_{u^j}\mathcal{L} = \biggl[{\disp\frac{\partial \varphi}
+{\partial u^j}(U)}\biggr]^T(\varphi(U)-\tilde{V}) - 
+(H^{j-1})^T\bar{u}^j + \biggl[{\disp\frac{\partial b^j}
+{\partial u^j}}\biggr]^T\bar{u}^{j+1} = 0 & j=1...M-1,\\
+\nabla_{u^M}\mathcal{L} = \biggl[{\disp\frac{\partial \varphi}
+{\partial u^M}(U)}\biggr]^T(\varphi(U)-\tilde{V}) - 
+(H^{M-1})^T\bar{u}^M = 0.
+\end{cases}
+\end{equation*}
+Ce syst\'eme est \'equivalent \`a~: 
+\begin{equation}
+\begin{cases}
+(H^{M-1})^T\bar{u}^M = \biggl[{\disp\frac{\partial \varphi}
+{\partial u^M}(U)}\biggr]^T(\varphi(U)-\tilde{V}),\\
+(H^{j-1})^T\bar{u}^j = \biggl[{\disp\frac{\partial \varphi}
+{\partial u^j}(U)}\biggr]^T(\varphi(U)-\tilde{V}) + 
+\biggl[{\disp\frac{\partial b^j}{\partial u^j}}\biggr]^T
+\bar{u}^{j+1} & j=M-1,...,1,\\
+\bar{u}^0 = \biggl[{\disp\frac{\partial \varphi}
+{\partial u^0}(U)}\biggr]^T(\varphi(U)-\tilde{V}) + 
+\biggl[{\disp\frac{\partial b^0}{\partial u^0}}\biggr]^T\bar{u}^1.
+\end{cases}
+\end{equation}
+Pour calculer l'\'etat adjoint $\bar{U}$, il faut d\'eterminer les 
+d\'eriv\'ees partielles ${\disp\frac{\partial b^j}{\partial u^j}}$ 
+et ${\disp\frac{\partial \varphi}{\partial u^j}(U)}$. On a de 
+mani\`ere imm\'ediate 
+\begin{eqnarray*}
+\frac{\partial b^j}{\partial u^j} &=& (I-\theta k \hat{A}^j) 
+\quad \in \mathcal{M}_{N-1,N-1}.
+\end{eqnarray*}
+Pr\'ecisons la d\'efinition de la fonction d'observation 
+$\varphi : \cR^{n_U} \rightarrow \cR^{n_d}$. A partir des valeurs 
+des options aux points de la grille $u^l_k = U(y_k,T_l)$ on cherche 
+\`a d\'eterminer le prix d'une option dont le couple $(y=\log(K),T)$ 
+n'est pas forc\'ement sur la grille. On \'evalue le prix de cette 
+option par interpolation bilin\'eaire des $4$ valeurs qui l'entourent 
+sur la grille fine. Supposons que l'on veuille calculer le prix de 
+l'option dont le couple strike-maturit\'e $(y,T)$ est tel que~:
+\begin{eqnarray*}
+y_k \leq y < y_{k+1},\\
+T_l \leq T < T_{l+1}.
+\end{eqnarray*}
+Calculons dans un premier temps par interpolation lin\'eaire 
+$U(y,T_l)$ et $U(y,T_{l+1})$~:
+\begin{eqnarray*}
+U(y,T_l) &=& \biggl(1-\frac{y_{k+1}-y}{y_{k+1}-y_k}\biggr)
+u_{k+1}^l + \frac{y_{k+1}-y}{y_{k+1}-y_k}u_k^l,\\
+U(y,T_{l+1}) &=& \biggl(1-\frac{y_{k+1}-y}{y_{k+1}-y_k}\biggr)
+u_{k+1}^{l+1} + \frac{y_{k+1}-y}{y_{k+1}-y_k}u_k^{l+1}.
+\end{eqnarray*}
+Puis on fait une interpolation lin\'eraire entre $U(y,T_l)$ et 
+$U(y,T_{l+1})$ pour obtenir $U(y,T)$~:
+\begin{eqnarray*}
+U(y,T) &=& \biggl(1-\frac{T_{l+1}-T}{T_{l+1}-T_l}\biggr)U(y,T_{l+1}) 
++ \frac{T_{l+1}-T}{T_{l+1}-T_l}U(y,T_l).\\
+\end{eqnarray*}
+En posant
+\begin{eqnarray*}
+a_l &=& \frac{T_{l+1}-T}{T_{l+1}-T_l},\\
+b_k &=& \frac{y_{k+1}-y}{y_{k+1}-y_k},
+\end{eqnarray*}
+on obtient finalement
+\begin{equation*}
+U(y,T) = \varphi_{k,l}(U) = (1-a_l)[(1-b_k)u_{k+1}^{l+1} 
++ b_ku_k^{l+1}] + a_l[(1-b_k)u_{k+1}^l + b_ku_k^l].
+\end{equation*}
+Soient $(y^d,T^d)_{1\leq d \leq n_d}$ l'ensemble des couples 
+strike/maturit\'e pour lesquels on connait le prix du march\'e. La 
+fonction d'\'evaluation $\varphi$ est alors d\'efinie de la 
+mani\`ere suivante~:
+\begin{eqnarray*}
+\varphi : \cR^{n_U} &\rightarrow& \cR^{n_d}\\
+U &\rightarrow & \varphi(U) = \biggl(U(y^d,T^d)\biggr)_{d=1...n_d}
+\end{eqnarray*}
+avec
+\begin{eqnarray*}
+U(y^d,T^d) = \varphi_{kl}(U) \text{ avec } 
+y_k\leq y^d < y_{k+1} \text{ et } T_l\leq T^d < T_{l+1}.
+\end{eqnarray*}
+La matrice ${\disp\frac{\partial \varphi}{\partial u^j}(U)} \in 
+\mathcal{M}_{n_d,N-1}$ est donc d\'efinie par~:
+\begin{eqnarray*}
+\frac{\partial \varphi}{\partial u^j}(U) &=&  
+\biggl(\frac{\partial \varphi_{kl}}{\partial u^j_p}(U) 
+\biggr)_{\substack{d=1,...,n_d\\p=1,...,N-1}}
+\end{eqnarray*}
+o\`u $k$ et $l$ sont d\'efinis pour chaque $d$ par 
+$y_k\leq y^d < y_{k+1}$ et $T_l\leq T^d < T_{l+1}$, et o\`u
+\begin{eqnarray*}
+\frac{\partial \varphi_{kl}}{\partial u^j_p}(U) &=& 
+\begin{cases}
+a_lb_k & \text{ si } p=k \text{ et } j=l,\\
+(1-a_l)b_k & \text{ si } p=k \text{ et } j=l+1,\\
+a_l(1-b_k) & \text{ si } p=k+1 \text{ et } j=l,\\
+(1-a_l)(1-b_k) & \text{ si } p=k+1 \text{ et } j=l+1,\\
+0 & \text{sinon}.
+\end{cases}
+\end{eqnarray*}
+
+\subsection*{Calcul de $\nabla G$}
+On est \`a pr\'esent en mesure de calculer la solution $\bar{U}$ 
+de l'\'equation de l'\'etat adjoint $(A)$. Une fois $\Sigma$, $U$ 
+et $\bar{U}$ connus, il reste \`a calculer 
+\begin{eqnarray}
+\nabla_{\Sigma}G  &=& \nabla_{\Sigma} 
+\mathcal{L}(U,\bar{U},\Sigma)\\
+&=& \sum_{j=0}^{M-1}\biggl[\biggl(\frac{\partial b^j}
+{\partial \Sigma}\biggr)^T - \frac{\partial (H^ju^{j+1})}
+{\partial \Sigma}\biggr)^T\bar{u}^{j+1}\biggr]. 
+\label{deriv_G_Sigma}
+\end{eqnarray}
+Remarquons que ce calcul se ram\`ene \`a celui de 
+${\disp\frac{\partial (\hat{A}^ju^{j})}{\partial \Sigma}}$~:
+\begin{eqnarray}
+\frac{\partial b^j}{\partial \Sigma} &=& -\theta k 
+\frac{\partial (\hat{A}^ju^j)}{\partial \Sigma} -S_0k
+\biggl(\theta \frac{\partial \alpha_{1,T_j}}{\partial \Sigma}
+e^{-q(T_j-t_0)}+(1-\theta)\frac{\partial \alpha_{1,T_{j+1}}}
+{\partial \Sigma}e^{-q(T_{j+1}-t_0)}\biggr)e_1^{N-1},
+\label{deriv_bj_Sigma}\\
+\frac{\partial H^ju^{j+1}}{\partial \Sigma} &=& 
+(1-\theta)k\frac{\partial (\hat{A}^{j+1}u^{j+1})}
+{\partial \Sigma}. \label{deriv_Hu_Sigma}
+\end{eqnarray}
+Or 
+\begin{eqnarray*}
+\hat{A}^ju^j &=& \begin{pmatrix}
+\beta_{1,T_j}u_1^j + \gamma_{1,T_j}u_2^j \\
+\vdots \\
+\alpha_{i,T_j}u_{i-1}^j + \beta_{i,T_j}u_i^j + 
+\gamma_{i,T_j}u_{i+1}^j \\
+\vdots \\
+\alpha_{N-1,T_j}u_{N-2}^j + \beta_{N-1,T_j}u_{N-1}^j 
+\end{pmatrix}
+\quad \in \cR^{N-1},
+\end{eqnarray*}
+donc
+\begin{eqnarray}
+\frac{\partial\hat{A}^ju^j}{\partial \Sigma} &=& 
+\begin{pmatrix}
+\frac{\partial\beta_{1,T_j}}{\partial \Sigma} u_1^j + 
+\frac{\partial\gamma_{1,T_j}}{\partial \Sigma}u_2^j \\
+\vdots \\
+\frac{\partial\alpha_{i,T_j}}{\partial \Sigma}u_{i-1}^j + 
+\frac{\partial\beta_{i,T_j}}{\partial \Sigma}u_i^j + 
+\frac{\partial\gamma_{i,T_j}}{\partial \Sigma}u_{i+1}^j \\
+\vdots \\
+\frac{\partial\alpha_{N-1,T_j}}{\partial \Sigma}u_{N-2}^j + 
+\frac{\partial\beta_{N-1,T_j}}{\partial \Sigma}u_{N-1}^j 
+\end{pmatrix}
+\quad \in \mathcal{M}_{N-1,n_{\Sigma}}, \label{deriv_Ajuj_Sigma}
+\end{eqnarray}
+avec
+\begin{eqnarray*}
+\frac{\partial \alpha_{i,T_j}}{\partial \Sigma} &=& 
+\biggl[ -\frac{2}{(h_i+h_{i-1})h_{i-1}}-\frac{1}{2h_{i-1}}\biggr]
+\sigma(y_i,T_j)\frac{\partial \sigma(y_i,T_j)}{\partial \Sigma},\\
+\frac{\partial \beta_{i,T_j}}{\partial \Sigma} &=& 
+\biggl[\frac{2}{h_ih_{i-1}} + \frac{1}{2}\biggl(\frac{1}{h_{i-1}}-
+\frac{1}{h_i}\biggr)\biggr]\sigma(y_i,T_j)
+\frac{\partial \sigma(y_i,T_j)}{\partial \Sigma},\\
+\frac{\partial \gamma_{i,T_j}}{\partial \Sigma} &=& 
+\biggl[ -\frac{2}{(h_i+h_{i-1})h_i}+\frac{1}{2h_i}\biggr]
+\sigma(y_i,T_j)\frac{\partial \sigma(y_i,T_j)}{\partial \Sigma}.
+\end{eqnarray*}
+Il faut donc \'evaluer la fonction $\sigma$ aux points $(y_i,T_j)$, 
+gr\^ace \`a une interpolation par spline bicubique des valeurs de 
+$\sigma$ sur la grille grossi\`ere~:
+\begin{eqnarray*}
+\sigma(y_i,T_j) &=& \sum_{p=0}^3\sum_{q=0}^3 c_{pq}^{kl} 
+(y-y_{k-1})^p(T-T_{l-1})^q \quad \text{pour } (y_i,T_j) \in R_{kl}.
+\end{eqnarray*}
+Gr\^ace \`a l'\'egalit\'e matricielle (\ref{coeffs}), on peut 
+exprimer $c_{pq}^{kl}$ en fonction des valeurs de $\sigma$ et de 
+ses d\'eriv\'ees aux diff\'erents points de la grille~:
+\begin{eqnarray*}
+c_{pq}^{kl} &=& \sum_{r=0}^{n}\sum_{s=0}^{m}
+\biggl(a_{pq,rs}^{kl}\sigma_{kl} + b_{pq,rs}^{kl}\sigma_{y,kl} + 
+d_{pq,rs}^{kl}\sigma_{T,kl} + e_{pq,rs}^{kl}\sigma_{yT,kl}\biggr)\\
+&=& (\mathcal{U}_{pq}^{kl})^T \cdot S,
+\end{eqnarray*}
+ce qui nous permet d'\'ecrire $\sigma(y_i,T_j)$ sous la forme 
+suivante (pour $(y_i,T_j)\in R_{kl}$)~:
+\begin{eqnarray*}
+\sigma(y_i,T_j) &=& \sum_{p=0}^3\sum_{q=0}^3 
+(y-y_{k-1})^p(T-T_{l-1})^q (\mathcal{U}_{pq}^{kl})^T \cdot S,\\
+&=& \sum_{p=0}^3\sum_{q=0}^3 (y-y_{k-1})^p(T-T_{l-1})^q 
+(\mathcal{U}_{pq}^{kl})^T \cdot R \cdot \Sigma,
+\end{eqnarray*}
+soit
+\begin{eqnarray}
+\frac{\partial \sigma(y_i,T_j)}{\partial \Sigma} &=& 
+\sum_{p=0}^3\sum_{q=0}^3 \biggl[(y-y_{k-1})^p(T-T_{l-1})^q 
+(\mathcal{U}_{pq}^{kl})^T \biggr]\cdot R. \label{deriv_sigmaij_Sigma}
+\end{eqnarray}
+avec, en utilisant les m\^eme notations que dans la 
+partie~\ref{gradF1}~:
+\begin{alignat*}{2}
+S &= 
+\begin{pmatrix}
+\sigma_{\cdot 0}\\\vdots\\\sigma_{\cdot m}\\ 
+\sigma_{y,\cdot 0}\\\vdots\\\sigma_{y,\cdot m}\\ 
+\sigma_{T,\cdot 0}\\\vdots\\\sigma_{T,\cdot m}\\ 
+\sigma_{yT,\cdot 0}\\\vdots\\\sigma_{yT,\cdot m}
+\end{pmatrix} 
+&\quad \text{et}\quad \mathcal{U}_{pq}^{kl} &= 
+\begin{pmatrix}
+a_{pq,\cdot 0}^{kl}\\\vdots\\a_{pq,\cdot m}^{kl} \\
+b_{pq,\cdot 0}^{kl}\\ \vdots\\ b_{pq,\cdot m}^{kl}\\ 
+d_{pq,\cdot 0}^{kl}\\ \vdots\\d_{pq,\cdot m}^{kl} \\ 
+e_{pq,\cdot 0}^{kl}\\ \vdots\\ e_{pq,\cdot m}^{kl} 
+\end{pmatrix} 
+\quad \in \mathcal{M}_{4(m+1)(n+1),1}. 
+\end{alignat*}
+Il faut donc \`a pr\'esent d\'eterminer la matrice 
+$R \in \mathcal{M}_{4(n+1)(m+1),n_{\Sigma}}$ qui lie $S$ \`a 
+$\Sigma$ par 
+\begin{eqnarray*}
+S &=& R\cdot\Sigma \quad \in \cR^{4(n+1)(m+1)}.
+\end{eqnarray*} 
+
+\subsection*{Construction de la matrice $R$}
+
+Ce calcul a d\'ej\`a \'et\'e fait en partie lors du calcul de 
+$\nabla F_1$. En effet, rappelons que~:
+\begin{eqnarray*}
+\sigma_{T,i \cdot} &=& \mathcal{C}^{-1}\mathcal{D}_i 
+\cdot \Sigma \quad \forall i, \label{R2}\\
+\sigma_{y,\cdot j} &=& \mathcal{A}^{-1}\mathcal{B}_j 
+\cdot \Sigma \quad \forall j.\label{R3}
+\end{eqnarray*}
+Apr\`es un r\'eordonnancement, on obtient facilement les 
+$3(n+1)(m+1)$ premi\`eres colonnes de $R$. La d\'ependance des 
+d\'eriv\'ees crois\'ees en $\Sigma$ est plus d\'elicate \`a obtenir. 
+On proc\`ede en deux \'etapes~: les d\'eriv\'ees crois\'ees sont 
+dans un premier temps calcul\'ees au bord, puis on en d\'eduit par 
+un second syst\`eme les valeurs aux points int\'erieurs de la grille. 
+Le syst\`eme d'\'equations (\ref{syst_spline3}) peut s'\'ecrire sous 
+la forme matricielle suivante~:
+\begin{multline*}
+A\sigma_{yT,\cdot j} + \Delta y_1 \sigma_{yT,0j}e_1 + 
+\Delta y_{n-1} \sigma_{yT,nj}e_{n-1}\\
+= 3B\sigma_{T,\cdot j} - 
+3\frac{\Delta y_1}{\Delta y_0}\sigma_{T,0j}e_1 
++ 3\frac{\Delta y_{n-2}}{\Delta y_{n-1}}\sigma_{T,nj}e_{n-1} 
+\quad \text{pour } j=0,m
+\end{multline*}
+o\`u $e_1$,$e_{N-1}$, $A$, $B$ sont d\'efinis comme pr\'ec\'edemment 
+(cf. section \ref{gradF1}). On d\'efinit $\mathcal{H}_j$ par la 
+matrice~:
+\setlength{\fboxsep}{31.8pt}
+\setcounter{MaxMatrixCols}{20}
+{\tiny\begin{eqnarray*}
+&&\begin{pmatrix}
+\begin{matrix} 
+0 & \ldots & 0 & \mathbf{0} \\ 
+\vdots & & \vdots & \mathbf{-3\frac{\Delta y_1}{\Delta y_0}} \\ 
+\vdots & & \vdots & \mathbf{0} \\ 
+\vdots & & \vdots & \mathbf{\vdots} \\ 
+\vdots & & \vdots & \mathbf{0} \\  
+0 & \ldots & 0 & \mathbf{0} 
+\end{matrix} &
+\begin{matrix}
+\begin{matrix} \mathbf{0} & \mathbf{\ldots} & \mathbf{\ldots} & 
+\mathbf{\ldots} & \mathbf{0} \end{matrix}\\
+\raisebox{-1ex}{\fbox{\large $\mathbf{3B}$}}\\
+\begin{matrix} \mathbf{0} & \mathbf{\ldots} & \mathbf{\ldots} & 
+\mathbf{\ldots} & \mathbf{0} \end{matrix}
+\end{matrix} &
+\begin{matrix}
+\mathbf{0} & 0 & \ldots & 0 & \mathbf{1} & 0 & \ldots & 0 
+&\mathbf{0} & 0 & \ldots & 0 \\
+\mathbf{\vdots} & \vdots & & \vdots & \mathbf{0} & \vdots & 
+& \vdots &\mathbf{\vdots} & \vdots & & \vdots \\
+\mathbf{\vdots} & \vdots & & \vdots & \mathbf{\vdots} & \vdots 
+& & \vdots & \mathbf{\vdots} & \vdots & & \vdots \\
+\mathbf{0} & \vdots & & \vdots & \mathbf{\vdots} & \vdots 
+& & \vdots & \mathbf{\vdots} & \vdots & & \vdots \\
+\mathbf{3\frac{\Delta y_{n-2}}{\Delta y_{n-1}}} & \vdots 
+& & \vdots & \mathbf{\vdots} & \vdots & & \vdots 
+& \mathbf{0} & \vdots & & \vdots \\
+\mathbf{0} & 0 & \ldots & 0 & \mathbf{0} & 0 & \ldots 
+& 0 & \mathbf{1} & 0 & \ldots & 0
+\end{matrix}
+\end{pmatrix}.\\
+&&\phantom{xxxxxxxxxxxxx} 
+\underbrace{\phantom{aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}} 
+\phantom{iiiiiiiiiiiiiiiiiiii} \Uparrow 
+\phantom{iiiiiiiiiiiiiiiiiiii} \Uparrow \\
+&&\phantom{xxxxxxxxxxxxxxxxx} 
+\text{indices correspondant \`a} \quad \sigma_{T,.j} 
+\quad \text{dans}\quad \Sigma  \phantom{iiiiiiiiiiiiiiiii} 
+\text{indice de} \quad \sigma_{yT,0j} \phantom{iiiiiiii}  
+\text{indice de} \quad \sigma_{yT,Nj}\\
+\end{eqnarray*}}
+\setlength{\fboxsep}{3pt}
+\setcounter{MaxMatrixCols}{10}
+Alors le syst\`eme s'\'ecrit
+\begin{eqnarray}
+\sigma_{yT,\cdot j} &=& \mathcal{A}^{-1}\mathcal{H}_j\Sigma 
+\quad \text{pour } j=0,m.\label{R4_1}
+\end{eqnarray}
+On peut ensuite \'ecrire le syst\`eme d'\'equations 
+(\ref{syst_spline4}) sous la forme matricielle~:
+\begin{multline*}
+C\sigma_{yT,i \cdot} + \Delta T_1 \sigma_{yT,i0}f_1 + 
+\Delta T_{m-1} \sigma_{yT,im}f_{m-1}\\
+= 3D\sigma_{y,i \cdot} - 3\frac{\Delta T_1}{\Delta T_0}
+\sigma_{y,i0}f_1 + 3\frac{\Delta T_{m-2}}{\Delta T_{m-1}}
+\sigma_{y,im}f_{m-1} \quad \text{pour } i=0,...,n
+\end{multline*}
+o\`u $e^{m-1}_1$, $e^{m-1}_{m-1}$, $C$ et $D$ sont d\'efinies 
+comme pr\'ec\'edemment (cf. section \ref{gradF1}). On conna\^{\i}t 
+maintenant les valeurs de la d\'eriv\'ee aux bords de la grille~:
+\begin{equation*}
+\sigma_{yT,ij} = (\mathcal{A}^{-1}\mathcal{H}_j\Sigma)_i = 
+(\mathcal{A}^{-1}\mathcal{H}_j)_{i\cdot} \cdot \Sigma 
+\quad \text{pour } j=0,m 
+\end{equation*}
+o\`u $(\mathcal{A}^{-1}\mathcal{H}_j)_{i\cdot}$ repr\'esente la 
+$i^{\text{\`eme}}$ ligne de la matrice 
+$(\mathcal{A}^{-1}\mathcal{H}_j)$. On pose
+\begin{eqnarray*}
+P_i &=& \begin{pmatrix}
+\fbox{$(\mathcal{A}^{-1}\mathcal{H}_0)_{i\cdot}$}\\
+\begin{matrix}
+0&\hdots&0\\
+\vdots&&\vdots\\
+0&\hdots&0
+\end{matrix}\\
+\fbox{$(\mathcal{A}^{-1}\mathcal{H}_m)_{i\cdot}$}
+\end{pmatrix} \quad \in \mathcal{M}_{m-1,n_{\Sigma}}
+\end{eqnarray*}
+et
+\setlength{\fboxsep}{24pt}
+\begin{eqnarray*}
+\mathcal{G} &=& \begin{pmatrix} 
+\begin{matrix} -3\frac{\Delta T_1}{\Delta T_0}\\0\\ \vdots\\0 
+\end{matrix} & \raisebox{-1ex}{\fbox{\Huge $3D$}} & 
+\begin{matrix} 0\\ \vdots\\0 \\ 
+3\frac{\Delta T_{m-2}}{\Delta T_{m-1}} 
+\end{matrix}\\
+\end{pmatrix} \quad \in \mathcal{M}_{m-1,m+1}
+\end{eqnarray*}
+Alors
+\begin{eqnarray*}
+C\bar{\sigma}_{yT,i\cdot} + P_i\Sigma &=& 
+\mathcal{G}\sigma_{y,i\cdot}\\
+&=& \mathcal{G} L_i \Sigma
+\end{eqnarray*}
+o\`u $L_i$ est d\'efinie par 
+\begin{eqnarray*}
+j^{\text{\`eme}} \text{ ligne de } L_i &=& i^{\text{\`eme}} 
+\text{ ligne de } \mathcal{A}^{-1}\mathcal{B}_j
+\end{eqnarray*} et 
+\begin{eqnarray*}
+\bar{\sigma}_{yT,i\cdot} &=& \begin{pmatrix} \sigma_{yT,i1} 
+\\ \vdots \\ \sigma_{yT,i,M-1}\end{pmatrix}.
+\end{eqnarray*}
+
+\begin{Rem}
+Rappelons que $n_\Sigma =(n+1)(m+1)+2(n+1)+2(m+1)+4 =(n+3)(m+3)$ est 
+la taille du vecteur de degr\'es de libert\'e $\Sigma$.
+\end{Rem}
+
+On obtient finalement l'expression de $\bar{\sigma}_{yT,i\cdot}$ en 
+fonction de $\Sigma$~:
+\begin{eqnarray}
+\bar{\sigma}_{yT,i\cdot} &=& C^{-1}(\mathcal{G}L_i-P_i)\cdot \Sigma. 
+\label{R4_2}
+\end{eqnarray}
+On peut \`a pr\'esent construire $R$. Soit
+\setlength{\fboxsep}{4mm}
+\begin{eqnarray*}
+R &=& \begin{pmatrix}
+\framebox[4cm][c]{$R_1$}\\
+\framebox[4cm][c]{$R_2$}\\
+\framebox[4cm][c]{$R_3$}\\
+\framebox[4cm][c]{$R_4$}
+\end{pmatrix}
+\end{eqnarray*}
+\setlength{\fboxsep}{20pt}
+o\`u chaque $R_i$ est une matrice de taille 
+$(n+1)(m+1) \times n_{\Sigma}$ exprimant la d\'ependance des valeurs 
+de $\sigma$ et de ses d\'eriv\'ees en chaque point de la grille par 
+rapport au vecteur de param\`etres $\Sigma$.
+
+\begin{enumerate}
+\item La construction de $R_1$ est imm\'ediate puisque les 
+$\sigma_{ij}$ sont des \'el\'ements de $\Sigma$~:
+\begin{eqnarray*}
+R_1 &=& \begin{pmatrix}
+\framebox[2.2cm][c]{$I_{(n+1)(m+1)}$} & \begin{matrix} 0 
+& \hdots & 0\\ \vdots && \vdots \\  0 & \hdots & 0 \end{matrix}
+\end{pmatrix}
+\end{eqnarray*}
+\item On peut d\'ecomposer $R_2$ de la fa\c{c}on suivante~:
+\begin{alignat*}{2}
+R_2 &= \begin{pmatrix} R_2^0 \\ \vdots \\ R_2^m \end{pmatrix}
+&\quad \text{avec  } R_2^j &= \mathcal{A}^{-1}\mathcal{B}_j.
+\end{alignat*}
+\item De la m\^eme fa\c{c}on, on construit $R_3$~:
+\begin{eqnarray*}
+R_3 &=& \begin{pmatrix} R_3^0 \\ \vdots \\ R_3^M \end{pmatrix}
+\end{eqnarray*}
+o\`u chaque matrice $R_3^j$ est de taille $(n+1)\times n_{\Sigma}$. 
+D'apr\`es (\ref{R3}), $R_3^j$ est d\'efinie par~:
+\begin{eqnarray*}
+i^{\text{\`eme}}\text{ ligne de } R_3^j &=& j^{\text{\`eme}}
+\text{ ligne de } \mathcal{C}^{-1}\mathcal{D}_i.
+\end{eqnarray*}  
+\item Enfin, on \'ecrit $R_4$ de la mani\`ere suivante:
+\begin{eqnarray*}
+R_4 &=& \begin{pmatrix} R_4^0 \\ \vdots \\ R_4^m \end{pmatrix}
+\end{eqnarray*}
+o\`u chaque matrice $R_4^j$ est de taille 
+$(n+1)\times n_{\Sigma}$. D'apr\`es (\ref{R4_1}),
+\begin{eqnarray*}
+R_4^0 &=&  \mathcal{A}^{-1}\mathcal{H}_0,\\
+R_4^m &=&  \mathcal{A}^{-1}\mathcal{H}_m,\\
+\end{eqnarray*}
+et d'apr\`es (\ref{R4_2}), pour $j=1,...,m-1$,
+\begin{eqnarray*}
+i^{\text{\`eme}}\text{ ligne de } R_4^j &=& j^{\text{\`eme}}
+\text{ ligne de } \mathcal{C}^{-1}(\mathcal{G}L_i-P_i). 
+\end{eqnarray*}
+\end{enumerate}
+
+\subsection*{R\'ecapitulatif des principales \'etapes du calcul de 
+$\nabla G$\label{gradG}}
+
+\setlength{\fboxsep}{3pt}
+\begin{equation*}
+\text{\framebox{$R$}} 
+\overset{(\ref{deriv_sigmaij_Sigma})}{\rightarrow} 
+\text{\fbox{\parbox[c]{1.8cm}{${\disp\frac{\partial 
+\sigma(y_i,T_j)}{\partial \Sigma}}$}}}
+\overset{(\ref{deriv_Ajuj_Sigma})}{\rightarrow}
+\text{\fbox{\parbox[c]{1.5cm}{${\disp\frac{\partial \hat{A}^ju^j}
+{\partial \Sigma}}$}}}
+\overset{(\ref{deriv_bj_Sigma}),(\ref{deriv_Hu_Sigma})}{\rightarrow} 
+\text{\fbox{\parbox[c]{1.6cm}{${\disp\frac{\partial b^j}
+{\partial \Sigma}}$\vspace*{2mm} ${\disp\frac{\partial H^ju^{j+1}}
+{\partial \Sigma}}$}}}
+\overset{(\ref{deriv_G_Sigma})}{\rightarrow} 
+\text{\framebox{${\disp\frac{\partial G}{\partial \Sigma}}$}}
+\rightarrow 
+\text{\framebox{${\disp \nabla_{\Sigma}G}$}}
+\end{equation*}

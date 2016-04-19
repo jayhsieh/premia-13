@@ -1,0 +1,108 @@
+********************************************************************
+				PREMIA
+********************************************************************
+
+PREMIA is a software for pricing and hedging options on assets and
+interest rates and for calibration of financial models.
+
+It is developped by the MathFi research group, which gathers
+scientists from INRIA (the french national institute for research in
+computer science and control), ENPC (CERMICS laboratory on applied
+mathematics and computing), and the University of Marne la Vallée.
+
+
+1- The directories
+
+   The directory Src/ contains the source code.
+
+   The directory man/ contains the documentation of the algorithms
+   implemented in Premia.  Please refer to the README file in this
+   directory.
+
+
+
+2- Compilation
+
+
+   You need CMake 2.8 for installing PNL from the source version.
+
+     
+    Per default, the make install command installs the library in the build
+    directory. 
+
+    Go to the top level directory of PNL and run.
+    We advice to build the library out of the source tree.
+    > mkdir build
+    > cd build
+    
+    > cmake .. 
+
+     
+    Per default, the make install command installs the library in the build
+    directory. 
+
+    Go to the top level directory of Premia and run the following commands.
+    We advice to build Premia out of the source tree.
+    > mkdir build
+    > cd build
+    
+    > cmake .. 
+    > make
+    > make install
+
+    Some useful variables to modify the behaviour of cmake.
+
+        -DPREFIX                  The path where to install the library. If
+                this variable is not specified, the library is installed in
+                the building directory.
+
+        -DCMAKE_BUILD_TYPE        Release OR Debug. Default is Debug.
+
+                Choose Debug for building a development release without
+                optimization and with debugging symbols.
+
+                Choose Release for building an optimized version.
+
+
+	-DPREMIAVERSION=XXX       Specify the version to compile
+		XXXX is typically the current year to get version
+		n-2
+                
+    If you plan to use the built-in version of PNL, here are extra
+    variables to specify the location of Blas & Lapack
+
+        -DLAPACK_LIBRARIES        Full path of a Lapack library (not just its
+                directory). Lapack is detected automatically but the user
+                can specify a particular library.
+
+        -DBLAS_LIBRARIES          Full path of a Blas library (not just its
+                directory). Blas is detected automatically but the user
+                can specify a particular library.
+
+            Note that you must specify both BLAS_LIBRARIES and
+            LAPACK_LIBRARIES or none of them.
+
+        -DUSE_INTERNAL_BLAS       ON/OFF. Default OFF. If ON, use the
+                internal Blas & Lapack libraries shipped with the PNL
+                source code.
+
+    If you plan to use an external version of PNL, the following two
+    variables are required to specify the locations of the library and
+    the headers
+
+        -DPNL_LIBRARY           Full path of PNL library 
+                (not just its directory). 
+
+        -DPNL_INCLUDES          Full path of PNL includes 
+
+    For build and after installing the Web version, you need to tell
+    CMake where Karrigell is installed
+
+	-DKARRIGELL_INSTALLATION_PATH  Full path of Karrigell's
+		 installation directory.
+
+
+**********************************
+For questions or comments visit
+http://www.premia.fr
+***********************************

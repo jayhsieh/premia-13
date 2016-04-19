@@ -1,0 +1,23 @@
+add_library (libtemperedstable1d OBJECT
+	temperedstable1d.c
+	temperedstable1d_lim/fd_impexpdownout_ts.C
+	temperedstable1d_lim/fd_impexpupout_ts.C
+	temperedstable1d_lim/ap_fastwh.c
+	temperedstable1d_lim/temperedstable1d_lim.c
+	temperedstable1d_std/mc_tankovpoirot.C
+	temperedstable1d_std/ap_carr_ts.C
+	temperedstable1d_std/ap_iac.C
+	temperedstable1d_std/fd_impexp_ts.C
+	temperedstable1d_std/fd_klz.C
+	temperedstable1d_std/fd_klz_eput.C
+	temperedstable1d_std/ap_fastwhamer.c
+	temperedstable1d_std/ap_fastwhamer_digital.c
+	temperedstable1d_std/temperedstable1d_std.c
+	temperedstable1d_vol/temperedstable1d_vol.c
+	temperedstable1d_vol/ap_cgmy_realvar.C
+	temperedstable1d_vol/cf_cgmy_varianceswap.C
+	temperedstable1d_vol/ap_cgmy_varswap_repl1.C
+	temperedstable1d_vol/ap_cgmy_varswap_repl2.C
+	temperedstable1d_vol/ap_cgmy_volatilityswap.C
+	temperedstable1d_vol/ap_kellerressel.c
+	)

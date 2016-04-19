@@ -1,0 +1,165 @@
+%%
+%% This is file `squelette-rr.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% RR.dtx  (with options: `sample')
+%% *******************************************************************
+%% Copyright (C) 1997-1999 INRIA/MIAOU
+%% 
+\documentclass{article}
+
+%\usepackage{a4}
+\usepackage{amsmath}
+%\usepackage{french}
+\usepackage{rotating}
+%\usepackage{epsfig}
+%\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{array}
+
+\usepackage{RR}
+\usepackage{hyperref}
+\usepackage{french} % optionnel
+%%\usepackage[frenchb]{babel} % optionnel
+%%
+\RRdate{Novembre 2002} %  date de publication du rapport
+%%
+\RRauthor{
+J. Fr\'ed\'eric Bonnans 
+\thanks[sydoco]{Projet Sydoco} 
+\and % \and entre chaque auteur s'il y en a plusieurs
+Jean-Marc Cognet
+\thanks[edf-mathfi]{EDF Recherche et D\'eveloppement, 
+1 avenue du G\'en\'eral de Gaulle, BP 408, 92141 Clamart. 
+Travail effectu\'e dans le cadre d'un Post-Doctorat Industriel 
+au sein du projet Mathfi}
+\and
+Sophie Volle
+\thanks[raise-partner-mathfi-sydoco]{Raise Partner, 
+3 Chemin de ronde, 38000 Grenoble. Travail effectu\'e dans le cadre 
+d'un poste d'accueil des projets Mathfi et Sydoco}
+}
+%%
+\authorhead{J.F. Bonnans, J.-M. Cognet et S. Volle} 
+% Ceci apparait sur chaque page paire.
+%%
+\RRtitle{Estimation de la volatilit\'e locale d'actifs financiers 
+par une m\'ethode d'inversion num\'erique} % titre francais
+%%
+\RRetitle{Estimation of the local volatility of financial assets 
+by a numerical inversion method} % english title
+%%
+\titlehead{Estimation de la volatilit\'e locale} 
+%titre court, sur toutes les pages.
+%%
+%%\RRnote{This is a note}
+%%\RRnote{This is a second note}
+%%
+\RRresume{
+Nous nous int\'eressons \`a un probl\`eme de calibration 
+rencontr\'e en finance qui consiste \`a identifier la 
+volatilit\'e locale \`a partir de prix d'options observ\'es sur 
+le march\'e. Nous formulons le probl\`eme sous la forme d'un 
+probl\`eme inverse. Le probl\`eme direct (pricing), qui consiste 
+\`a calculer les prix d'options en r\'esolvant l'\'equation aux 
+d\'eriv\'ees partielles de Dupire, est r\'esolu par diff\'erences 
+finies. Le probl\`eme inverse (calibration) revient ensuite \`a 
+r\'esoudre un probl\`eme d'optimisation dans lequel il s'agit de 
+d\'eterminer la volatilit\'e optimale telle que les prix calcul\'es 
+avec cette volatilit\'e soit le plus proche possible des prix 
+observ\'es sur le march\'e. Ce probl\`eme inverse mal pos\'e est 
+r\'egularis\'e en param\'etrant la volatilit\'e par des splines 
+bicubiques et en adoptant une approche multi\'echelle. De plus, 
+nous utilisons l'algorithme de Quasi-Newton (avec ou sans bornes) 
+pour r\'esoudre le probl\`eme d'optimisation. Notre algorithme de 
+calibration est test\'e sur des donn\'es synth\'etiques (simul\'ees 
+par notre mod\`ele) et sur des donn\'ees r\'eelles du march\'e.
+}
+%%
+\RRabstract{
+We consider a problem arising in finance that consists 
+in identifying the local volatility from option prices provided by 
+the market. The problem is formulated as an inverse problem. The 
+direct problem (pricing), which consists in computing option 
+prices by solving Dupire's partial differential equation, is 
+solved by finite differences. Then, the inverse problem 
+(calibration) consists in solving an optimization problem where 
+we have to determine the optimal volatility such that the prices 
+computed with this volatility are as close as possible to the 
+prices given by the market. This ill-posed inverse problem is 
+regularized by parameterizing the volatility using bicubic 
+splines and by employing a multiscale approach. Moreover, we use 
+the Quasi-Newton algorithm (with or without bounds) to solve 
+the optimization problem. Our algorithm of calibration is tested 
+on synthetic data (simulated with our model) and on real data 
+provided by the market.
+}
+%%
+\RRmotcle{finance, calibration, EDP de Dupire, diff\'erences finies, 
+probl\`eme inverse, optimisation}
+%%
+\RRkeyword{finance, calibration, Dupire's PDE, finite differences, 
+inverse problem, optimization}
+%% \RRprojet{Miaou} % cas d'un seul projet
+%%
+%%\RRprojets{Miaou et Opéra} % cas de 2 projets.
+\RRprojets{Mathfi et Sydoco} % cas de 2 projets.
+%%
+\RRtheme{4} % cas d'un seul theme
+%%\RRtheme{43} % cas de 2 themes
+%%
+%% \URLorraine % pour ceux qui sont à l'est
+%% \URRennes  % pour ceux qui sont à l'ouest
+%% \URRhoneAlpes % pour ceux qui sont dans les montagnes
+\URRocq % pour ceux qui sont au centre de la France
+%% \URFuturs % pour ceux qui sont dans le virtuel
+%% \URSophia % pour ceux qui sont au Sud.
+%%
+
+\input{macro.tex}
+
+\begin{document}
+%%
+\makeRR   % cas d'un rapport de recherche
+%% \makeRT % cas d'un rapport technique.
+%% a partir d'ici, chacun fait comme il le souhaite
+
+%%\section{First section}
+%%Here is some text for the first section, and a label\label{sec1}.
+%%Uses version \RRfileversion\ of the package.\newpage
+%%\section{Second section}
+%%Text for the second section. This is closely related to the text in
+%%section \ref{sec1} on page \pageref{sec1}. \newpage
+
+\tableofcontents
+
+\input{introduction.tex}
+\input{pb_direct.tex}
+\newpage
+\input{pb_inverse.tex}
+\input{resultats}
+\input{conclusion.tex}
+\input{remerciements.tex}
+
+\newpage
+\appendix
+\input{annexe_spline.tex}
+\newpage
+\input{annexe_gradF1.tex}
+\newpage
+\input{annexe_gradG.tex}
+
+\newpage
+\bibliography{biblio}
+\bibliographystyle{plain}
+
+%\newpage
+%\tableofcontents
+
+\end{document}
+\endinput
+%%
+%% End of file `squelette-rr.tex'.

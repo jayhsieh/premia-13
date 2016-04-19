@@ -1,0 +1,27 @@
+add_library (liblim OBJECT
+	calldowninamer.c
+	calldownineuro.c
+	calldownoutamer.c
+	calldownouteuro.c
+	callupinamer.c
+	callupineuro.c
+	callupoutamer.c
+	callupouteuro.c
+	lim.c
+	parisiancalldownineuro.c
+	parisiancalldownouteuro.c
+	parisiancallupineuro.c
+	parisiancallupouteuro.c
+	parisianputdownineuro.c
+	parisianputdownouteuro.c
+	parisianputupineuro.c
+	parisianputupouteuro.c
+	putdowninamer.c
+	putdownineuro.c
+	putdownoutamer.c
+	putdownouteuro.c
+	putupinamer.c
+	putupineuro.c
+	putupoutamer.c
+	putupouteuro.c
+)

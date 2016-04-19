@@ -1,0 +1,7 @@
+import sys
+sys.path.append(r'%PYTHON_DIR%')
+
+from premia import pricings
+from premia import models
+from premia import options
+from premia import assets

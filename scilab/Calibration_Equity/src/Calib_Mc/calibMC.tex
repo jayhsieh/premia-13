@@ -1,0 +1,151 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amssymb,amsmath}
+\begin{document}
+\begin{center}
+{\Large Calibration by a weighted Monte Carlo method .}
+
+\
+
+
+\
+
+\Large Yael BEER-GABEL
+
+\Large June 2003
+\end{center}
+\
+
+\
+
+This calibration method introduced in \cite{ABFGKN} consists in generating
+$\nu$ sample paths according to some a priori model and in assigning non
+uniform weights to these paths according to the market prices of some
+Put options.
+
+
+
+\section*{The a priori model.}
+
+\
+
+The sample paths are generated according to the following stochastic
+volatility model:
+\begin{equation*}
+\begin{cases}
+dS_t=S_t((r-q) dt+\sigma_t dB^1_t)\\
+d\sigma_t=-\beta (\sigma_t - \sigma_0) dt + \alpha dB^2_t \\
+d<B^1,B^2>_t =\rho dt, -1\leq \rho \leq 1
+\end{cases}
+\end{equation*}
+where
+\begin{itemize}
+\item{r is the risk free interest rate.}
+\item{q is the dividend rate}
+\item{$\sigma_t$ is the stochastic volatility.}
+\item{$B^1_t,B^2_t$ are  brownian motions.}
+\item{$\rho$ is the correlation between the brownian motions.}
+\item{$\sigma_0$ is the mean volatility.}
+\item{$\alpha$ is the perturbation .}
+\item{$\beta>0$ is the rate of return to mean.}
+\end{itemize}
+More precisely,we generate discretized sample-paths by the standard
+Euler scheme with timestep $\Delta t$:
+\begin{equation}
+\begin{cases}
+\overline{S}_{(n+1)\Delta t} =  \overline{S}_{n\Delta
+t}(1+(r-q)\Delta t +\overline{\sigma}_{n\Delta
+  t}\sqrt{\Delta t}g^1_{n+1}) , n=1,\hdots,M\\
+\overline{\sigma}_{(n+1)\Delta t}= \sigma_0+
+(\overline{\sigma}_{n\Delta t}-\sigma_0)(1- \beta \Delta t)+
+\alpha \sqrt{\Delta t}(\rho g^1_{n+1}+\sqrt{1-\rho^2} g^2_{n+1})
+\end{cases}
+\end{equation}
+where $(g^1_{n},g^2_{n})_{1\leq n \leq M}$ are i.i.d according to
+$\mathcal{N}_{2}(0,Id)$.
+
+\
+
+\
+
+\begin{flushleft}
+We construct a set of $\nu$ sample paths of (1) which we denote
+by
+$$\omega^{(i)}=(\overline{S}_{\Delta t}(\omega^{(i)}),\hdots,\overline{S}_{M \Delta t}(\omega^{(i)})) , i=1,\hdots,\nu$$
+\end{flushleft}
+\section*{Computation of the weights.}
+The choice of the weights $(p_i)_{1\leq i \leq \nu}$ is done by
+minimizing the Kullback-Leibler relative entropy
+$D(p\vert{u})=\ln(\nu)+\sum_{i=1}^{\nu}{p_i\ln(p_i)}$ with respect to the
+uniform distribution under the constraint that the corresponding price
+of the benchmark puts is equal to their market prices.\\
+More precisely, let $P_1,...,P_N$ denote the market prices of N
+european puts,  and $g_{1j},g_{2j},\hdots,g_{\nu j} ,
+j=1,\hdots,N$ represent the present values of the cashflows of the
+\emph{j}th benchmark along the different paths, i.e
+$g_{ij}=e^{-rk_{j}\Delta t}(\overline{S}_{k_{j}\Delta
+  t}(\omega^{(i)})-K_{j})^{+}$, where $K_{j}$ is the strike of the \emph{j}th
+benchmark and $k_{j}\Delta t$ is its maturity.
+\\
+The price relations for the benchmark instruments can be written in the
+form
+\begin{equation}
+\sum_{i=1}^{\nu}{p_i g_{ij}}=P_j, j=1,\hdots,N
+\end{equation}
+The mathematical problem is to minimize the convex function of p
+\begin{equation*}
+D(p\vert{u})=\ln(\nu)+\sum_{i=1}^{\nu}{p_i\ln(p_i)}
+\end{equation*}
+under the linear constraints (2).
+\\
+Let's introduce Langrange multipliers $(\lambda_1,...,\lambda_N)$. The
+problem is equivalent to find p which maximizes $$ \min_{\lambda \in
+  \mathbb{R}^N} {\bigg(}-D(p\vert{u})+\sum_{j=1}^{N}{\lambda_j{\bigg(}\sum_{i=1}^{\nu}{p_ig_{ij}}-P_j}{\bigg)\bigg )}$$ and can be solved by considering the dual formulation
+\begin{equation*}
+\min_{\lambda}\bigg(\max_{p}\bigg(-D(p\vert{u})+\sum_{j=1}^{N}{\lambda_j\bigg(\sum_{i=1}^{\nu}{p_ig_{ij}}-P_j}\bigg)\bigg)\bigg
+)
+\end{equation*}
+A straightforward argument shows that the probability vector that
+realizes the supremum for each $\lambda$ has the Boltzmann-Gibbs form
+\begin{equation*}
+p_i=p(\omega^{(i)})=\frac{1}{Z(\lambda)}e^{\sum_{j=1}^{N}{g_{ij}\lambda_j}}
+\end{equation*}
+where
+\begin{equation*}
+Z(\lambda)=\sum_{i=1}^{\nu}{e^{\sum_{j=1}^{N}{g_{ij}\lambda_j}}}
+\end{equation*}
+Then the optimal $\lambda$ minimizes
+\begin{equation*}
+W(\lambda)=\ln
+{\bigg(}\sum_{i=1}^{\nu}{e^{\sum_{j=1}^{N}{g_{ij}\lambda_j}}}{\bigg)}-\sum_{j=1}^{N}{\lambda_jP_j}
+\end{equation*}
+It is also interesting not to satisfy exactly the constraint by
+choosing $\lambda$ which minimizes the penalized
+function:$$\ln\bigg(\sum_{i=1}^{\nu}{e^{\sum_{j=1}^{N}{g_{ij}\lambda_j}}}\bigg)-\sum_{j=1}^{N}{\lambda_j
+  P_j}+\frac{1}{2}\sum_{j=1}^{N}{w_j\lambda_j^2}$$ \\
+We recover the previous case by choosing $w_j= 0 , 1 \leq j
+\leq N$.
+\section*{Numerical resolution}
+We first renormalize the payoff by introducing $\alpha_j=\sup_{1 \leq i
+  \leq \nu}|g_{ij}-P_j|$ and setting
+  $\tilde{g}_{ij}=\frac{g_{ij}-P_{j}}{\alpha_j}$.\\
+We find $(\tilde{\lambda}_1,...,\tilde{\lambda}_N)$ which
+minimizes
+  $$\ln\bigg(\sum_{i=1}^{\nu}{e^{\sum_{j=1}^{N}{\tilde{\lambda}_j\tilde{g}_{ij}}}}\bigg)+\frac{1}{2}\sum_{j=1}^{N}{
+  \frac{w_j}{\alpha_j^2}\tilde{\lambda}_j^2}$$ by a conjugate gradient algorithm
+  and deduce the corresponding weights $$ p_i=\frac{1}{\tilde{Z}(\tilde{\lambda})}e^{\sum_{j=1}^{N}{\tilde{g}_{ij}\tilde{\lambda}_j}}$$
+where
+\begin{equation*}
+\tilde{Z}(\tilde{\lambda})=\sum_{i=1}^{\nu}{e^{\sum_{j=1}^{N}{\tilde{g}_{ij}\tilde{\lambda}_j}}}
+\end{equation*}
+
+\begin{thebibliography}{1}
+\bibitem{ABFGKN}
+M.\textsc{Avellaneda}, R.\textsc{Buff}, C.\textsc{Friedman},
+N.\textsc{Grandchamp}, L.\textsc{Kruk}, J.\textsc{Newman}.
+\emph{Weighted Monte Carlo : A New Technique for Calibrating
+ Asset-Pricing Models}.
+International Journal of Theoretical and Applied Finance
+Vol. 4, No. 1 (2001) 91-119
+\end{thebibliography}
+
+\end{document}

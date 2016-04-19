@@ -1,0 +1,239 @@
+\section{Interpolation par splines bicubiques}
+\label{ANN:SPLINES}
+
+Nous montrons dans cette annexe comment d\'eterminer la 
+valeur d'une spline bicubique en un point quelconque du domaine 
+\`a partir de ses degr\'es de libert\'e. Le d\'etail des 
+d\'emonstrations se trouve dans l'article \cite{deb:jmp:62}. 
+On consid\`ere une grille rectangulaire de points $(x_i,y_j)$, 
+$i=0,...,I$, $j=0,...,J$. Soient~: 
+\begin{itemize}
+\item $u_{ij} = u(x_i,y_j)$ donn\'es pour $i=0,...,I$ et 
+$j=0,...,J$,
+\item $p_{ij} = u_x(x_i,y_j)$ donn\'es pour $i=0,I$ et 
+$j=0,...,J$,
+\item $q_{ij} = u_y(x_i,y_j)$ donn\'es pour $i=0,...,I$ et $j=0,J$,
+\item $s_{ij} = u_{xy}(x_i,y_j)$ donn\'es aux 4 coins de la grille, 
+i.e. pour $i=0,I$ et $j=0,J$.
+\end{itemize}
+Le probl\`eme consiste \`a interpoler ces points \`a l'aide d'une 
+fonction $u \in C^2$.
+
+\subsection{Splines cubiques en dimension 1}
+
+Pour les fonctions d'une variable, l'interpolation par spline 
+d\'efinit une fonction $u(x)$ de classe $C^2$ \'etant donn\'ees~: 
+\begin{itemize}
+\item les valeurs $u(x_i)$ aux points $x_i$, $i=0,...,I$, 
+$x_0<...<x_I$,
+\item les d\'eriv\'ees $p_i = u'(x_i)$ en $x_0$ et $x_I$.
+\end{itemize}
+La fonction d'interpolation est une fonction polynomiale cubique 
+sur chacun des intervalles $[x_{i-1},x_i]$, $i=1,...,I$. 
+
+Soient $\Delta x_i = x_{i+1}-x_i$ et $\Delta u_i = u_{i+1}-u_i$. 
+
+\begin{theo}
+Soit $u$ une fonction polynomiale cubique par morceaux de classe 
+$C^1$. Pour des valeurs $u(x_i),~ i=1,...,I$ et $u'(x_0), u'(x_I)$ 
+donn\'ees, il existe un unique ensemble de valeurs 
+$p_i = u'(x_i), ~ i=1,...,I-1$ tel que $u \in C^2$. Ces valeurs 
+sont d\'etermin\'ees par le syst\`eme d'\'equations suivant~:   
+\begin{eqnarray}
+\lefteqn{\Delta x_{i}p_{i-1}+2(\Delta x_{i}+\Delta x_{i-1})p_{i} + 
+\Delta x_{i-1} p_{i+1} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta x_{i-1}}{\Delta x_i}\Delta u_i + 
+\frac{\Delta x_i}{\Delta x_{i-1}}\Delta u_{i-1}\biggr ],~ i=1,...,I-1.
+\end{eqnarray}
+Par cons\'equent, pour chaque ensemble de donn\'ees 
+$\{u_0,...,u_I,p_0,p_I\}$, il existe une unique fonction $u$ 
+polynomiale cubique par morceaux de classe $C^1$ telle que~: 
+\begin{xalignat*}{4} 
+u(x_i)&=u_i, &\quad  i&=0,...,I,&\quad u'(x_0)&=p_0, 
+&\quad  u'(x_I)&=p_I.
+\end{xalignat*}
+\end{theo}
+
+\begin{corr}
+$S(x;x_0,...,x_I)$ est un espace de dimension $(I+3)$.
+\end{corr}
+
+\begin{corr}
+\label{base}
+L'ensemble des fonctions $\Phi_i(x) \in S(x;x_0,...,x_I)$, 
+$i=0,...,I+2$ d\'efinies par les conditions~: 
+$$
+\begin{array}{l}
+\Phi_j(x_i) = \delta_{ij}  ~\text{pour} ~ i,j=0,...,I,\\
+\Phi'_j(x_0) = \Phi'_j(x_I) = 0 ~ \text{pour} ~ j=0,...,I,\\
+\Phi_{I+1}(x_i) = \Phi_{I+2}(x_i) = 0 ~ \text{pour} ~ i=0,...,I,\\
+\Phi'_{I+1}(x_0) = \Phi'_{I+2}(x_I) = 1,\\
+\Phi'_{I+1}(x_I) = \Phi'_{I+2}(x_0) = 0
+\end{array}
+$$
+est une base de $S(x;x_0,...,x_I)$.
+\end{corr}
+
+\subsection{Splines bicubiques en dimension 2}
+
+Soit $\{\psi_j(y)\}_{0\leq j\leq J+2}$ la base de $S(y;y_0,...,y_I)$ 
+d\'efinie dans le corrolaire \ref{base} pr\'ec\'edent. Consid\'erons 
+le produit tensoriel 
+$T=S(x;x_0,...,x_I) \bigotimes S(y;y_0,...,y_J)$. $T$ est l'espace 
+de dimension $(I+3)(J+3)$ des fonctions de la forme
+\begin{eqnarray}
+u(x,y) &=& 
+\sum_{p=0}^{I+2}\sum_{q=0}^{J+2}\beta_{pq}\Phi_p(x)\Psi_q(y),
+\end{eqnarray}
+Par construction, $u$ est bicubique par morceaux et de classe $C^2$.
+
+\begin{defi}
+Soit $R_{ij} = \{(x,y):x_{i-1}\leq x \leq x_i, 
+y_{j-1} \leq y \leq y_j\}$. Une fonction est polynomiale bicubique 
+par morceaux si elle est d\'efinie sur chaque rectangle $R_{ij}$ de 
+la grille par une fonction polynomiale bicubique, i.e.
+$$
+u(x,y) ~=~ c_{ij}(x,y) ~=~ \sum_{p=0}^3 \sum_{q=0}^3 
+\alpha_{pq}^{ij}(x-x_{i-1})^p(y-y_{j-1})^q, ~ (x,y) \in R_{ij}.
+$$
+\end{defi}
+
+\begin{theo}
+Si les valeurs suivantes sont donn\'ees~: 
+\begin{eqnarray}
+&&\begin{cases}
+u_{ij} = u(x_i,y_j), & i=0,...,I; j=0,...,J,\\
+p_{ij} = u_x(x_i,y_j), & i=0,I; j=0,...,J,\\
+q_{ij} = u_y(x_i,y_j), & i=0,...,I; j=0,J,\\
+s_{ij} = u_{xy}(x_i,y_j), & i=0,I; j=0,J,\\
+\end{cases}
+\label{cond}
+\end{eqnarray}
+alors il existe une unique fonction bicubique par morceaux de classe 
+$C^2$ qui v\'erifie~(\ref{cond}).
+\end{theo}
+
+\subsection{Evaluation de la fonction d'interpolation}
+
+Dans cette section, nous pr\'esentons une m\'ethode d'\'evaluation 
+de la fonction d'interpolation $u$ en un point $(x,y)$ quelconque. 
+Rappelons que sur chaque rectangle $R_{ij}$, la fonction $u$ est 
+\'egale \`a la fonction polynomiale bicubique 
+\begin{eqnarray}
+\label{Cij}
+c_{ij} &=& \sum_{p=0}^3 \sum_{q=0}^3 
+\gamma_{pq}^{ij}(x-x_{i-1})^p(y-y_{j-1})^q.
+\end{eqnarray}
+
+\begin{lemme}
+Si $u_{ij}$, $p_{ij}$, $q_{ij}$ et $s_{ij}$ sont connus aux quatre 
+coins du rectangle $R_{ij}$, alors il existe une unique fonction 
+polynomiale bicubique $c_{ij}(x,y)$ qui concorde avec ces valeurs. La 
+matrice $\Lambda_{ij}$ des coefficients $\gamma_{mn}^{ij}$ dans 
+(\ref{Cij}) est donn\'ee par l'\'equation matricielle suivante~:
+\begin{eqnarray}
+\label{coeffs}
+\Lambda_{ij} &=& A(\Delta x_{i-1}) K_{ij} A(\Delta y_{j-1})^T,
+\end{eqnarray}
+o\`u
+\begin{eqnarray*}
+K_{ij} = \begin{pmatrix} 
+B_{i-1,j-1} & B_{i-1,j}\\ 
+B_{i,j-1} & B_{ij} 
+\end{pmatrix} & \text{avec} & B_{mn} = 
+\begin{pmatrix} 
+u_{mn}&q_{mn}\\p_{mn}&s_{mn}
+\end{pmatrix},
+\end{eqnarray*}
+et o\`u la matrice $A(h)$ est d\'efinie par 
+\begin{eqnarray*}
+A(h) &=& \begin{pmatrix}
+1&0&0&0\\
+0&1&0&0\\
+-3/h^2 & -2/h & 3/h^2 & -1/h \\
+2/h^3 & 1/h^2 & -2/h^3 & 1/h^2 
+\end{pmatrix}.
+\end{eqnarray*}
+
+\end{lemme}
+
+\subsubsection*{D\'eriv\'ees aux points de la grille}
+
+\begin{lemme}
+Si les valeurs (\ref{cond}) sont connues, alors les valeurs
+\begin{itemize}
+\item $p_{ij}=u_x(x_i,y_j)$, pour $i=1,...,I-1$;$j=0,...,J$,
+\item $q_{ij}=u_y(x_i,y_j)$, pour $i=0,...,I$;$j=1,...,J-1$,
+\item $s_{ij}=u_{xy}(x_i,y_j)$, pour $i=1,...,I-1$;$j=0,J$ et 
+$i=0,...,I$;$j=1,...,J-1$,
+\end{itemize}
+sont d\'etermin\'ees de mani\`ere unique par les $2I+J+5$ 
+syst\`emes lin\'eaires qui comptent en tout $3IJ+I+J-5$ \'equations. 
+Pour $j=0,...,J$, 
+\begin{eqnarray}
+\lefteqn{\Delta x_{i-1}p_{i+1,j}+2(\Delta x_{i-1}+\Delta x_i)p_{ij} 
++ \Delta x_i p_{i-1,j} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta x_{i-1}}{\Delta x_i}(u_{i+1,j}-u_{i,j}) 
++ \frac{\Delta x_i}{\Delta x_{i-1}}(u_{i,j}-u_{i-1,j})\biggr ],
+~ i=1,...,I-1; \label{syst_spline1}
+\end{eqnarray}
+pour $i=0,...,I$,   
+\begin{eqnarray}
+\lefteqn{\Delta y_{j-1}q_{i,j+1}+2(\Delta y_{j-1}+\Delta y_j)q_{ij} 
++ \Delta y_j q_{i,j-1} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta y_{j-1}}{\Delta y_j}(u_{i,j+1}-u_{i,j}) 
++ \frac{\Delta y_j}{\Delta y_{j-1}}(u_{i,j}-u_{i,j-1})\biggr ],
+~ j=1,...,J-1; \label{syst_spline2}
+\end{eqnarray}
+pour $j=0,J$,   
+\begin{eqnarray}
+\lefteqn{\Delta x_{i-1}s_{i+1,j}+2(\Delta x_{i-1}+\Delta x_i)s_{ij} 
++ \Delta x_i s_{i-1,j} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta x_{i-1}}{\Delta x_i}(q_{i+1,j}-q_{i,j}) 
++ \frac{\Delta x_i}{\Delta x_{i-1}}(q_{i,j}-q_{i-1,j})\biggr ],
+~ i=1,...,I-1; \label{syst_spline3}
+\end{eqnarray}
+pour $i=0,...,I$, 
+\begin{eqnarray}
+\lefteqn{\Delta y_{j-1}s_{i,j+1}+2(\Delta y_{j-1}+\Delta y_j)s_{ij} 
++ \Delta y_j s_{i,j-1} = } \nonumber \\
+&& 3\biggl [ \frac{\Delta y_{j-1}}{\Delta y_j}(p_{i,j+1}-p_{i,j}) 
++ \frac{\Delta y_j}{\Delta y_{j-1}}(p_{i,j}-p_{i,j-1})\biggr ],
+~ j=1,...,J-1; \label{syst_spline4}
+\end{eqnarray}
+\end{lemme}
+
+\subsubsection*{Algorithme d'\'evaluation de $u(x,y)$} 
+
+\begin{description}
+\item[Etape 1] Calculer les valeurs $p_{ij}$, $q_{ij}$ et $s_{ij}$ 
+pour tous les points de la grille gr\^ace aux \'equations 
+pr\'ec\'edentes en utilisant l'\'elimination de Gauss (les matrices 
+des $2I+J-5$ syst\`emes sont tridiagonales et \`a diagonale 
+strictement dominante).
+\item[Etape 2] Une fois que l'on dispose des valeurs $u$, $u_x$, 
+$u_y$ et $u_{xy}$ en tout point de la grille, calculer dans chaque 
+rectangle $R_{ij}$ les coefficients $\gamma_{pq}^{ij}$ de la fonction 
+polynomiale bicubique dans ce rectangle en utilisant (\ref{coeffs}). 
+\end{description}
+Evaluer la fonction d'interpolation en un point $(x,y)$ revient 
+alors \`a trouver les indices $(i,j)$ tels que $(x,y) \in R_{ij}$, 
+puis \`a \'evaluer la fonction polynomiale bicubique correspondante.
+
+\subsection{Application dans l'algorithme de calibration}
+
+Pour r\'esoudre l'EDP de Dupire, il faut conn\^{\i}tre la 
+volatilit\'e $\sigma$ en tout point de la grille fine de 
+diff\'erences finies de taille $N \times M$. La volatilit\'e \'etant 
+d\'efinie comme une spline bicubique sur une grille grossi\`ere de 
+taille $n \times m$, nous proc\'edons de fa\c con suivante pour 
+obtenir la valeur de $\sigma$ en un point quelconque de la grille 
+fine~: 
+\begin{itemize}
+\item on calcule la fonction d'interpolation par spline bicubique sur 
+tout l'espace $[y_{min};y_{max}]\times [t_0;T_{max}]$ \`a partir des 
+degr\'es de libert\'es sur la grille grossi\`ere $n \times m$, en 
+appliquant l'algorithme d\'ecrit pr\'ec\'edemment~;
+\item on \'evalue la fonction d'interpolation au point consid\'er\'e 
+de la grille fine $N \times M$.
+\end{itemize}

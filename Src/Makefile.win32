@@ -1,0 +1,21 @@
+
+# terminer la compilation en creant le dll a la main 
+# creation du dll 
+
+all:  shared-win32 
+
+ARCS=common/.libs/libcommon.a mod/.libs/libmod.a opt/.libs/libopt.a \
+	 ../lib/libpnl.dll -lstdc++  -lm
+
+shared-win32:: $(OBJS1) 
+	gcc -mno-cygwin -shared -o ../lib/libpremia.dll premia_obj.o \
+		-Wl,--export-all-symbols -Wl,--allow-multiple-definition \
+		-Wl,--enable-auto-import -Wl,--whole-archive $(ARCS)  \
+		-Wl,--no-whole-archive -Xlinker --out-implib -Xlinker ../lib/libpremia.dll.a 
+	cp .libs/PremiaTerm.exe ../bin
+
+
+
+
+ 
+
